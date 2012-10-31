@@ -7,7 +7,7 @@ import (
 	"os"
 	"path"
 	"tumblr/circuit/use/anchorfs"
-	_ "tumblr/TUMBLR/load"
+	_ "tumblr/circuit/boot"
 )
 
 var flagFull = flag.Bool("f", true, "Print out full path of files and directories")

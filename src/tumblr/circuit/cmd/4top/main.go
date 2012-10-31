@@ -1,3 +1,4 @@
+// 4top displays real-time vitals (cpu, mem, io) of circuit deployments at various anchor granularities (file, directory, subtree)
 package main
 
 import (
