@@ -21,9 +21,8 @@ import (
 
 
 func init() {
-	parseZookeeperConfig()
-	parseInstallConfig()
-	parseBuildConfig()
+	// Read configuration
+	parse()
 
 	// Seed random number generator
 	rand.Seed(time.Now().UnixNano())
