@@ -87,6 +87,10 @@ func (env Env) Environ() []string {
 	return r
 }
 
+func (env Env) Unset(key string) {
+	delete(env, key)
+}
+
 func (env Env) Get(key string) string {
 	return env[key]
 }
