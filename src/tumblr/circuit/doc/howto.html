@@ -1,0 +1,134 @@
+<html>
+	<head>
+		<title>Circuit language runtime</title>
+		<meta charset="utf-8">
+		<link href="skin/main.css" rel="stylesheet" type="text/css" />
+	</head>
+	<body>
+		<div id="splash">Go Circuit</div>
+
+		<div id="page">
+			<h1>Cookbook recipes</h1>
+
+			<h3>How to turn a regular Go app into a circuit-managed app?</h3>
+
+			<p class="first">As a first order of business: what
+			does it mean to make a standalone app a
+			“circuit-managed” app? This means that you will be able
+			to install, launch, update, log, profile and debug in production, query vitals and monitor the
+			instances of your app, using the facilities provided by
+			the circuit. Even a standalone app &mdash; that does not take
+			advantage of the type-safe, inter-worker communication
+			primitives provided by the circuit &mdash; can benefit
+			tremendously from being managed by the circuit.</p>
+
+			<p>So let's see how this is done. Suppose you've already written a standalone Go app, like so:</p>
+<pre>
+package main
+import …
+…
+func main() {
+	…
+}
+</pre>
+			<ol>
+				<li>Turn your <code>main</code> function into the singleton method of an empty type,
+				and rename your package from <code>main</code> to the name of your app; E.g. rewrite as
+<pre>
+package myapp
+import …
+…
+type Main sturct{}
+func (Main) Main() {
+	…
+}
+</pre>
+				</li>
+				<li>
+				If your <code>main</code> expects any arguments in <code>os.Args</code>, go ahead and put
+				the expected arguments directly into the parameter list of <code>Main</code> with their
+				respective types, e.g.
+<pre>
+func (Main) Main(arg1 int, arg2 []string, argn ...interface{}) {
+	…
+}
+</pre>
+				Note that even variable-length arguments are allowed.
+				</li>
+				<li>
+				Next we need to indicate to the circuit that <code>Main</code> will be invoked remotely.
+				To do so, import the circuit package <code>"tumblr/circuit"</code> and do the registration
+				during the initialization phase. Simply add the following lines to your program:
+<pre>
+import "tumblr/circuit"
+…
+func init() {
+	circuit.RegisterFunc(Main{})
+}
+</pre>
+				</li>
+				<li>You are done!</li>
+			</ol>
+
+			<p>Now that your app is ready, let's see how you would deploy it. Instead of writing your deploy logic
+			using a complicated and concurrency-crippled combination of <code>bash</code>, <code>ssh</code>, and so on,
+			you get to write your deploy script in Go, taking full advantage of its concurrency primitives.</p>
+
+			<p>In the example below, we spawn 10 copies of your app in parallel and we register all of them in the
+			circuit's Anchor File System. This allows you convenient way of browsing through your processes and 
+			perofrming a wide range of operations on them in production:
+<pre>
+package main
+
+import (
+	"…/myapp"                            // The package of your app
+	"tumblr/circuit"
+	"tumblr/circuit/use/n"               // Package n (for network) implements the remote worker spawn operation
+	_ "tumblr/TUMBLR/load"               // This load the Tumblr EWR environment
+)
+
+func main() {
+	ch := make(chan int)
+	for i := 0; i < 10; i++ {
+		go func() {
+			spawnOne()
+			ch <- 1
+		}()
+	}
+	// Wait until all spawned
+	for i := 0; i < 10; i++ {
+		<-ch
+	}
+}
+
+func spawnOne() {
+	// First argument is the host where the worker should be spawned.
+	// Second argument is the directory in the Anchor File System where the worker should register itself
+	proc, err := n.Spawn("hostname", "/myapp")
+	if err != nil {
+		panic(err)
+	}
+	var (
+		arg1 int
+		arg2 []string
+		argn []complex128
+	)
+	circuit.Go(proc.Addr(), myapp.Main{}, arg1, arg2, argn...)
+}
+</pre>
+			<p>After executing your startup script, you can immediately check the state of your workers. For example,
+			using the <code>4ls</code> tool you can list the live workers registered under the anchor <code>/myapp</code>:</p>
+<pre>
+$ 4ls /myapp
+</pre>
+			Or, you can inspect the stack of one of your running workers:
+<pre>
+$ 4stk /myapp/R12345abcdef0
+</pre>
+			<p>And so on and so forth. There is myriad of command-line tools allowing you introspection and control into your
+			running processes. You get all these for free. If you venture a step deeper into the circuit, you would also be
+			able to utilize the monitoring service and automated emails upon error events. This is a topic for another post.</p>
+
+		</div>
+	</body>
+</html>
