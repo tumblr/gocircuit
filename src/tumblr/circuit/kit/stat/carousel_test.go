@@ -25,7 +25,7 @@ func TestCarousel(t *testing.T) {
 	slots, tlast := c.Slots()
 	println("timelast", tlast.UnixNano())
 	for _, slot := range slots {
-		println("slot", slot.Samples(), slot.Max())
+		println("slot", slot.Count(), slot.Max())
 	}
-	println(c.AverageWeight())
+	println(c.Weight())
 }

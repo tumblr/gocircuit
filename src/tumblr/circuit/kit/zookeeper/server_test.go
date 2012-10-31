@@ -5,7 +5,7 @@ import (
 	"flag"
 	"fmt"
 	. "launchpad.net/gocheck"
-	zk "launchpad.net/gozk/zookeeper"
+	zk "tumblr/circuit/kit/zookeeper"
 	"os"
 	"os/exec"
 	"strings"

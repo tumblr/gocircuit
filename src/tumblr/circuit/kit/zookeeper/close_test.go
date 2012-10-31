@@ -3,7 +3,7 @@ package zookeeper_test
 import (
 	"io"
 	. "launchpad.net/gocheck"
-	zk "launchpad.net/gozk/zookeeper"
+	zk "tumblr/circuit/kit/zookeeper"
 	"log"
 	"net"
 	"time"
