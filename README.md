@@ -12,4 +12,4 @@ own AppEngine". Unlike with AppEngine, programming for the circuit is
 considerably more integrated with the Go Language and access to low-level
 machine facilities is exposed to the user.
 
-See the (Go Circuit project page)[http://gocircuit.org] for more details.
+See the [Go Circuit project page](http://gocircuit.org) for more details.
