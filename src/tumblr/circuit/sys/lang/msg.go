@@ -2,7 +2,7 @@ package lang
 
 import (
 	"encoding/gob"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 	"tumblr/circuit/sys/lang/types"
 )
 
@@ -93,7 +93,7 @@ func (*ptrMsg) String() string {
 // ptrPtrMsg carries ...
 type ptrPtrMsg struct {
 	ID  handleID
-	Src lang.Addr
+	Src circuit.Addr
 }
 
 func (*ptrPtrMsg) IsX() {}
@@ -129,7 +129,7 @@ func (*permPtrMsg) String() string {
 type permPtrPtrMsg struct {
 	ID     handleID
 	TypeID types.TypeID
-	Src    lang.Addr
+	Src    circuit.Addr
 }
 
 func (*permPtrPtrMsg) IsX() {}

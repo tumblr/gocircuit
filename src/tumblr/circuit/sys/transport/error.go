@@ -1,12 +1,10 @@
 package transport
 
-import (
-	"tumblr/circuit/use/lang"
-)
+import "tumblr/circuit/use/circuit"
 
 var (
-	ErrEnd            = lang.NewError("end")
-	ErrAlreadyClosed  = lang.NewError("already closed")
-	errCollision      = lang.NewError("conn id collision")
-	ErrNotSupported   = lang.NewError("not supported")
+	ErrEnd            = circuit.NewError("end")
+	ErrAlreadyClosed  = circuit.NewError("already closed")
+	errCollision      = circuit.NewError("conn id collision")
+	ErrNotSupported   = circuit.NewError("not supported")
 )

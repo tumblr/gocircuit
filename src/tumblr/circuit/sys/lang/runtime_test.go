@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"testing"
 	"time"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 	"tumblr/circuit/sys/lang/types"
 )
 
@@ -18,8 +18,8 @@ func (x *testBoot) NewGreeter() interface{} {
 	return Ref(&testGreeter{})
 }
 
-func (x *testBoot) UseGreeter(g lang.X) string {
-	return g.(lang.X).Call("String")[0].(string)
+func (x *testBoot) UseGreeter(g circuit.X) string {
+	return g.(circuit.X).Call("String")[0].(string)
 }
 
 func (x *testBoot) Name() string {
@@ -75,7 +75,7 @@ func TestX(t *testing.T) {
 
 func TestRe(t *testing.T) {
 	r := make([]*Runtime, 3)
-	l := make([]lang.Transport, len(r))
+	l := make([]circuit.Transport, len(r))
 	for i := 0; i < len(r); i++ {
 		l[i] = NewSandbox()
 		r[i] = New(l[i])
@@ -90,7 +90,7 @@ func TestRe(t *testing.T) {
 	}
 	
 	// R1 gets an ptr to a new greeter residing on R0
-	g0 := r1b0.Call("NewGreeter")[0].(lang.X)
+	g0 := r1b0.Call("NewGreeter")[0].(circuit.X)
 	
 	// R1 gets boot value of R2
 	r1b2, err := r[1].TryDial(l[2].Addr(), "test")

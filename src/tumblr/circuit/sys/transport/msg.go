@@ -2,7 +2,7 @@ package transport
 
 import (
 	"encoding/gob"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 )
 
 func init() {
@@ -23,7 +23,7 @@ type linkMsg struct {
 }
 
 type welcomeMsg struct {
-	ID  lang.RuntimeID   // Runtime ID of sender
+	ID  circuit.RuntimeID   // Runtime ID of sender
 	PID int              // Process ID of sender runtime
 }
 

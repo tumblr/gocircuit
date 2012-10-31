@@ -3,10 +3,10 @@ package lang
 import (
 	"log"
 	"strings"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 )
 
-func (r *Runtime) serveDropPtr(q *dropPtrMsg, conn lang.Conn) {
+func (r *Runtime) serveDropPtr(q *dropPtrMsg, conn circuit.Conn) {
 	// Go guarantees the defer runs even if panic occurs
 	defer conn.Close()
 
@@ -60,7 +60,7 @@ func (u *_ptr) Call(proc string, in ...interface{}) []interface{} {
 	return out
 }
 
-func (r *Runtime) serveCall(req *callMsg, conn lang.Conn) {
+func (r *Runtime) serveCall(req *callMsg, conn circuit.Conn) {
 	// Go guarantees the defer runs even if panic occurs
 	defer conn.Close()
 

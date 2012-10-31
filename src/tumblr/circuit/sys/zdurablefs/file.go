@@ -6,7 +6,7 @@ import (
 	"encoding/gob"
 	"path"
 	"sync"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 	"tumblr/circuit/kit/zookeeper"
 	"tumblr/circuit/kit/zookeeper/zutil"
 	"tumblr/circuit/use/durablefs"
@@ -58,7 +58,7 @@ func (file *File) Write(val ...interface{}) error {
 		file.wbuf = &bytes.Buffer{}
 		file.enc = gob.NewEncoder(file.wbuf)
 	}
-	err := file.enc.Encode(&block{Payload: lang.Export(val...)})
+	err := file.enc.Encode(&block{Payload: circuit.Export(val...)})
 	if err != nil {
 		file.wbuf = nil
 		file.enc = nil
@@ -75,13 +75,13 @@ func (file *File) Read() ([]interface{}, error) {
 		return nil, err
 	}
 	if b.Payload == nil {
-		return nil, lang.NewError("block without payload")
+		return nil, circuit.NewError("block without payload")
 	}
-	val, _, err := lang.Import(b.Payload)
+	val, _, err := circuit.Import(b.Payload)
 	return val, err
 }
 
-func (file *File) Addr() lang.Addr {
+func (file *File) Addr() circuit.Addr {
 	return stringAddr{file.zroot + ":" + file.fpath}
 }
 
@@ -104,7 +104,7 @@ func (file *File) Close() error {
 	return nil
 }
 
-// stringAddr implements lang.Addr
+// stringAddr implements circuit.Addr
 type stringAddr struct {
 	Addr string
 }
@@ -113,6 +113,6 @@ func (sa stringAddr) String() string {
 	return sa.Addr
 }
 
-func (sa stringAddr) RuntimeID() lang.RuntimeID {
+func (sa stringAddr) RuntimeID() circuit.RuntimeID {
 	return 0
 }

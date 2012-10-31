@@ -1,4 +1,4 @@
-package lang
+package circuit
 
 type runtime interface {
 	XAddr() Addr

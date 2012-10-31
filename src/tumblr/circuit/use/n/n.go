@@ -3,12 +3,12 @@ package n
 import (
 	"io"
 	"tumblr/circuit/kit/join"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 )
 
 type Process interface {
 	Console
-	Addr() lang.Addr
+	Addr() circuit.Addr
 	Kill() error
 }
 
@@ -20,17 +20,17 @@ type Console interface {
 
 // Process is a usually remote OS process of a circuit runtime.
 
-func Spawn(host lang.Host, anchors ...string) (Process, error) {
+func Spawn(host circuit.Host, anchors ...string) (Process, error) {
 	return get().Spawn(host, anchors...)
 }
 
-func Kill(addr lang.Addr) error {
+func Kill(addr circuit.Addr) error {
 	return get().Kill(addr)
 }
 
 type Commander interface {
-	Spawn(lang.Host, ...string) (Process, error)
-	Kill(lang.Addr) error
+	Spawn(circuit.Host, ...string) (Process, error)
+	Kill(circuit.Addr) error
 }
 
 // Binding mechanism

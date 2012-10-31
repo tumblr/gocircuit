@@ -5,7 +5,7 @@ import (
 	"encoding/gob"
 	"path"
 	"sync"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 	"tumblr/circuit/kit/zookeeper"
 	"tumblr/circuit/kit/zookeeper/zutil"
 	"tumblr/circuit/use/anchorfs"
@@ -30,10 +30,10 @@ func New(zookeeper *zookeeper.Conn, root string) *FS {
 }
 
 type ZFile struct {
-	Addr lang.Addr
+	Addr circuit.Addr
 }
 
-func (fs *FS) CreateFile(anchor string, owner lang.Addr) error {
+func (fs *FS) CreateFile(anchor string, owner circuit.Addr) error {
 	// Probably should save addr using durable-like techniques
 	var w bytes.Buffer
 	if err := gob.NewEncoder(&w).Encode(&ZFile{owner}); err != nil {
@@ -103,7 +103,7 @@ func (fs *FS) OpenDir(anchor string) (anchorfs.Dir, error) {
 
 func (fs *FS) OpenFile(anchor string) (anchorfs.File, error) {
 	ad, af := path.Split(anchor)
-	id, err := lang.ParseRuntimeID(af)
+	id, err := circuit.ParseRuntimeID(af)
 	if err != nil {
 		return nil, err
 	}

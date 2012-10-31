@@ -13,7 +13,7 @@ import (
 	"tumblr/circuit/use/anchorfs"
 	"tumblr/circuit/use/durablefs"
 	"tumblr/circuit/use/issuefs"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 	un "tumblr/circuit/use/n"
 	
 	// _ "tumblr/TUMBLR/app" // Registers all apps used by the environment
@@ -43,10 +43,10 @@ func init() {
 	un.Bind(sn.New(Install.LibPath, Install.Binary, Install.JailDir()))
 }
 
-func NewHost(h string) lang.Host {
+func NewHost(h string) circuit.Host {
 	return sn.NewHost(h)
 }
 
-func NewTransport(id lang.RuntimeID, addr, host string) lang.Transport {
+func NewTransport(id circuit.RuntimeID, addr, host string) circuit.Transport {
 	return transport.New(id, addr, host)
 }

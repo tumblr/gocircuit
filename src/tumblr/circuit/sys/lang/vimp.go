@@ -3,17 +3,17 @@ package lang
 import (
 	"reflect"
 	"sync"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 )
 
 type importGroup struct {
 	AllowPP bool	// Allow import of re-exported values (PtrPtr)
-	ConnPP  lang.Conn	// If non-nil, acknowledge receipt of Ptr for each PtrPtr
+	ConnPP  circuit.Conn	// If non-nil, acknowledge receipt of Ptr for each PtrPtr
 	sync.Mutex
 	Err     error
 }
 
-func (r *Runtime) importValues(values []interface{}, types []reflect.Type, exporter lang.Addr, allowPP bool, connPP lang.Conn) ([]interface{}, error) {
+func (r *Runtime) importValues(values []interface{}, types []reflect.Type, exporter circuit.Addr, allowPP bool, connPP circuit.Conn) ([]interface{}, error) {
 	ig := &importGroup{
 		AllowPP: allowPP,
 		ConnPP:  connPP,
@@ -28,7 +28,7 @@ func (r *Runtime) importValues(values []interface{}, types []reflect.Type, expor
 	return unflattenSlice(rewritten, types), ig.Err
 }
 
-func (r *Runtime) importRewrite(src, dst reflect.Value, exporter lang.Addr, ig *importGroup) bool {
+func (r *Runtime) importRewrite(src, dst reflect.Value, exporter circuit.Addr, ig *importGroup) bool {
 	switch v := src.Interface().(type) {
 
 	case *ptrMsg:

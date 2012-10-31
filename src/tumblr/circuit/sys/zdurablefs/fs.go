@@ -2,12 +2,12 @@ package zdurablefs
 
 import (
 	"path"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 	"tumblr/circuit/kit/zookeeper"
 )
 
 var (
-	ErrClosed  = lang.NewError("closed")
+	ErrClosed  = circuit.NewError("closed")
 )
 
 // FS implements a durable file system on top of Zookeeper

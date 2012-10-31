@@ -13,10 +13,10 @@ import (
 	"time"
 	"tumblr/circuit/kit/debug"
 	"tumblr/circuit/kit/lockfile"
-	slang "tumblr/circuit/sys/lang"
+	"tumblr/circuit/sys/lang"
 	"tumblr/circuit/sys/transport"
 	"tumblr/circuit/use/anchorfs"
-	ulang "tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 )
 
 func usage() {
@@ -24,7 +24,7 @@ func usage() {
 	os.Exit(1)
 }
 
-type NewTransportFunc func(id ulang.RuntimeID, addr, host string) ulang.Transport
+type NewTransportFunc func(id circuit.RuntimeID, addr, host string) circuit.Transport
 
 // Main is the 'func main' of a circuit binary that can spawn a circuit runtime
 // and report back its address.
@@ -109,10 +109,10 @@ func run(newTransport NewTransportFunc, addr, id, magic, host string) {
 	pie2(lockfile.Create("lock"))
 
 	// Start runtime
-	id_, err := ulang.ParseRuntimeID(id)
+	id_, err := circuit.ParseRuntimeID(id)
 	pie(err)
 	t := newTransport(id_, addr, host)
-	ulang.Bind(slang.New(t))
+	circuit.Bind(lang.New(t))
 
 	// Create anchors
 	for _, a := range anchor {
@@ -133,7 +133,7 @@ func run(newTransport NewTransportFunc, addr, id, magic, host string) {
 func daemonize(addr, id, jaildir, host string) {
 
 	// Make jail directory
-	id_ := ulang.ParseOrHashRuntimeID(id)
+	id_ := circuit.ParseOrHashRuntimeID(id)
 	jail := path.Join(jaildir, id_.String())
 	pie(os.MkdirAll(jail, 0700))
 

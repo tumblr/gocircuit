@@ -9,7 +9,7 @@ import (
 	"path"
 	"sync"
 	"time"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 	"tumblr/circuit/kit/sched/limiter"
 	"tumblr/circuit/kit/zookeeper"
 	"tumblr/circuit/kit/zookeeper/zutil"
@@ -32,7 +32,7 @@ func New(z *zookeeper.Conn, root string) *FS {
 	return &FS{z: z, root: root}
 }
 
-func (fs *FS) Add(msg string/*, affected lang.Addr*/) int64 {
+func (fs *FS) Add(msg string/*, affected circuit.Addr*/) int64 {
 	fs.Lock()
 	defer fs.Unlock()
 
@@ -40,7 +40,7 @@ func (fs *FS) Add(msg string/*, affected lang.Addr*/) int64 {
 	issue := &issuefs.Issue{
 		ID:       issuefs.ChooseID(),
 		Time:     time.Now(),
-		Reporter: lang.XAddr(),
+		Reporter: circuit.XAddr(),
 		//Affected: affected,
 		Anchor:   anchorfs.Created(),
 		Msg:      msg,

@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 	"tumblr/circuit/sys/transport"
 	"tumblr/circuit/use/n"
 )
@@ -21,7 +21,7 @@ type Host struct {
 	Host string
 }
 
-func NewHost(host string) lang.Host {
+func NewHost(host string) circuit.Host {
 	return &Host{host}
 }
 
@@ -43,7 +43,7 @@ func New(libpath, binary, jaildir string) *Config {
 	}
 }
 
-func (c *Config) Spawn(host lang.Host, anchors ...string) (n.Process, error) {
+func (c *Config) Spawn(host circuit.Host, anchors ...string) (n.Process, error) {
 
 	h := host.(*Host).Host
 	cmd := exec.Command("ssh", h, "sh")
@@ -65,7 +65,7 @@ func (c *Config) Spawn(host lang.Host, anchors ...string) (n.Process, error) {
 	defer cmd.Wait() /// Make sure that ssh does not remain zombie
 
 	// Feed stdin to shell
-	id := lang.ChooseRuntimeID()
+	id := circuit.ChooseRuntimeID()
 
 	ss := fmt.Sprintf(
 		"LD_LIBRARY_PATH=%s DYLD_LIBRARY_PATH=%s %s daemonize '%s' '%s' '%s' '%s'\n", 
@@ -127,11 +127,11 @@ func (c *Config) Spawn(host lang.Host, anchors ...string) (n.Process, error) {
 	}, nil
 }
 
-func (c *Config) Kill(remote lang.Addr) error {
+func (c *Config) Kill(remote circuit.Addr) error {
 	return kill(remote)
 }
 
-func kill(remote lang.Addr) error {
+func kill(remote circuit.Addr) error {
 	a := remote.(*transport.Addr)
 	cmd := exec.Command("ssh", a.Addr.IP.String(), "sh")
 

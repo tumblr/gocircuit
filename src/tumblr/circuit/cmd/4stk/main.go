@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"tumblr/circuit"
+	_ "tumblr/circuit/boot"
 	"tumblr/circuit/use/anchorfs"
-	_ "tumblr/TUMBLR/load"
+	"tumblr/circuit/use/circuit"
 )
 
 func main() {

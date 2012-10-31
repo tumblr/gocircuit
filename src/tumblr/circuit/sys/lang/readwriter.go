@@ -5,10 +5,10 @@ import (
 	"encoding/gob"
 	"io"
 	"sync"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 )
 
-func NewBytesConn(addr string) lang.Conn {
+func NewBytesConn(addr string) circuit.Conn {
 	var b bytes.Buffer
 	return ReadWriterConn(stringAddr(addr), nopCloser{&b})
 }
@@ -23,7 +23,7 @@ func (nc nopCloser) Close() error {
 
 type stringAddr string
 
-func (a stringAddr) RuntimeID() lang.RuntimeID {
+func (a stringAddr) RuntimeID() circuit.RuntimeID {
 	return 0
 }
 
@@ -32,7 +32,7 @@ func (a stringAddr) String() string {
 }
 
 // ReadWriterConn converts an io.ReadWriteClosert into a Conn
-func ReadWriterConn(addr lang.Addr, rwc io.ReadWriteCloser) lang.Conn {
+func ReadWriterConn(addr circuit.Addr, rwc io.ReadWriteCloser) circuit.Conn {
 	return &readWriterConn{
 		addr: addr,
 		rwc:  rwc,
@@ -42,7 +42,7 @@ func ReadWriterConn(addr lang.Addr, rwc io.ReadWriteCloser) lang.Conn {
 }
 
 type readWriterConn struct {
-	addr lang.Addr
+	addr circuit.Addr
 	sync.Mutex
 	rwc io.ReadWriteCloser
 	enc *gob.Encoder
@@ -76,6 +76,6 @@ func (conn *readWriterConn) Close() error {
 	return conn.rwc.Close()
 }
 
-func (conn *readWriterConn) Addr() lang.Addr {
+func (conn *readWriterConn) Addr() circuit.Addr {
 	return conn.addr
 }

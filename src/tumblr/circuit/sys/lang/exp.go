@@ -5,7 +5,7 @@ import (
 	"math/rand"
 	"reflect"
 	"sync"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 	"tumblr/circuit/sys/lang/types"
 )
 
@@ -28,13 +28,13 @@ type expTabl struct {
 	lk      sync.Mutex
 	id      map[handleID]*expHandle
 	perm    map[interface{}]*expHandle
-	nonperm map[lang.Addr]map[interface{}]*expHandle
+	nonperm map[circuit.Addr]map[interface{}]*expHandle
 }
 
 // expHandle holds the underlying local value of an exported handle
 type expHandle struct {
 	ID       handleID
-	Importer lang.Addr
+	Importer circuit.Addr
 	Value    reflect.Value     // receiver of methods
 	Type     *types.TypeChar
 }
@@ -44,11 +44,11 @@ func makeExpTabl(tt *types.TypeTabl) *expTabl {
 		tt:      tt,
 		id:      make(map[handleID]*expHandle),
 		perm:    make(map[interface{}]*expHandle),
-		nonperm: make(map[lang.Addr]map[interface{}]*expHandle),
+		nonperm: make(map[circuit.Addr]map[interface{}]*expHandle),
 	}
 }
 
-func (exp *expTabl) Add(receiver interface{}, importer lang.Addr) *expHandle {
+func (exp *expTabl) Add(receiver interface{}, importer circuit.Addr) *expHandle {
 	if receiver == nil {
 		panic("bug: nil receiver in export")
 	}
@@ -120,7 +120,7 @@ func (exp *expTabl) Lookup(id handleID) *expHandle {
 // Remove removes the exported value with handle id from the table, if present.
 // If present, a check is performed that importer is the same one, registered 
 // with the table. If not, an error is returned.
-func (exp *expTabl) Remove(id handleID, importer lang.Addr) {
+func (exp *expTabl) Remove(id handleID, importer circuit.Addr) {
 	if importer == nil {
 		panic("cannot remove perm handles from exp")
 	}
@@ -147,7 +147,7 @@ func (exp *expTabl) Remove(id handleID, importer lang.Addr) {
 	}
 }
 
-func (exp *expTabl) RemoveImporter(importer lang.Addr) {
+func (exp *expTabl) RemoveImporter(importer circuit.Addr) {
 	if importer == nil {
 		panic("nil importer")
 	}

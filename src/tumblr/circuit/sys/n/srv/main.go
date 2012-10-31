@@ -1,7 +1,7 @@
 package main
 
 import (
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 	"tumblr/circuit/sys/n/trojan"
 	"tumblr/circuit/sys/transport"
 )

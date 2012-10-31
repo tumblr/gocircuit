@@ -2,10 +2,10 @@ package lang
 
 import (
 	"strings"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 )
 
-func (r *Runtime) callGetPtr(srcID handleID, exporter lang.Addr) (lang.X, error) {
+func (r *Runtime) callGetPtr(srcID handleID, exporter circuit.Addr) (circuit.X, error) {
 	conn, err := r.dialer.Dial(exporter)
 	if err != nil {
 		return nil, err
@@ -20,7 +20,7 @@ func (r *Runtime) callGetPtr(srcID handleID, exporter lang.Addr) (lang.X, error)
 	return r.importEitherPtr(rvmsg, exporter)
 }
 
-func (r *Runtime) serveGetPtr(req *getPtrMsg, conn lang.Conn) {
+func (r *Runtime) serveGetPtr(req *getPtrMsg, conn circuit.Conn) {
 	defer conn.Close()
 
 	h := r.exp.Lookup(req.ID)
@@ -37,7 +37,7 @@ func (r *Runtime) serveGetPtr(req *getPtrMsg, conn lang.Conn) {
 	conn.Write(&returnMsg{Out: expReply})
 }
 
-func (r *Runtime) readGotPtrPtr(ptrPtr []*ptrPtrMsg, conn lang.Conn) error {
+func (r *Runtime) readGotPtrPtr(ptrPtr []*ptrPtrMsg, conn circuit.Conn) error {
 	p := make(map[handleID]struct{})
 	for _, pp := range ptrPtr {
 		p[pp.ID] = struct{}{}

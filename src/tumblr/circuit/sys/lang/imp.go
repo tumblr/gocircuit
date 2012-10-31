@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"runtime"
 	"sync"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 	"tumblr/circuit/sys/lang/types"
 )
 
@@ -19,7 +19,7 @@ type impTabl struct {
 type impHandle struct {
 	Perm     bool
 	ID       handleID
-	Exporter lang.Addr
+	Exporter circuit.Addr
 	Type     *types.TypeChar
 
 	// Garbage collection
@@ -101,7 +101,7 @@ var ErrTypeID = NewError("importing handle with unregistered type")
 // Add adds a new handle to the table.
 // It returns an error ErrTypeID if the handle has a type ID that is not
 // registered with the local type table.
-func (imp *impTabl) Add(id handleID, typeID types.TypeID, exporter lang.Addr, perm bool) (*impHandle, error) {
+func (imp *impTabl) Add(id handleID, typeID types.TypeID, exporter circuit.Addr, perm bool) (*impHandle, error) {
 	imp.lk.Lock()
 	defer imp.lk.Unlock()
 

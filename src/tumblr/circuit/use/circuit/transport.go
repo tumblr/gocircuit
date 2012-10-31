@@ -1,4 +1,4 @@
-package lang
+package circuit
 
 // Addr is a unique representation of the identity of a remote runtime.
 // The implementing type must be registered with gob.

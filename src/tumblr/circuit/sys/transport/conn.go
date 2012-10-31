@@ -3,7 +3,7 @@ package transport
 import (
 	"math/rand"
 	"sync"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 )
 
 // Within a TCP connection, the connID distinguishes a unique logical session
@@ -13,7 +13,7 @@ func chooseConnID() connID {
 	return connID(rand.Int31())
 }
 
-// conn implements lang.Conn
+// conn implements circuit.Conn
 type conn struct {
 	id   connID
 	addr *Addr
@@ -71,6 +71,6 @@ func (c *conn) Close() error {
 	return nil
 }
 
-func (c *conn) Addr() lang.Addr {
+func (c *conn) Addr() circuit.Addr {
 	return c.addr
 }

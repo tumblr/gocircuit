@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 	"sync"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 )
 
 // gobConn keeps a Conn instance together with its gob codecs
@@ -26,9 +26,9 @@ func newGobConn(c net.Conn) *gobConn {
 }
 
 // Transport ..
-// Transport implements lang.Transport, lang.Dialer and lang.Listener
+// Transport implements circuit.Transport, circuit.Dialer and circuit.Listener
 type Transport struct {
-	self       lang.Addr
+	self       circuit.Addr
 	bind       *Addr
 	listener   *net.TCPListener
 	addrtabl   *addrTabl
@@ -37,18 +37,18 @@ type Transport struct {
 	pipelining int  
 
 	lk         sync.Mutex
-	remote     map[lang.RuntimeID]*link
+	remote     map[circuit.RuntimeID]*link
 
 	ach        chan *conn
 }
 
-func NewClient(id lang.RuntimeID) *Transport {
+func NewClient(id circuit.RuntimeID) *Transport {
 	return New(id, "", "localhost")
 }
 
 const DefaultPipelining = 333
 
-func New(id lang.RuntimeID, bindAddr string, host string) *Transport {
+func New(id circuit.RuntimeID, bindAddr string, host string) *Transport {
 
 	// Bind
 	var l *net.TCPListener
@@ -66,7 +66,7 @@ func New(id lang.RuntimeID, bindAddr string, host string) *Transport {
 		listener:   l,
 		addrtabl:   makeAddrTabl(),
 		pipelining: DefaultPipelining,
-		remote:     make(map[lang.RuntimeID]*link),
+		remote:     make(map[circuit.RuntimeID]*link),
 		ach:        make(chan *conn),
 	}
 
@@ -88,11 +88,11 @@ func (t *Transport) Port() int {
 	return t.bind.Addr.Port
 }
 
-func (t *Transport) Addr() lang.Addr {
+func (t *Transport) Addr() circuit.Addr {
 	return t.self
 }
 
-func (t *Transport) Accept() lang.Conn {
+func (t *Transport) Accept() circuit.Conn {
 	return <-t.ach
 }
 
@@ -106,7 +106,7 @@ func (t *Transport) loop() {
 	}
 }
 
-func (t *Transport) Dial(a lang.Addr) (lang.Conn, error) {
+func (t *Transport) Dial(a circuit.Addr) (circuit.Conn, error) {
 	a_ := a.(*Addr)
 	t.lk.Lock()
 	l, ok := t.remote[a_.ID]
@@ -134,7 +134,7 @@ func (t *Transport) dialLink(a *Addr) (*link, error) {
 	return l, nil
 }
 
-func (t *Transport) drop(id lang.RuntimeID) {
+func (t *Transport) drop(id circuit.RuntimeID) {
 	t.lk.Lock()
 	delete(t.remote, id)
 	t.lk.Unlock()
@@ -180,11 +180,11 @@ func (t *Transport) link(c *net.TCPConn) (*link, error) {
 	return l, nil
 }
 
-func (t *Transport) Dialer() lang.Dialer { 
+func (t *Transport) Dialer() circuit.Dialer { 
 	return t 
 }
 
-func (t *Transport) Listener() lang.Listener { 
+func (t *Transport) Listener() circuit.Listener { 
 	return t 
 }
 

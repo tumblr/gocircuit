@@ -1,4 +1,4 @@
-package lang
+package circuit
 
 // X is a local proxy to a Go value residing on a remote runtime.
 // It stands for cross-runtime (X) pointer (Ptr).

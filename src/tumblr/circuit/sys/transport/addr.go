@@ -4,13 +4,13 @@ import (
 	"encoding/gob"
 	"net"
 	"sync"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 )
 
 // Addr maintains a single unique instance for each addr.
-// Addr object uniqueness is required by the lang.Addr interface.
+// Addr object uniqueness is required by the circuit.Addr interface.
 type Addr struct {
-	ID   lang.RuntimeID
+	ID   circuit.RuntimeID
 	PID  int
 	Addr *net.TCPAddr
 }
@@ -19,7 +19,7 @@ func init() {
 	gob.Register(&Addr{})
 }
 
-func NewAddr(id lang.RuntimeID, pid int, hostport string) (lang.Addr, error) {
+func NewAddr(id circuit.RuntimeID, pid int, hostport string) (circuit.Addr, error) {
 	a, err := net.ResolveTCPAddr("tcp", hostport)
 	if err != nil {
 		return nil, err
@@ -35,17 +35,17 @@ func (a *Addr) String() string {
 	return a.ID.String() + "@" + a.Addr.String()
 }
 
-func (a *Addr) RuntimeID() lang.RuntimeID {
+func (a *Addr) RuntimeID() circuit.RuntimeID {
 	return a.ID
 }
 
 type addrTabl struct {
 	lk   sync.Mutex
-	tabl map[lang.RuntimeID]*Addr
+	tabl map[circuit.RuntimeID]*Addr
 }
 
 func makeAddrTabl() *addrTabl {
-	return &addrTabl{tabl: make(map[lang.RuntimeID]*Addr)}
+	return &addrTabl{tabl: make(map[circuit.RuntimeID]*Addr)}
 }
 
 func (t *addrTabl) Normalize(addr *Addr) *Addr {

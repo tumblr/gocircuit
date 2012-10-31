@@ -4,7 +4,7 @@ package lang
 
 	FORKING A GO ROUTINE ON A REMOTE RUNTIME
 
-		import . "tumblr/circuit/use/lang"
+		import . "tumblr/circuit/use/circuit"
 
 		type MyFunc struct{}
 		func (MyFunc) AnyName(anyArg anyType) (anyReturn anyType) {

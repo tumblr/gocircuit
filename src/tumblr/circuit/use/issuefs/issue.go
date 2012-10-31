@@ -7,14 +7,14 @@ import (
 	"strconv"
 	"time"
 	"tumblr/circuit/kit/join"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 )
 
 type Issue struct {
 	ID       int64
 	Time     time.Time
-	Reporter lang.Addr
-	Affected lang.Addr
+	Reporter circuit.Addr
+	Affected circuit.Addr
 	Anchor   []string
 	Msg      string
 }

@@ -5,7 +5,7 @@ import (
 	"log"
 	"runtime/pprof"
 	"time"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 )
 
 type acid struct{}
@@ -23,7 +23,7 @@ func (s *acid) Ping() {}
 func (s *acid) RuntimeProfile(name string, debug int) ([]byte, error) {
 	prof := pprof.Lookup(name)
 	if prof == nil {
-		return nil, lang.NewError("no such profile")
+		return nil, circuit.NewError("no such profile")
 	}
 	var w bytes.Buffer
 	if err := prof.WriteTo(&w, debug); err != nil {
@@ -34,7 +34,7 @@ func (s *acid) RuntimeProfile(name string, debug int) ([]byte, error) {
 
 func (s *acid) CPUProfile(duration time.Duration) ([]byte, error) {
 	if duration > time.Hour {
-		return nil, lang.NewError("cpu profile duration exceeds 1 hour")
+		return nil, circuit.NewError("cpu profile duration exceeds 1 hour")
 	}
 	var w bytes.Buffer
 	if err := pprof.StartCPUProfile(&w); err != nil {

@@ -1,7 +1,7 @@
 package lang
 
 import (
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 	"tumblr/circuit/sys/lang/types"
 )
 
@@ -12,7 +12,7 @@ func (r *Runtime) Listen(service string, receiver interface{}) {
 
 // Dial returns an ptr to the permanent xvalue of the addressed remote runtime.
 // It panics if any errors get in the way.
-func (r *Runtime) Dial(addr lang.Addr, service string) lang.X {
+func (r *Runtime) Dial(addr circuit.Addr, service string) circuit.X {
 	ptr, err := r.TryDial(addr, service)
 	if err != nil {
 		panic(err)
@@ -21,7 +21,7 @@ func (r *Runtime) Dial(addr lang.Addr, service string) lang.X {
 }
 
 // TryDial returns an ptr to the permanent xvalue of the addressed remote runtime
-func (r *Runtime) TryDial(addr lang.Addr, service string) (lang.X, error) {
+func (r *Runtime) TryDial(addr circuit.Addr, service string) (circuit.X, error) {
 	conn, err := r.dialer.Dial(addr)
 	if err != nil {
 		return nil, err
@@ -36,7 +36,7 @@ func (r *Runtime) TryDial(addr lang.Addr, service string) (lang.X, error) {
 	return r.importEitherPtr(retrn, addr)
 }
 
-func (r *Runtime) serveDial(req *dialMsg, conn lang.Conn) {
+func (r *Runtime) serveDial(req *dialMsg, conn circuit.Conn) {
 	// Go guarantees the defer runs even if panic occurs
 	defer conn.Close()
 
@@ -47,7 +47,7 @@ func (r *Runtime) serveDial(req *dialMsg, conn lang.Conn) {
 
 // Utils
 
-func writeReturn(conn lang.Conn, msg interface{}) ([]interface{}, error) {
+func writeReturn(conn circuit.Conn, msg interface{}) ([]interface{}, error) {
 	if err := conn.Write(msg); err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func writeReturn(conn lang.Conn, msg interface{}) ([]interface{}, error) {
 	return retrn.Out, nil
 }
 
-func (r *Runtime) importEitherPtr(retrn []interface{}, exporter lang.Addr) (lang.X, error) {
+func (r *Runtime) importEitherPtr(retrn []interface{}, exporter circuit.Addr) (circuit.X, error) {
 	out, err := r.importValues(retrn, nil, exporter, false, nil)
 	if err != nil {
 		return nil, err
@@ -76,7 +76,7 @@ func (r *Runtime) importEitherPtr(retrn []interface{}, exporter lang.Addr) (lang
 	if out[0] == nil {
 		return nil, nil
 	}
-	ptr, ok := out[0].(lang.X)
+	ptr, ok := out[0].(circuit.X)
 	if !ok {
 		return nil, NewError("foreign reply value")
 	}

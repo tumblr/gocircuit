@@ -1,4 +1,4 @@
-package lang
+package circuit
 
 import (
 	"tumblr/circuit/kit/join"

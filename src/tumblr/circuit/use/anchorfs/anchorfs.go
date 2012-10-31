@@ -4,17 +4,17 @@ import (
 	"path"
 	"strings"
 	"time"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 )
 
 var (
-	ErrName     = lang.NewError("anchor name")
-	ErrNotFound = lang.NewError("not found")
+	ErrName     = circuit.NewError("anchor name")
+	ErrNotFound = circuit.NewError("not found")
 )
 
 // fs represents an anchor file system
 type fs interface {
-	CreateFile(string, lang.Addr) error
+	CreateFile(string, circuit.Addr) error
 	OpenFile(string) (File, error)
 	OpenDir(string) (Dir, error)
 	Created() []string
@@ -25,17 +25,17 @@ type Dir interface {
 	Name() string
 	Dirs() ([]string, error)
 
-	Files()                                            (rev int64, workers map[lang.RuntimeID]File, err error)
-	Change(sinceRev int64)                             (rev int64, workers map[lang.RuntimeID]File, err error)
-	ChangeExpire(sinceRev int64, expire time.Duration) (rev int64, workers map[lang.RuntimeID]File, err error)
+	Files()                                            (rev int64, workers map[circuit.RuntimeID]File, err error)
+	Change(sinceRev int64)                             (rev int64, workers map[circuit.RuntimeID]File, err error)
+	ChangeExpire(sinceRev int64, expire time.Duration) (rev int64, workers map[circuit.RuntimeID]File, err error)
 
-	OpenFile(lang.RuntimeID) (File, error)
+	OpenFile(circuit.RuntimeID) (File, error)
 	OpenDir(string) (Dir, error)
 }
 
 // File ...
 type File interface {
-	Owner() lang.Addr
+	Owner() circuit.Addr
 }
 
 // Sanitizer ensures that anchor is a valid anchor path in the fs
@@ -47,7 +47,7 @@ func Sanitize(anchor string) ([]string, string, error) {
 	}
 	parts := strings.Split(anchor[1:], "/")
 	for _, part := range parts {
-		if _, err := lang.ParseRuntimeID(part); err == nil {
+		if _, err := circuit.ParseRuntimeID(part); err == nil {
 			return nil, "", ErrName
 		}
 	}

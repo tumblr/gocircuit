@@ -3,7 +3,7 @@ package lang
 import (
 	"log"
 	"sync"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 	"tumblr/circuit/sys/lang/prof"
 	"tumblr/circuit/sys/lang/types"
 )
@@ -11,14 +11,14 @@ import (
 // Runtime represents that state of the circuit program at the present moment.
 // This state can change in two ways: by a 'linguistic' action ...
 type Runtime struct {
-	dialer  lang.Transport
+	dialer  circuit.Transport
 	exp     *expTabl
 	imp     *impTabl
 	srv     srvTabl
 	blk     sync.Mutex
 	boot    interface{}
 	lk      sync.Mutex
-	live    map[lang.Addr]struct{}  // Set of peers we monitor for liveness
+	live    map[circuit.Addr]struct{}  // Set of peers we monitor for liveness
 	prof    *prof.Profile
 
 	dlk     sync.Mutex
@@ -26,12 +26,12 @@ type Runtime struct {
 	daemon  bool
 }
 
-func New(t lang.Transport) *Runtime {
+func New(t circuit.Transport) *Runtime {
 	r := &Runtime{
 		dialer: t,
 		exp:    makeExpTabl(types.ValueTabl),
 		imp:    makeImpTabl(types.ValueTabl),
-		live:   make(map[lang.Addr]struct{}),
+		live:   make(map[circuit.Addr]struct{}),
 		prof:   prof.New(),
 	}
 	r.srv.Init()
@@ -44,7 +44,7 @@ func New(t lang.Transport) *Runtime {
 	return r
 }
 
-func (r *Runtime) XAddr() lang.Addr {
+func (r *Runtime) XAddr() circuit.Addr {
 	return r.dialer.Addr()
 }
 
@@ -57,7 +57,7 @@ func (r *Runtime) SetBoot(v interface{}) {
 	r.boot = v
 }
 
-func (r *Runtime) accept(l lang.Listener) {
+func (r *Runtime) accept(l circuit.Listener) {
 	conn := l.Accept()
 	req, err := conn.Read()
 	if err != nil {
@@ -68,7 +68,7 @@ func (r *Runtime) accept(l lang.Listener) {
 	go func() {
 		// Importing reptr variables involves waiting on other runtimes,
 		// we fork request handling to dedicated go routines.
-		// No rate-limiting/throttling is performed in the lang.
+		// No rate-limiting/throttling is performed in the circuit.
 		// It is the responsibility of Listener and/or the user app logic to
 		// keep the runtime from contending.
 		switch q := req.(type) {

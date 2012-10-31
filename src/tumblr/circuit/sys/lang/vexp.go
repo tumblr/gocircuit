@@ -2,14 +2,14 @@ package lang
 
 import (
 	"reflect"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 )
 
 type exportGroup struct {
 	PtrPtr []*ptrPtrMsg
 }
 
-func (r *Runtime) exportValues(values []interface{}, importer lang.Addr) ([]interface{}, []*ptrPtrMsg) {
+func (r *Runtime) exportValues(values []interface{}, importer circuit.Addr) ([]interface{}, []*ptrPtrMsg) {
 	eg := &exportGroup{}
 	rewriter := func(src, dst reflect.Value) bool {
 		return r.exportRewrite(src, dst, importer, eg)
@@ -17,7 +17,7 @@ func (r *Runtime) exportValues(values []interface{}, importer lang.Addr) ([]inte
 	return rewriteInterface(rewriter, values).([]interface{}), eg.PtrPtr
 }
 
-func (r *Runtime) exportRewrite(src, dst reflect.Value, importer lang.Addr, eg *exportGroup) bool {
+func (r *Runtime) exportRewrite(src, dst reflect.Value, importer circuit.Addr, eg *exportGroup) bool {
 	// Serialize cross-runtime pointers
 	switch v := src.Interface().(type) {
 
@@ -51,7 +51,7 @@ func (r *Runtime) exportRewrite(src, dst reflect.Value, importer lang.Addr, eg *
 }
 
 // If importer is nil, a permanent ptr is exported
-func (r *Runtime) exportPtr(v interface{}, importer lang.Addr) interface{} {
+func (r *Runtime) exportPtr(v interface{}, importer circuit.Addr) interface{} {
 	exph := r.exp.Add(v, importer)
 
 	if importer == nil {

@@ -3,7 +3,7 @@ package durablefs
 import (
 	"time"
 	"tumblr/circuit/kit/join"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 )
 
 var link = join.SetThenGet{Name: "durable file system"}
@@ -65,4 +65,4 @@ type File interface {
 	Close() error
 }
 
-var ErrParse = lang.NewError("parse")
+var ErrParse = circuit.NewError("parse")

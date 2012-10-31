@@ -1,4 +1,4 @@
-package lang
+package circuit
 
 import (
 	"encoding/gob"

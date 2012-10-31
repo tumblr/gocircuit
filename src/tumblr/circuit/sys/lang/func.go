@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"os"
 	"time"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 	"tumblr/circuit/sys/lang/types"
 	"tumblr/circuit/use/n"
 )
 
-func (r *Runtime) Kill(addr lang.Addr) error {
+func (r *Runtime) Kill(addr circuit.Addr) error {
 	return n.Kill(addr)
 }
 
@@ -52,7 +52,7 @@ func (r *Runtime) closeDaemonizer() bool {
 	return r.daemon
 }
 
-func (r *Runtime) serveGo(req *goMsg, conn lang.Conn) {
+func (r *Runtime) serveGo(req *goMsg, conn circuit.Conn) {
 
 	// Go guarantees the defer runs even if panic occurs
 	defer conn.Close()
@@ -96,13 +96,13 @@ func (r *Runtime) serveGo(req *goMsg, conn lang.Conn) {
 	conn.Close()
 }
 
-func (r *Runtime) Spawn(host lang.Host, anchor []string, fn lang.Func, in ...interface{}) (retrn []interface{}, addr lang.Addr, err error) {
+func (r *Runtime) Spawn(host circuit.Host, anchor []string, fn circuit.Func, in ...interface{}) (retrn []interface{}, addr circuit.Addr, err error) {
 
 	// Catch all errors
 	defer func() {
 		if p := recover(); p != nil {
 			retrn, addr = nil, nil
-			err = lang.NewError(fmt.Sprintf("spawn panic: %#v", p))
+			err = circuit.NewError(fmt.Sprintf("spawn panic: %#v", p))
 		}
 	}()
 
@@ -118,7 +118,7 @@ func (r *Runtime) Spawn(host lang.Host, anchor []string, fn lang.Func, in ...int
 	return
 }
 
-func (r *Runtime) remoteGo(addr lang.Addr, ufn lang.Func, in ...interface{}) []interface{} {
+func (r *Runtime) remoteGo(addr circuit.Addr, ufn circuit.Func, in ...interface{}) []interface{} {
 	reply, err := r.tryRemoteGo(addr, ufn, in...)
 	if err != nil {
 		panic(err)
@@ -128,7 +128,7 @@ func (r *Runtime) remoteGo(addr lang.Addr, ufn lang.Func, in ...interface{}) []i
 
 // TryGo runs the function ufn on the runtime behind c.
 // Any failure to obtain the return values causes a panic.
-func (r *Runtime) tryRemoteGo(addr lang.Addr, ufn lang.Func, in ...interface{}) ([]interface{}, error) {
+func (r *Runtime) tryRemoteGo(addr circuit.Addr, ufn circuit.Func, in ...interface{}) ([]interface{}, error) {
 	conn, err := r.dialer.Dial(addr)
 	if err != nil {
 		return nil, err

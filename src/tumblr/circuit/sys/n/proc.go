@@ -2,7 +2,7 @@ package n
 
 import (
 	"io"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 	"tumblr/circuit/sys/transport"
 )
 
@@ -17,7 +17,7 @@ type Process struct {
 	addr    *transport.Addr
 }
 
-func (p *Process) Addr() lang.Addr {
+func (p *Process) Addr() circuit.Addr {
 	return p.addr
 }
 

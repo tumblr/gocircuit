@@ -7,7 +7,7 @@ import (
 	"path"
 	"sync"
 	"time"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 	"tumblr/circuit/use/anchorfs"
 	"tumblr/circuit/kit/zookeeper"
 	"tumblr/circuit/kit/zookeeper/zutil"
@@ -27,7 +27,7 @@ type Dir struct {
 	sync.Mutex
 	stat      *zookeeper.Stat
 	watch     *zutil.Watch
-	files     map[lang.RuntimeID]*File
+	files     map[circuit.RuntimeID]*File
 	dirs      map[string]struct{}
 }
 
@@ -55,7 +55,7 @@ func (dir *Dir) Name() string {
 }
 
 // Files returns the current view of the files in this directory
-func (dir *Dir) Files() (rev int64, files map[lang.RuntimeID]anchorfs.File, err error) {
+func (dir *Dir) Files() (rev int64, files map[circuit.RuntimeID]anchorfs.File, err error) {
 	if err = dir.sync(); err != nil {
 		return 0, nil, err
 	}
@@ -72,7 +72,7 @@ func (dir *Dir) rev() int64 {
 	return int64(dir.stat.CVersion())
 }
 
-func (dir *Dir) Change(sinceRev int64) (rev int64, files map[lang.RuntimeID]anchorfs.File, err error) {
+func (dir *Dir) Change(sinceRev int64) (rev int64, files map[circuit.RuntimeID]anchorfs.File, err error) {
 	if err = dir.change(sinceRev, 0); err != nil {
 		return 0, nil, err
 	}
@@ -81,7 +81,7 @@ func (dir *Dir) Change(sinceRev int64) (rev int64, files map[lang.RuntimeID]anch
 	return dir.rev(), copyFiles(dir.files), nil
 }
 
-func (dir *Dir) ChangeExpire(sinceRev int64, expire time.Duration) (rev int64, files map[lang.RuntimeID]anchorfs.File, err error) {
+func (dir *Dir) ChangeExpire(sinceRev int64, expire time.Duration) (rev int64, files map[circuit.RuntimeID]anchorfs.File, err error) {
 	if err = dir.change(sinceRev, expire); err != nil {
 		return 0, nil, err
 	}
@@ -90,8 +90,8 @@ func (dir *Dir) ChangeExpire(sinceRev int64, expire time.Duration) (rev int64, f
 	return dir.rev(), copyFiles(dir.files), nil
 }
 
-func copyFiles(files map[lang.RuntimeID]*File) map[lang.RuntimeID]anchorfs.File {
-	copied := make(map[lang.RuntimeID]anchorfs.File)
+func copyFiles(files map[circuit.RuntimeID]*File) map[circuit.RuntimeID]anchorfs.File {
+	copied := make(map[circuit.RuntimeID]anchorfs.File)
 	for id, f := range files {
 		copied[id] = f
 	}
@@ -120,7 +120,7 @@ func (dir *Dir) syncDirs() (dirs []string, stat *zookeeper.Stat, err error) {
 }
 
 // OpenFile returns the worker view of the worker with the specified ID
-func (dir *Dir) OpenFile(id lang.RuntimeID) (anchorfs.File, error) {
+func (dir *Dir) OpenFile(id circuit.RuntimeID) (anchorfs.File, error) {
 	if err := dir.sync(); err != nil {
 		return nil, err
 	}
@@ -199,11 +199,11 @@ func (dir *Dir) fetch(children []string, stat *zookeeper.Stat) error {
 }
 
 // fetch returns the anchor files and subdirectories rooted at zdir
-func fetch(z *zookeeper.Conn, zdir string, children []string) (dirs map[string]struct{}, files map[lang.RuntimeID]*File, err error) {
+func fetch(z *zookeeper.Conn, zdir string, children []string) (dirs map[string]struct{}, files map[circuit.RuntimeID]*File, err error) {
 	dirs    = make(map[string]struct{})
-	files = make(map[lang.RuntimeID]*File)
+	files = make(map[circuit.RuntimeID]*File)
 	for _, name := range children {
-		id, err := lang.ParseRuntimeID(name)
+		id, err := circuit.ParseRuntimeID(name)
 		if err != nil {
 			// Node names that are not files are ok. 
 			// We treat them as subdirectories.

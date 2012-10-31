@@ -1,7 +1,7 @@
 package anchorfs
 
 import (
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 	"tumblr/circuit/kit/join"
 )
 
@@ -15,7 +15,7 @@ func get() fs {
 	return link.Get().(fs)
 }
 
-func CreateFile(anchor string, addr lang.Addr) error {
+func CreateFile(anchor string, addr circuit.Addr) error {
 	return get().CreateFile(anchor, addr)
 }
 

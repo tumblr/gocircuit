@@ -4,23 +4,23 @@ import (
 	"encoding/gob"
 	"io"
 	"sync"
-	"tumblr/circuit/use/lang"
+	"tumblr/circuit/use/circuit"
 )
 
 type sandbox struct {
 	lk  sync.Mutex
-	l   map[lang.RuntimeID]*listener
+	l   map[circuit.RuntimeID]*listener
 }
 
-var s = &sandbox{l: make(map[lang.RuntimeID]*listener)}
+var s = &sandbox{l: make(map[circuit.RuntimeID]*listener)}
 
 // NewSandbox creates a new transport instance, part of a sandbox network in memory
-func NewSandbox() lang.Transport {
+func NewSandbox() circuit.Transport {
 	s.lk.Lock()
 	defer s.lk.Unlock()
 
 	l := &listener{
-		id: lang.ChooseRuntimeID(),
+		id: circuit.ChooseRuntimeID(),
 		ch: make(chan *halfconn),
 	}
 	l.a = &addr{ID: l.id, l: l}
@@ -28,7 +28,7 @@ func NewSandbox() lang.Transport {
 	return l
 }
 
-func dial(remote lang.Addr) (lang.Conn, error) {
+func dial(remote circuit.Addr) (circuit.Conn, error) {
 	pr, pw := io.Pipe()
 	qr, qw := io.Pipe()
 	srvhalf := &halfconn{PipeWriter: qw, PipeReader: pr}
@@ -47,11 +47,11 @@ func dial(remote lang.Addr) (lang.Conn, error) {
 
 // addr implements Addr
 type addr struct {
-	ID  lang.RuntimeID
+	ID  circuit.RuntimeID
 	l   *listener
 }
 
-func (a *addr) RuntimeID() lang.RuntimeID {
+func (a *addr) RuntimeID() circuit.RuntimeID {
 	return a.ID
 }
 
@@ -65,16 +65,16 @@ func init() {
 
 // listener implements Listener
 type listener struct {
-	id  lang.RuntimeID
+	id  circuit.RuntimeID
 	a   *addr
 	ch  chan *halfconn
 }
 
-func (l *listener) Addr() lang.Addr { 
+func (l *listener) Addr() circuit.Addr { 
 	return l.a
 }
 
-func (l *listener) Accept() lang.Conn { 
+func (l *listener) Accept() circuit.Conn { 
 	return ReadWriterConn(l.Addr(), <-l.ch)
 }
 
@@ -84,7 +84,7 @@ func (l *listener) Close() {
 	delete(s.l, l.id)
 }
 
-func (l *listener) Dial(remote lang.Addr) (lang.Conn, error) {
+func (l *listener) Dial(remote circuit.Addr) (circuit.Conn, error) {
 	return dial(remote)
 }
 
