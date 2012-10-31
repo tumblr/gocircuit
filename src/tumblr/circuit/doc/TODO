@@ -1,4 +1,0 @@
-
-language object garbage collection vs. runtime process garbage collection:
-in process GC if there are no handles (x pointers) held by live runtimes,
-or inside durable records, then kill orphan runtimes.
