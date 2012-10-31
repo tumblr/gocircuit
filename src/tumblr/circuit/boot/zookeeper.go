@@ -13,7 +13,7 @@ import (
 // ZookeeperConfig holds configuration parameters regarding the zookeeper cluster for the circuit
 type ZookeeperConfig struct {
 	Workers []string  // Access points for the Zookeeper cluster
-	RootDir string    // Root directory for this circuit within Zookeeper
+	RootDir string    // Root directory for this circuit instance within Zookeeper
 }
 
 func (z *ZookeeperConfig) Zookeepers() string {

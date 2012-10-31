@@ -10,9 +10,9 @@ import (
 
 // InstallConfig holds configuration parameters regarding circuit installation on host machines
 type InstallConfig struct {
-	RootDir string  // Root directory of circuit installation
+	RootDir string  // Root directory of circuit installation on
 	LibPath string  // Any additions to the library path for execution time
-	Binary  string  // Desired name for the circuit runtime binary of the user app
+	Binary  string  // Desired name for the circuit runtime binary
 }
 
 func (i *InstallConfig) BinDir() string {
