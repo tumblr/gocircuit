@@ -9,7 +9,7 @@ import (
 	"os/exec"
 	"strings"
 	"sync"
-	"tumblr/util/posix"
+	"text/template"
 	"tumblr/circuit/load/config"
 )
 
@@ -22,7 +22,14 @@ const build_sh_src = `{{.Tool}} ` +
 
 func Build(cfg *config.BuildConfig) error {
 	// Prepare sh script
-	build_sh := posix.MustParseAndExecute(build_sh_src, cfg)
+	t := template.New("_")
+	template.Must(t.Parse(build_sh_src))
+	var w bytes.Buffer
+	if err := t.Execute(&w, cfg); err != nil {
+		panic("parse cross-build script")
+	}
+	build_sh := string(w.Bytes())
+
 	if cfg.Show {
 		println(build_sh)
 	}
@@ -61,7 +68,7 @@ func Build(cfg *config.BuildConfig) error {
 	}
 
 	// Clean the ship directory
-	if _, _, err = posix.RunShell(`rm -f ` + cfg.ShipDir + `/*`); err != nil {
+	if _, _, err = RunShell(`rm -f ` + cfg.ShipDir + `/*`); err != nil {
 		return err
 	}
 
@@ -73,7 +80,7 @@ func Build(cfg *config.BuildConfig) error {
 
 	// Download files
 	println("Downloading from", r)
-	if err = posix.DownloadDir(cfg.Host, r, cfg.ShipDir); err != nil {
+	if err = DownloadDir(cfg.Host, r, cfg.ShipDir); err != nil {
 		return err
 	}
 	println("Download successful.")
