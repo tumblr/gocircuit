@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"os"
-	"tumblr/util/posix"
-	"tumblr/circuit/load/config"
+	"text/template"
+	"tumblr/circuit/kit/posix"
 	"tumblr/circuit/kit/sched/limiter"
+	"tumblr/circuit/load/config"
 )
 
 const limitParallelTasks = 20
@@ -24,21 +26,28 @@ func Install(i *config.InstallConfig, b *config.BuildConfig, hosts []string) {
 	l.Wait()
 }
 
-const install_sh_src = `
-mkdir -p {{.BinDir}} && mkdir -p {{.JailDir}} && mkdir -p {{.VarDir}}
-`
+const installShSrc = `mkdir -p {{.BinDir}} && mkdir -p {{.JailDir}} && mkdir -p {{.VarDir}}`
 
-??
 func installHost(i *config.InstallConfig, b *config.BuildConfig, host string) error {
-	install_sh := posix.MustParseAndExecute(install_sh_src, &struct{BinDir, JailDir, VarDir string}{
-		BinDir:  c.BinDir(),
-		JailDir: c.JailDir(),
-		VarDir:  c.VarDir(),
-	})
-	if _, _, err := posix.RunRemoteShell(host, install_sh); err != nil {
+
+	// Prepare shell script
+	t := template.New("_")
+	template.Must(t.Parse(installShSrc))
+	var w bytes.Buffer
+	if err := t.Execute(&w, &struct{BinDir, JailDir, VarDir string}{
+		BinDir:  i.BinDir(),
+		JailDir: i.JailDir(),
+		VarDir:  i.VarDir(),
+	}); err != nil {
 		return err
 	}
-	if err := posix.UploadDir(host, shipDir, c.BinDir()); err != nil {
+	install_sh := string(w.Bytes())
+
+	// Execute remotely
+	if _, _, err := posix.RemoteShell(host, install_sh); err != nil {
+		return err
+	}
+	if err := posix.UploadDir(host, b.ShipDir, i.BinDir()); err != nil {
 		return err
 	}
 	return nil

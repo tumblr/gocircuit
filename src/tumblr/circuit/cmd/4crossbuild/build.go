@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 	"text/template"
+	"tumblr/circuit/kit/posix"
 	"tumblr/circuit/load/config"
 )
 
@@ -68,7 +69,7 @@ func Build(cfg *config.BuildConfig) error {
 	}
 
 	// Clean the ship directory
-	if _, _, err = RunShell(`rm -f ` + cfg.ShipDir + `/*`); err != nil {
+	if _, _, err = posix.Shell(`rm -f ` + cfg.ShipDir + `/*`); err != nil {
 		return err
 	}
 
@@ -80,7 +81,7 @@ func Build(cfg *config.BuildConfig) error {
 
 	// Download files
 	println("Downloading from", r)
-	if err = DownloadDir(cfg.Host, r, cfg.ShipDir); err != nil {
+	if err = posix.DownloadDir(cfg.Host, r, cfg.ShipDir); err != nil {
 		return err
 	}
 	println("Download successful.")
