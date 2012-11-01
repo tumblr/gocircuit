@@ -11,7 +11,7 @@ import (
 
 // BuildConfig holds configuration parameters for the automated circuit app build system
 type BuildConfig struct {
-	Binary           string  // Desired name for circuit runtime binary
+	Binary           string
 	Jail             string  // Build jail path on build host
 
 	AppRepo          string  // App repo URL

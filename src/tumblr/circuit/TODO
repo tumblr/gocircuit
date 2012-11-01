@@ -1,8 +1,3 @@
-+binary name duplicated in both install and build configs
-+move build config elsewhere and build tools should not rely on boot
-+same for install
-*build and install one config
-
 +remove dependence on util/posix
 
 spam issue track deployment

@@ -9,7 +9,7 @@ import (
 	"io"
 	"os"
 	"strings"
-	"tumblr/circuit/load"
+	"tumblr/circuit/load/config"
 )
 
 func main() {
@@ -30,6 +30,6 @@ func main() {
 		}
 	}
 	println("Installing circuit.")
-	Install(boot.Install, boot.Build.ShipDir, hosts)
+	Install(config.Install, config.Build, hosts)
 	println("Done.")
 }

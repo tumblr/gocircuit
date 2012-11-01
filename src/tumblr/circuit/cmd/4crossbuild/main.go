@@ -3,14 +3,15 @@ package main
 import (
 	"flag"
 	"os"
-	"tumblr/circuit/load"
+	"tumblr/circuit/load/config"
 )
 
 var flagShow = flag.Bool("v", false, "Verbose mode")
 
 func main() {
 	flag.Parse()
-	c := boot.Build
+	c := config.Build
+	c.Binary = config.Install.Binary
 	if c == nil {
 		println("Circuit build configuration not specified in environment")
 		os.Exit(1)

@@ -10,7 +10,7 @@ import (
 	"strings"
 	"sync"
 	"tumblr/util/posix"
-	"tumblr/circuit/load"
+	"tumblr/circuit/load/config"
 )
 
 const build_sh_src = `{{.Tool}} ` +
@@ -20,7 +20,7 @@ const build_sh_src = `{{.Tool}} ` +
 	`'-zinclude={{.ZookeeperInclude}}' '-zlib={{.ZookeeperLib}}' ` +
 	`'-cir={{.CircuitRepo}}' '-cirsrc={{.CircuitSrc}}' `
 
-func Build(cfg *boot.BuildConfig) error {
+func Build(cfg *config.BuildConfig) error {
 	// Prepare sh script
 	build_sh := posix.MustParseAndExecute(build_sh_src, cfg)
 	if cfg.Show {
