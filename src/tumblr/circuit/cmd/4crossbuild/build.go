@@ -7,41 +7,28 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"strconv"
 	"strings"
 	"sync"
 	"tumblr/util/posix"
-	"tumblr/TUMBLR/config/types"
+	"tumblr/circuit/boot"
 )
 
-const build_sh_src = `{{.BuildTool}} '-jail={{.JailDir}}' '-buildgo={{.BuildGo}}' ` +
-	`'-show={{.Show}}' '-repo={{.Repo}}' '-zinclude={{.ZInclude}}' '-zlib={{.ZLib}}'`
+const build_sh_src = `{{.Tool}} ` +
+	`'-binary={{.Binary}}' '-jail={{.Jail}}' ` +
+	`'-app={{.AppRepo}}' '-appsrc={{.AppSrc}}' ` +
+	`'-pkg={{.Pkg}}' '-show={{.Show}}' '-rebuildgo={{.RebuildGo}}' ` +
+	`'-zinclude={{.ZookeeperInclude}}' '-zlib={{.ZookeeperLib}}' ` +
+	`'-cir={{.CircuitRepo}}' '-cirsrc={{.CircuitSrc}}' `
 
-func Build(cfg *types.Build) error {
+func Build(cfg *boot.BuildConfig) error {
 	// Prepare sh script
-	build_sh := posix.MustParseAndExecute(build_sh_src, &struct{
-		BuildTool string
-		JailDir   string
-		BuildGo   string
-		Show      string
-		Repo      string
-		ZInclude  string
-		ZLib      string
-	}{
-		BuildTool: cfg.Tool,
-		JailDir:   cfg.Jail,
-		BuildGo:   strconv.FormatBool(cfg.BuildGo),
-		Show:      strconv.FormatBool(cfg.Show),
-		Repo:      cfg.Repo,
-		ZInclude:  cfg.ZookeeperInclude,
-		ZLib:      cfg.ZookeeperLib,
-	})
+	build_sh := posix.MustParseAndExecute(build_sh_src, cfg)
 	if cfg.Show {
 		println(build_sh)
 	}
 
 	// Execute remotely
-	cmd := exec.Command("ssh", cfg.Host)
+	cmd := exec.Command("ssh", cfg.Host, "sh -il")
 	cmd.Stdin = bytes.NewBufferString(build_sh)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {

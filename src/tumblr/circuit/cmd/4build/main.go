@@ -15,20 +15,20 @@ import (
 var (
 	flagBinary           = flag.String("binary", "4r", "Preferred name for the resulting runtime binary")
 	flagJail             = flag.String("jail", path.Join(os.Getenv("HOME"), "_circuit/build"), "Build jail directory")
-	// If flagRepo is empty, we expect that the repo subdirectory is
-	// already in place inside the build jail.  This case is useful for
-	// cases when the origin repo is local and the user can simply put a
-	// link to it in the build jail
-	flagCircuitRepo      = flag.String("cir", "git@github.com:tumblr/gocircuit.git", "Circuit repository")
-	flagCircuitPath      = flag.String("cirpath", ".", "GOPATH relative to circuit repository")
 
 	flagAppRepo          = flag.String("app", "", "App repository")
-	flagAppPath          = flag.String("path", "", "GOPATH relative to app repository")
+	flagAppPath          = flag.String("appsrc", "", "GOPATH relative to app repository")
+
 	flagPkg              = flag.String("pkg", "", "Package to import for side-effects in circuit runtime binary")
+
 	flagShow             = flag.Bool("show", false, "Show output of underlying build commands")
 	flagRebuildGo        = flag.Bool("rebuildgo", false, "Force fetch and rebuild of the Go compiler")
+
 	flagZookeeperInclude = flag.String("zinclude", path.Join(os.Getenv("HOME"), "local/include/c-client-src") , "Zookeeper C headers directory")
 	flagZookeeperLib     = flag.String("zlib", path.Join(os.Getenv("HOME"), "local/lib") , "Zookeeper libraries directory")
+
+	flagCircuitRepo      = flag.String("cir", "git@github.com:tumblr/gocircuit.git", "Circuit repository")
+	flagCircuitPath      = flag.String("cirsrc", ".", "GOPATH relative to circuit repository")
 )
 
 /*
@@ -56,8 +56,7 @@ func main() {
 
 	// Initialize build environment
 	x.binary = *flagBinary
-	x.env = make(Env)
-	x.env.Set("PATH", OSEnv().Get("PATH"))
+	x.env = OSEnv()
 	x.jail = *flagJail
 	x.appPkgs = []string{*flagPkg}
 	x.zinclude = *flagZookeeperInclude
@@ -241,9 +240,10 @@ func buildGoCompiler(rebuild bool) {
 	if err != nil {
 		Fatalf("Problem stat'ing %s (%s)", path.Join(x.jail, "/go"), err)
 	}
+	//Errorf("EEE %#v\n", x.env.Environ())
 	if !ok {
 		// If not, fetch the source tree
-		if err = Exec(nil, x.jail, "hg", "clone", "-u", "tip", "https://code.google.com/p/go"); err != nil {
+		if err = Exec(x.env, x.jail, "hg", "clone", "-u", "tip", "https://code.google.com/p/go"); err != nil {
 			Fatalf("Problem cloning Go repository (%s)", err)
 		}
 		// Force rebuild
@@ -251,11 +251,11 @@ func buildGoCompiler(rebuild bool) {
 	} else {
 		if rebuild {
 			// Pull changes
-			if err = Exec(nil, path.Join(x.jail, "/go"), "hg", "pull"); err != nil {
+			if err = Exec(x.env, path.Join(x.jail, "/go"), "hg", "pull"); err != nil {
 				Fatalf("Problem pulling Go repository changes (%s)", err)
 			}
 			// Update working copy
-			if err = Exec(nil, path.Join(x.jail, "/go"), "hg", "update"); err != nil {
+			if err = Exec(x.env, path.Join(x.jail, "/go"), "hg", "update"); err != nil {
 				Fatalf("Problem updating Go repository changes (%s)", err)
 			}
 		}

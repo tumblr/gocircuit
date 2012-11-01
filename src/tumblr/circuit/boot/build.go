@@ -9,16 +9,25 @@ import (
 
 // BuildConfig holds configuration parameters for the automated circuit app build system
 type BuildConfig struct {
-	Repo             string  // User repo to fetch
-	GoPath           string  // User GOPATH relative to user repo; or empty string if user repo meant to be cloned at root of GOPATH
-	Pkg              string  // User side-effect package to include in the circuit runtime build
-	Host             string  // Host where build takes place
-	Tool             string  // Build tool path on build host
+	Binary           string  // Desired name for circuit runtime binary
 	Jail             string  // Build jail path on build host
+
+	AppRepo          string  // App repo URL
+	AppSrc           string  // App GOPATH relative to app repo; or empty string if app repo meant to be cloned inside a GOPATH
+
+	Pkg              string  // User side-effect package to include in the circuit runtime build
+	Show             bool
 	RebuildGo        bool    // Rebuild Go even if a newer version is not available
-	ShipDir          string  // Local directory where built runtime binary and dynamic libraries will be delivered
+
 	ZookeeperInclude string  // Path to Zookeeper include files on build host
 	ZookeeperLib     string  // Path to Zookeeper library files on build host
+
+	CircuitRepo      string
+	CircuitSrc       string
+
+	Host             string  // Host where build takes place
+	Tool             string  // Build tool path on build host
+	ShipDir          string  // Local directory where built runtime binary and dynamic libraries will be delivered
 }
 
 var Build *BuildConfig
