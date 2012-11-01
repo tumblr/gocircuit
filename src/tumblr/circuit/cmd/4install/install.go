@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 	"tumblr/util/posix"
-	"tumblr/circuit/boot"
+	"tumblr/circuit/load"
 	"tumblr/circuit/kit/sched/limiter"
 )
 

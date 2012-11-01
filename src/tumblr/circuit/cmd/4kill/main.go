@@ -9,7 +9,7 @@ import (
 	"tumblr/circuit/use/anchorfs"
 	"tumblr/circuit/use/circuit"
 	"tumblr/circuit/use/n"
-	_ "tumblr/circuit/boot"
+	_ "tumblr/circuit/load"
 )
 
 func usage() {

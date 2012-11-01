@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 	"tumblr/circuit/use/anchorfs"
-	_ "tumblr/circuit/boot"
+	_ "tumblr/circuit/load"
 )
 
 func main() {

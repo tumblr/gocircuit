@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 	"tumblr/circuit/use/issuefs"
-	_ "tumblr/circuit/boot"
+	_ "tumblr/circuit/load"
 )
 
 func usage() {

@@ -10,7 +10,7 @@ import (
 	"strings"
 	"sync"
 	"tumblr/util/posix"
-	"tumblr/circuit/boot"
+	"tumblr/circuit/load"
 )
 
 const build_sh_src = `{{.Tool}} ` +

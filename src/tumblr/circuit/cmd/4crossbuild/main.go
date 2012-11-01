@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"os"
-	"tumblr/circuit/boot"
+	"tumblr/circuit/load"
 )
 
 var flagShow = flag.Bool("v", false, "Verbose mode")

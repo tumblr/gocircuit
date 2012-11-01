@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	_ "tumblr/circuit/boot"
+	_ "tumblr/circuit/load"
 	"tumblr/circuit/use/anchorfs"
 	"tumblr/circuit/use/circuit"
 )
