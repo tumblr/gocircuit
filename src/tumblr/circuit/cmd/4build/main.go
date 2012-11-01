@@ -3,7 +3,9 @@
 package main
 
 import (
+	"bytes"
 	"flag"
+	"io/ioutil"
 	"path"
 	"os"
 	"strings"
@@ -12,7 +14,7 @@ import (
 
 var (
 	flagBinary           = flag.String("binary", "4r", "Preferred name for the resulting runtime binary")
-	flagJail             = flag.String("jail", path.Join(os.Getenv("HOME"), "_circuit/_build"), "Build jail directory")
+	flagJail             = flag.String("jail", path.Join(os.Getenv("HOME"), "_circuit/build"), "Build jail directory")
 	// If flagRepo is empty, we expect that the repo subdirectory is
 	// already in place inside the build jail.  This case is useful for
 	// cases when the origin repo is local and the user can simply put a
@@ -47,7 +49,7 @@ var x struct {
 	goBin     string
 	goCmd     string
 	goPath    map[string]string
-)
+}
 
 func main() {
 	flag.Parse()
@@ -88,7 +90,7 @@ func main() {
 	Printf("%s\n", bundleDir)
 }
 
-func shipCircuit() {
+func shipCircuit() string {
 	tmpdir, err := MakeTempDir()
 	if err != nil {
 		Fatalf("Problem making packaging directory (%s)\n", err)
@@ -119,10 +121,13 @@ const mainSrc = `
 package main
 import (
 	_ "tumblr/circuit/boot"
-	_ {{.AppPkgs}}
+	{{range .}}
+	_ "{{.}}"
+	{{end}}
 )
 func main() {}
 `
+
 func binPkg() string {
 	return path.Join(x.goPath["circuit"], "src", "autopkg", x.binary)	
 }
@@ -146,10 +151,10 @@ func buildCircuit() {
 	t := template.New("main")
 	template.Must(t.Parse(mainSrc))
 	var w bytes.Buffer
-	if err = t.Execute(&w, &struct{ AppPkgs []string }{ x.appPkgs }); err != nil {
+	if err := t.Execute(&w, x.appPkgs); err != nil {
 		Fatalf("Problem preparing main.go (%s)\n", err)
 	}
-	if err = ioutil.WriteFile(path.Join(binpkg, x.binary), w.Bytes(), 0664); err != nil {
+	if err := ioutil.WriteFile(path.Join(binpkg, "main.go"), w.Bytes(), 0664); err != nil {
 		Fatalf("Problem writing main.go (%s)\n", err)
 	}
 
@@ -166,11 +171,12 @@ func repoName(repo string) string {
 	if strings.HasSuffix(repo, ".git") {
 		repo = repo[:len(repo) - len(".git")]
 	}
-	for i := len(repo) - 1; i >= 0; i++ {
+__For:
+	for i := len(repo) - 1; i >= 0; i-- {
 		switch repo[i] {
 		case ':', '/', '@':
 			repo = repo[i + 1:]
-			break
+			break __For
 		}
 	}
 	return repo
@@ -213,7 +219,7 @@ func fetchRepo(namespace, repo, gopath string) {
 	}
 
 	// Create build environment for building in this repo
-	oldGoPath = x.env.Get("GOPATH")
+	oldGoPath := x.env.Get("GOPATH")
 	var p string
 	if gopath == "" {
 		p = path.Join(x.jail, namespace)
@@ -252,7 +258,7 @@ func buildGoCompiler(rebuild bool) {
 	}
 	if rebuild {
 		// Build Go compiler
-		if err = Exec(env, path.Join(x.jail, "/go/src"), path.Join(x.jail, "/go/src/all.bash")); err != nil {
+		if err = Exec(x.env, path.Join(x.jail, "/go/src"), path.Join(x.jail, "/go/src/all.bash")); err != nil {
 			if !IsExitError(err) {
 				Fatalf("Problem building Go (%s)", err)
 			}
