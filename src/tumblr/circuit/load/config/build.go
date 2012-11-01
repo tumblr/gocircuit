@@ -1,4 +1,6 @@
-package boot
+// Package build is responsible for reading the build system's configuration
+// from a file named by the CIR_BUILD environment variable
+package config
 
 import (
 	"encoding/json"
@@ -32,14 +34,17 @@ type BuildConfig struct {
 
 var Build *BuildConfig
 
-func parseBuildConfig() {
+func parseBuild() {
 	bfile := os.Getenv("CIR_BUILD")
+	if bfile == "" {
+		return
+	}
 	Build = &BuildConfig{}
 	data, err := ioutil.ReadFile(bfile)
 	if err != nil {
 		Build = nil
-		fmt.Fprintf(os.Stderr, "Not using a build config file (%s)", err)
-		return
+		fmt.Fprintf(os.Stderr, "Problem reading build config file %s (%s)", bfile, err)
+		os.Exit(1)
 	}
 	if err = json.Unmarshal(data, Build); err != nil {
 		fmt.Fprintf(os.Stderr, "Problem parsing build file (%s)", err)

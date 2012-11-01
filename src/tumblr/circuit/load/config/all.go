@@ -1,4 +1,4 @@
-package boot
+package config
 
 import (
 	"encoding/json"
@@ -13,7 +13,7 @@ type allInOne struct {
 	Build     *BuildConfig
 }
 
-func parse() {
+func init() {
 	cc := os.Getenv("CIR")
 	if cc != "" {
 		data, err := ioutil.ReadFile(cc)
@@ -32,7 +32,7 @@ func parse() {
 		return
 	}
 
-	parseZookeeperConfig()
-	parseInstallConfig()
-	parseBuildConfig()
+	parseZookeeper()
+	parseInstall()
+	parseBuild()
 }

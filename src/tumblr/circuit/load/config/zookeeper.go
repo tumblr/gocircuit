@@ -1,4 +1,4 @@
-package boot
+package config
 
 import (
 	"bytes"
@@ -41,7 +41,7 @@ func (z *ZookeeperConfig) DurableDir() string {
 
 var Zookeeper *ZookeeperConfig
 
-func parseZookeeperConfig() {
+func parseZookeeper() {
 	Zookeeper = &ZookeeperConfig{}
 
 	// Try parsing Zookeeper config out of environment variables
@@ -51,7 +51,7 @@ func parseZookeeperConfig() {
 		Zookeeper.RootDir = os.Getenv("_CIR_ZR")
 		if Zookeeper.RootDir == "" {
 			fmt.Fprintf(os.Stderr, "No Zookeeper root directory in $_CIR_ZR")
-			os.Exit(1)
+			Zookeeper = nil
 		}
 		return
 	}

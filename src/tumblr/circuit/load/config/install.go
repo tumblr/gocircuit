@@ -1,4 +1,6 @@
-package boot
+// Package install is responsible for reading the install system's configuration
+// from a file named by the CIR_INSTALL environment variable
+package config
 
 import (
 	"encoding/json"
@@ -29,7 +31,7 @@ func (i *InstallConfig) VarDir() string {
 
 var Install *InstallConfig
 
-func parseInstallConfig() {
+func parseInstall() {
 	Install = &InstallConfig{}
 
 	// Try parsing install config from environment
@@ -42,6 +44,10 @@ func parseInstallConfig() {
 
 	// Try parsing the install config from a file
 	ifile := os.Getenv("CIR_INSTALL")
+	if ifile == "" {
+		Install = nil
+		return
+	}
 	data, err := ioutil.ReadFile(ifile)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Problem reading install config file (%s)", err)

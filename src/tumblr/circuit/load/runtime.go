@@ -1,4 +1,4 @@
-package boot
+package load
 
 import (
 	"math/rand"
@@ -16,31 +16,29 @@ import (
 	"tumblr/circuit/use/circuit"
 	un "tumblr/circuit/use/n"
 	
-	// _ "tumblr/TUMBLR/app" // Registers all apps used by the environment
+	"tumblr/circuit/load/config"
 )
 
 
 func init() {
-	// Read configuration
-	parse()
 
 	// Seed random number generator
 	rand.Seed(time.Now().UnixNano())
 	
 	// Connect to Zookeeper for anchor file system
-	aconn := zanchorfs.Dial(Zookeeper.Workers)
-	anchorfs.Bind(zanchorfs.New(aconn, Zookeeper.AnchorDir()))
+	aconn := zanchorfs.Dial(config.Zookeeper.Workers)
+	anchorfs.Bind(zanchorfs.New(aconn, config.Zookeeper.AnchorDir()))
 
 	// Connect to Zookeeper for durable file system
-	dconn := zdurablefs.Dial(Zookeeper.Workers)
-	durablefs.Bind(zdurablefs.New(dconn, Zookeeper.DurableDir()))
+	dconn := zdurablefs.Dial(config.Zookeeper.Workers)
+	durablefs.Bind(zdurablefs.New(dconn, config.Zookeeper.DurableDir()))
 
 	// Connect to Zookeeper for issue file system
-	iconn := zissuefs.Dial(Zookeeper.Workers)
-	issuefs.Bind(zissuefs.New(iconn, Zookeeper.IssueDir()))
+	iconn := zissuefs.Dial(config.Zookeeper.Workers)
+	issuefs.Bind(zissuefs.New(iconn, config.Zookeeper.IssueDir()))
 
 	// Create network
-	un.Bind(sn.New(Install.LibPath, Install.Binary, Install.JailDir()))
+	un.Bind(sn.New(config.Install.LibPath, config.Install.Binary, config.Install.JailDir()))
 }
 
 func NewHost(h string) circuit.Host {
