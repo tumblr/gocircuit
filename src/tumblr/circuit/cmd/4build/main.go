@@ -69,61 +69,49 @@ func main() {
 	}
 
 	Errorf("Building Go compiler\n")
-	if err = buildGoCompiler(*flagRebuildGo); err != nil {
-		Fatalf("Error building Go compiler (%s)\n", err)
-	}
+	buildGoCompiler(*flagRebuildGo)
 
 	Errorf("Updating circuit repository\n")
-	if err = fetchRepo("circuit", *flagCircuitRepo, *flagCircuitPath); err != nil {
-		Fatalf("Error fetching circuit repository %s (%s)\n", *flagCircuitRepo, err)
-	}
+	fetchRepo("circuit", *flagCircuitRepo, *flagCircuitPath)
 
 	Errorf("Updating app repository\n")
-	if err = fetchRepo("app", *flagAppRepo, *flagAppPath); err != nil {
-		Fatalf("Error fetching app repository %s (%s)\n", *flagAppRepo, err)
-	}
+	fetchRepo("app", *flagAppRepo, *flagAppPath)
 
 	Errorf("Building circuit binaries\n")
 	buildCircuit()
 
 	Errorf("Shipping install package\n")
-	bundleDir, err := shipCircuit()
-	if err != nil {
-		Fatalf("Error shipping package (%s)\n", err)
-	}
+	bundleDir := shipCircuit()
 	Errorf("Build successful!\n")
 
 	// Print temporary directory containing bundle
 	Printf("%s\n", bundleDir)
 }
 
-func ShipCircuit(env Env) (string, error) {
+func shipCircuit() {
 	tmpdir, err := MakeTempDir()
 	if err != nil {
-		return "", err
+		Fatalf("Problem making packaging directory (%s)\n", err)
 	}
 
 	// Copy binaries over to shipping directory
-	for _, pkg := range BuildPkgs {
-		println("Packaging", pkg)
-		pkgpath := pkgPath(env, pkg)
-		_, name := path.Split(pkg)
-		shipFile := path.Join(tmpdir, name)
-		if _, err = CopyFile(path.Join(pkgpath, name), shipFile); err != nil {
-			return "", err
-		}
-		if err = os.Chmod(shipFile, 0755); err != nil {
-			return "", err
-		}
+	println("+Packaging", x.binary)
+	binpkg := binPkg()
+	shipFile := path.Join(tmpdir, x.binary)
+	if _, err = CopyFile(path.Join(binpkg, x.binary), shipFile); err != nil {
+		Fatalf("Problem copying circuit binary (%s)\n", err)
+	}
+	if err = os.Chmod(shipFile, 0755); err != nil {
+		Fatalf("Problem chmod'ing circuit binary (%s)\n", err)
 	}
 
 	// zookeeper lib
-	println("Packaging Zookeeper libraries")
-	if err = ShellCopyFile(path.Join(*flagZookeeperLib, "libzookeeper*"), tmpdir + "/"); err != nil {
-		return "", err
+	println("+Packaging Zookeeper libraries")
+	if err = ShellCopyFile(path.Join(x.zlib, "libzookeeper*"), tmpdir + "/"); err != nil {
+		Fatalf("Problem copying Zookeeper library files (%s)\n", err)
 	}
 
-	return tmpdir, nil
+	return tmpdir
 }
 
 // Source code of a circuit runtime executable
@@ -135,6 +123,9 @@ import (
 )
 func main() {}
 `
+func binPkg() string {
+	return path.Join(x.goPath["circuit"], "src", "autopkg", x.binary)	
+}
 
 func buildCircuit() {
 
@@ -146,7 +137,7 @@ func buildCircuit() {
 	defer x.env.Unset("CGO_LDFLAGS")
 
 	// Create a package for the runtime executable
-	binpkg := path.Join(x.goPath["circuit"], "src", "autopkg", x.binary)
+	binpkg := binPkg()
 	if err := os.MkdirAll(binpkg, 0700); err != nil {
 		Fatalf("Problem creating runtime package %s (%s)\n", binpkg, err)
 	}
@@ -192,7 +183,7 @@ func repoName(repo string) string {
 	[===============]					GOPATH, if gopath == ""
 	[======================================]		GOPATH, if gopath == "/a"
 */
-func fetchRepo(namespace, repo, gopath string) error {
+func fetchRepo(namespace, repo, gopath string) {
 
 	// Make _build/app/src
 	repoSrc := path.Join(x.jail, path.Join(namespace, "src"))
@@ -204,19 +195,19 @@ func fetchRepo(namespace, repo, gopath string) error {
 	// Check whether repo directory exists
 	ok, err := Exists(repoPath)
 	if err != nil {
-		return err
+		Fatalf("Problem stat'ing %s (%s)", repoPath, err)
 	}
 	if !ok {
 		// If not, clone the source tree
 		if err = Exec(nil, repoSrc, "git", "clone", repo); err != nil {
-			return nil, err
+			Fatalf("Problem cloning repo %s (%s)", repo, err)
 		}
 	} else {
 		// If user repo exists in the jail, and a repo URL is given, then pull updates
 		if repo != "" {
 			// Pull changes
 			if err = Exec(nil, repoPath, "git", "pull", "origin", "master"); err != nil {
-				return nil, err
+				Fatalf("Problem pulling repo in %s (%s)", repoPath, err)
 			}
 		}
 	}
@@ -231,7 +222,6 @@ func fetchRepo(namespace, repo, gopath string) error {
 	}
 	x.env.Set("GOPATH", p + ":" + oldGoPath)
 	x.goPath[namespace] = p
-	return nil
 }
 
 func buildGoCompiler(rebuild bool) {
