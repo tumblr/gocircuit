@@ -15,6 +15,7 @@ import (
 	"tumblr/circuit/use/issuefs"
 	"tumblr/circuit/use/circuit"
 	un "tumblr/circuit/use/n"
+	"tumblr/circuit/use/n/hijack"
 	
 	"tumblr/circuit/load/config"
 )
@@ -23,8 +24,13 @@ import (
 func init() {
 
 	// Seed random number generator
-	rand.Seed(time.Now().UnixNano())
-	
+	rand.Seed(time.Now().UnixNano())	
+
+	if config.Worker {
+		hijack.Main(NewTransport)
+		panic("never reach")
+	}
+
 	// Connect to Zookeeper for anchor file system
 	aconn := zanchorfs.Dial(config.Zookeeper.Workers)
 	anchorfs.Bind(zanchorfs.New(aconn, config.Zookeeper.AnchorDir()))

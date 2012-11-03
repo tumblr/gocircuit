@@ -1,4 +1,4 @@
-package trojan
+package hijack
 
 import (
 	"bufio"
@@ -20,15 +20,17 @@ import (
 )
 
 func usage() {
+	println("Attempting to use circuit executable in worker mode.")
 	fmt.Fprintf(os.Stderr, "usage: %s [daemonize|run] Addr RuntimeID JailDir Host\n", os.Args[0])
 	os.Exit(1)
 }
 
 type NewTransportFunc func(id circuit.RuntimeID, addr, host string) circuit.Transport
 
-// Main is the 'func main' of a circuit binary that can spawn a circuit runtime
-// and report back its address.
-//
+
+// init checks an environment variable to determine if this executable is being invoked
+// as a runtime worker, or at the command-line to perform user logic in its main function.
+// In the former case, init hijacks the execution and never lets the main function run.
 func Main(newTransport NewTransportFunc) {
 	debug.InstallCtrlCPanic()
 	rand.Seed(time.Now().UnixNano())
@@ -70,8 +72,9 @@ func piefwd(stdout, stderr *os.File, err interface{}) {
 }
 
 
-// dbg is for debugging purposes.
-// It provides an alternate way of logging.
+// dbg is like a printf for debugging the interactions between
+// daemonizer and runtime where stdandard out and error are not
+// available to us to play with.
 func dbg(n, s string) {
 	cmd := exec.Command("sh")
 	stdin, err := cmd.StdinPipe()
@@ -107,6 +110,8 @@ func run(newTransport NewTransportFunc, addr, id, magic, host string) {
 
 	// Create lock file
 	pie2(lockfile.Create("lock"))
+
+	?? Initialize all other subsystems before you start runtime?
 
 	// Start runtime
 	id_, err := circuit.ParseRuntimeID(id)

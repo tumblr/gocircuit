@@ -1,7 +1,5 @@
-+remove dependence on util/posix
-
 spam issue track deployment
-profiler
+4cpu
 
 ??? tool to fetch out/err of successfully-started runtimes
 ____________________________________________________
