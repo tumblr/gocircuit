@@ -46,16 +46,21 @@ func Main(newTransport NewTransportFunc) {
 	usage()
 }
 
+// pie (Panic-If-Error) panics if err is non-nil
 func pie(err interface{}) {
 	if err != nil {
 		panic(err)
 	}
 }
 
+// pie2 panics of err is non-nil
 func pie2(underscore interface{}, err interface{}) {
 	pie(err)
 }
 
+// piefwd panics of err is non-nil, in which case it prints the entire 
+// contents of stdout and stderr to this process' standard error, followed
+// by the panic stack trace
 func piefwd(stdout, stderr *os.File, err interface{}) {
 	if err == nil {
 		return
@@ -192,6 +197,7 @@ func daemonize(addr, id, jaildir, host string) {
 	// Read port
 	line, err = back.ReadString('\n')
 	piefwd(stdout, stderr, err)
+	
 	port, err := strconv.Atoi(strings.TrimSpace(line))
 	piefwd(stdout, stderr, err)
 
