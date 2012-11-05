@@ -92,54 +92,6 @@ func dbg(n, s string) {
 	stdin.Close()
 }
 
-
-// Run starts the runtime server in this process and blocks.
-func run(newTransport NewTransportFunc, addr, id, magic, host string) {
-	// Avoid manual execution
-	if magic != "cleaver" {
-		panic("missing magic")
-	}
-
-	// Read anchors from stdin
-	r := bufio.NewReader(os.Stdin)
-	var anchor []string
-	for {
-		line, err := r.ReadString('\n')
-		pie(err)
-		line = strings.TrimSpace(line)
-		if line == "" {
-			break
-		}
-		anchor = append(anchor, line)
-	}
-
-	// Create lock file
-	pie2(lockfile.Create("lock"))
-
-	?? Initialize all other subsystems before you start runtime?
-
-	// Start runtime
-	id_, err := circuit.ParseRuntimeID(id)
-	pie(err)
-	t := newTransport(id_, addr, host)
-	circuit.Bind(lang.New(t))
-
-	// Create anchors
-	for _, a := range anchor {
-		pie(anchorfs.CreateFile(a, t.Addr()))
-	}
-
-	// Send back PID and port
-	backpipe := os.NewFile(3, "circuit•backpipe")
-	pie2(backpipe.WriteString(strconv.Itoa(os.Getpid()) + "\n"))
-	pie2(backpipe.WriteString(strconv.Itoa(t.(*transport.Transport).Port()) + "\n"))
-
-	pie(backpipe.Close())
-
-	// Hang forever
-	<-(chan int)(nil)
-}
-
 func daemonize(addr, id, jaildir, host string) {
 
 	// Make jail directory

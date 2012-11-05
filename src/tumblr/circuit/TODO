@@ -1,3 +1,5 @@
+note that cli 'go build' will not work unless CGO lines for zookeeper are included. document this
+
 spam issue track deployment
 4cpu
 

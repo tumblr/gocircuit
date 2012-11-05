@@ -43,6 +43,9 @@ func init() {
 	case Worker:
 		readAsDaemonizerOrWorker()
 	}
+	if Spark == nil {
+		Spark = DefaultSpark
+	}
 }
 
 func readAsMain() {
