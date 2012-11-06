@@ -68,6 +68,10 @@ type Transport interface {
 // Host represents a host that can spawn circuit runtimes.
 // Its specific implementation is up to the user.
 // A Host must be gob encodable.
-type Host interface{
+type Host interface {
 	String() string
+}
+
+type hostParser interface {
+	Parse(s string) Host
 }

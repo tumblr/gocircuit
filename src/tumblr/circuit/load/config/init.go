@@ -23,7 +23,8 @@ func init() {
 	Config = &WorkerConfig{}
 	Role = os.Getenv(RoleEnv)
 	switch Role {
-	case Main:
+	case "", Main:
+		println("Executing main()")
 		readAsMain()
 	case Daemonizer:
 		readAsDaemonizerOrWorker()

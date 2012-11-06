@@ -10,8 +10,8 @@ var flagShow = flag.Bool("v", false, "Verbose mode")
 
 func main() {
 	flag.Parse()
-	c := config.Build
-	c.Binary = config.Install.Binary
+	c := config.Config.Build
+	c.Binary = config.Config.Install.Binary
 	if c == nil {
 		println("Circuit build configuration not specified in environment")
 		os.Exit(1)

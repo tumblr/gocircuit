@@ -70,7 +70,7 @@ func start(worker bool, z *config.ZookeeperConfig, i *config.InstallConfig, s *c
 	t := transport.New(s.ID, s.BindAddr, s.Host)
 
 	// Initialize language runtime
-	circuit.Bind(lang.New(t))
+	circuit.Bind(lang.New(t), hostParser{})
 
 	// Create anchors
 	for _, a := range s.Anchor {
@@ -98,10 +98,8 @@ func start(worker bool, z *config.ZookeeperConfig, i *config.InstallConfig, s *c
 	}
 }
 
-func NewHost(h string) circuit.Host {
-	return sn.NewHost(h)
-}
+type hostParser struct{}
 
-func NewTransport(id circuit.RuntimeID, addr, host string) circuit.Transport {
-	return transport.New(id, addr, host)
+func (hostParser) Parse(h string) circuit.Host {
+	return sn.NewHost(h)
 }
