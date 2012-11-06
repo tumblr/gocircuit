@@ -3,14 +3,15 @@ package n
 import (
 	"bufio"
 	"encoding/gob"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os/exec"
 	"strconv"
-	"strings"
 	"tumblr/circuit/use/circuit"
 	"tumblr/circuit/sys/transport"
 	"tumblr/circuit/use/n"
+	"tumblr/circuit/load/config"
 )
 
 func init() {
@@ -44,7 +45,6 @@ func New(libpath, binary, jaildir string) *Config {
 }
 
 func (c *Config) Spawn(host circuit.Host, anchors ...string) (n.Process, error) {
-	?
 
 	h := host.(*Host).Host
 	cmd := exec.Command("ssh", h, "sh")
@@ -65,22 +65,29 @@ func (c *Config) Spawn(host circuit.Host, anchors ...string) (n.Process, error) 
 	}
 	defer cmd.Wait() /// Make sure that ssh does not remain zombie
 
-	// Feed stdin to shell
+	// Feed shell script to execute circuit binary
+	sh := fmt.Sprintf(
+		"LD_LIBRARY_PATH=%s DYLD_LIBRARY_PATH=%s %s=%s %s\n", 
+		c.LibPath, c.LibPath, config.RoleEnv, config.Daemonizer, c.Binary)
+	stdin.Write([]byte(sh))
+
+	// Write worker configuration to stdin of running worker process
 	id := circuit.ChooseRuntimeID()
-
-	ss := fmt.Sprintf(
-		"LD_LIBRARY_PATH=%s DYLD_LIBRARY_PATH=%s %s daemonize '%s' '%s' '%s' '%s'\n", 
-		c.LibPath, c.LibPath, c.Binary, h, id, c.JailDir, host)
-	stdin.Write([]byte(ss))
-
-	// Send internal per-host anchor
-	fmt.Fprintf(stdin, "/host/%s\n", host.String())
-
-	// Send user anchors
-	for _, a := range anchors {
-		fmt.Fprintf(stdin, "%s\n", strings.TrimSpace(a))
+	wc := &config.WorkerConfig{
+		Spark: &config.SparkConfig{
+			ID:       circuit.ChooseRuntimeID(),
+			BindAddr: "",
+			Host:     h,
+			Anchor:   append(anchors, fmt.Sprintf("/host/%s\n", host.String())),
+		},
+		Zookeeper: config.Config.Zookeeper,
+		Install:   config.Config.Install,
 	}
-	stdin.Write([]byte{'\n'})
+	if err := json.NewEncoder(stdin).Encode(wc); err != nil {
+		return nil, err
+	}
+
+	// Close stdin
 	if err = stdin.Close(); err != nil {
 		return nil, err
 	}

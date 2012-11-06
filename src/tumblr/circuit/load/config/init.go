@@ -9,25 +9,11 @@ import (
 
 // Role determines the context within which this executable was invoked
 const (
-	Main = iota
-	Daemonizer
-	Worker
+	Main       = "main"
+	Daemonizer = "daemonizer"
+	Worker     = "worker"
 )
-var Role int
-
-func parseRole(s string) int {
-	switch s {
-	case "":
-		return Main
-	case "daemonizer":
-		return Daemonizer
-	case "worker":
-		return Worker
-	}
-	fmt.Fprintf(os.Stderr, "Unrecognized execution role '%s'\n", s)
-	os.Exit(1)
-	panic("unr")
-}
+var Role string
 
 // CIRCUIT_ROLE names the environment variable that determines the role of this invokation
 const RoleEnv = "CIRCUIT_ROLE"
@@ -35,7 +21,7 @@ const RoleEnv = "CIRCUIT_ROLE"
 // init determines in what context we are being run and reads the configurations accordingly
 func init() {
 	Config = &WorkerConfig{}
-	Role = parseRole(os.Getenv(RoleEnv))
+	Role = os.Getenv(RoleEnv)
 	switch Role {
 	case Main:
 		readAsMain()

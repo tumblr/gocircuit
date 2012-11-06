@@ -34,11 +34,11 @@ func init() {
 
 	switch config.Role {
 	case config.Main:
-		start(false, config.Zookeeper, config.Install, config.Spark)
+		start(false, config.Config.Zookeeper, config.Config.Install, config.Config.Spark)
 	case config.Worker:
-		start(true, config.Zookeeper, config.Install, config.Spark)
+		start(true, config.Config.Zookeeper, config.Config.Install, config.Config.Spark)
 	case config.Daemonizer:
-		???
+		sn.Daemonize(config.Config)
 	}
 }
 
