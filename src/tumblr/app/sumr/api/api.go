@@ -1,7 +1,7 @@
 package api
 
 import (
-	"tumblr/circuit"
+	"tumblr/circuit/use/circuit"
 	"tumblr/circuit/kit/sched/limiter"
 	"tumblr/app/sumr/client"
 )

@@ -4,7 +4,7 @@ import (
 	"path"
 	"strconv"
 	"sync"
-	"tumblr/circuit"
+	"tumblr/circuit/use/circuit"
 	"tumblr/app/sumr/api"
 	"tumblr/circuit/kit/sched/limiter"
 	"tumblr/circuit/use/anchorfs"

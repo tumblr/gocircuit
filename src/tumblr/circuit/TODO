@@ -2,9 +2,10 @@ note that cli 'go build' will not work unless CGO lines for zookeeper are includ
 
 spam issue track deployment
 4cpu
+4doc
+4top
 
 ??? tool to fetch out/err of successfully-started runtimes
-4doc
 ____________________________________________________
 
 4lsof (list registered listeners, etc. resources)
@@ -12,10 +13,6 @@ ____________________________________________________
 zombie detect/kill mechanism (procs not in anchor fs)
 	add hidden flat registration space for runtime IDS in anchor file system
 	add permanent flat registration space, where workers check in and out
-
-__________________________________________________________
-live display of cpu utilization on all hosts
-display consoles, when how?
 
 __________________________________________________________
 OPEN-SOURCE

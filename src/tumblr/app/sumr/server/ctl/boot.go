@@ -5,7 +5,7 @@ import (
 	"sync"
 	"tumblr/app/sumr"
 	"tumblr/app/sumr/server"
-	"tumblr/circuit"
+	"tumblr/circuit/use/circuit"
 	"tumblr/circuit/kit/sched/limiter"
 	"tumblr/struct/xor"
 )

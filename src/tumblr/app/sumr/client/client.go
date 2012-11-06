@@ -7,7 +7,7 @@ import (
 	"time"
 	"tumblr/app/sumr"
 	"tumblr/app/sumr/server/ctl"
-	"tumblr/circuit"
+	"tumblr/circuit/use/circuit"
 	"tumblr/circuit/kit/sched/limiter"
 	"tumblr/struct/xor"
 )

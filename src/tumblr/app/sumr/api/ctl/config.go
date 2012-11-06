@@ -2,7 +2,7 @@ package ctl
 
 import (
 	"encoding/gob"
-	"tumblr/circuit"
+	"tumblr/circuit/use/circuit"
 )
 
 func init() {

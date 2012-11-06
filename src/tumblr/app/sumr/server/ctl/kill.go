@@ -2,7 +2,7 @@ package ctl
 
 import (
 	"log"
-	"tumblr/circuit"
+	"tumblr/circuit/use/circuit"
 	"tumblr/circuit/use/durablefs"
 	"tumblr/circuit/use/n"
 )

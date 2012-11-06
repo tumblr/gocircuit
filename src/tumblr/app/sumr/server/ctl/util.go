@@ -5,7 +5,7 @@ import (
 	"time"
 	"tumblr/struct/xor"
 	"tumblr/app/sumr"
-	"tumblr/circuit"
+	"tumblr/circuit/use/circuit"
 	"tumblr/circuit/use/durablefs"
 )
 
