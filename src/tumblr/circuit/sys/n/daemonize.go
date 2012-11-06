@@ -1,50 +1,18 @@
-package hijack
+package n
 
 import (
 	"bufio"
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
-	"math/rand"
 	"os"
 	"os/exec"
 	"path"
 	"strconv"
 	"strings"
-	"time"
-	"tumblr/circuit/kit/debug"
-	"tumblr/circuit/kit/lockfile"
-	"tumblr/circuit/sys/lang"
-	"tumblr/circuit/sys/transport"
-	"tumblr/circuit/use/anchorfs"
-	"tumblr/circuit/use/circuit"
+	"tumblr/circuit/load/config"
 )
-
-func usage() {
-	println("Attempting to use circuit executable in worker mode.")
-	fmt.Fprintf(os.Stderr, "usage: %s [daemonize|run] Addr RuntimeID JailDir Host\n", os.Args[0])
-	os.Exit(1)
-}
-
-type NewTransportFunc func(id circuit.RuntimeID, addr, host string) circuit.Transport
-
-
-// init checks an environment variable to determine if this executable is being invoked
-// as a runtime worker, or at the command-line to perform user logic in its main function.
-// In the former case, init hijacks the execution and never lets the main function run.
-func Main(newTransport NewTransportFunc) {
-	debug.InstallCtrlCPanic()
-	rand.Seed(time.Now().UnixNano())
-	if len(os.Args) != 6 {
-		usage()
-	}
-	switch os.Args[1] {
-	case "run":
-		run(newTransport, os.Args[2], os.Args[3], os.Args[4], os.Args[5])
-	case "daemonize":
-		daemonize(os.Args[2], os.Args[3], os.Args[4], os.Args[5])
-	}
-	usage()
-}
 
 // pie (Panic-If-Error) panics if err is non-nil
 func pie(err interface{}) {
@@ -76,7 +44,6 @@ func piefwd(stdout, stderr *os.File, err interface{}) {
 	panic(err)
 }
 
-
 // dbg is like a printf for debugging the interactions between
 // daemonizer and runtime where stdandard out and error are not
 // available to us to play with.
@@ -92,15 +59,14 @@ func dbg(n, s string) {
 	stdin.Close()
 }
 
-func daemonize(addr, id, jaildir, host string) {
+func Daemonize(wc *config.WorkerConfig) {
 
 	// Make jail directory
-	id_ := circuit.ParseOrHashRuntimeID(id)
-	jail := path.Join(jaildir, id_.String())
+	jail := path.Join(wc.Install.JailDir(), wc.Spark.ID.String())
 	pie(os.MkdirAll(jail, 0700))
 
 	// Prepare exec
-	cmd := exec.Command(os.Args[0], "run", addr, id_.String(), "cleaver", host)
+	cmd := exec.Command(os.Args[0])
 	cmd.Dir = jail
 
 	// Out-of-band pipe for reading child PID and port
@@ -110,10 +76,19 @@ func daemonize(addr, id, jaildir, host string) {
 
 	// stdin 
 	// Relay stdin of daemonizer to stdin of child runtime process
-	cmd.Stdin = os.Stdin
-	defer os.Stdin.Close()
+	var w bytes.Buffer
+	pie(json.NewEncoder(&w).Encode(wc))
+	cmd.Stdin = &w
 
-	// stdout
+	// Also save the config as a file for debugging purposes
+	u, err := os.Create(path.Join(jail, "config"))
+	if err != nil {
+		panic(err)
+	}
+	pie(json.NewEncoder(u).Encode(wc))
+	pie(u.Close())
+
+	// Create stdout file
 	stdout, err := os.Create(path.Join(jail, "out"))
 	if err != nil {
 		panic(err)
@@ -121,7 +96,7 @@ func daemonize(addr, id, jaildir, host string) {
 	defer stdout.Close()
 	cmd.Stdout = stdout
 
-	// stderr
+	// Create stderr file
 	stderr, err := os.Create(path.Join(jail, "err"))
 	if err != nil {
 		panic(err)

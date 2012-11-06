@@ -44,6 +44,7 @@ func New(libpath, binary, jaildir string) *Config {
 }
 
 func (c *Config) Spawn(host circuit.Host, anchors ...string) (n.Process, error) {
+	?
 
 	h := host.(*Host).Host
 	cmd := exec.Command("ssh", h, "sh")

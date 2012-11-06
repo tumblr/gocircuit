@@ -29,23 +29,21 @@ func (i *InstallConfig) VarDir() string {
 	return path.Join(i.RootDir, "var")
 }
 
-var Install *InstallConfig
-
 func parseInstall() {
-	Install = &InstallConfig{}
+	Config.Install = &InstallConfig{}
 
 	// Try parsing install config from environment
-	Install.RootDir = os.Getenv("_CIR_IR")
-	Install.LibPath = os.Getenv("_CIR_IL")
-	Install.Binary = os.Getenv("_CIR_IB")
-	if Install.RootDir != "" {
+	Config.Install.RootDir = os.Getenv("_CIR_IR")
+	Config.Install.LibPath = os.Getenv("_CIR_IL")
+	Config.Install.Binary = os.Getenv("_CIR_IB")
+	if Config.Install.RootDir != "" {
 		return
 	}
 
 	// Try parsing the install config from a file
 	ifile := os.Getenv("CIR_INSTALL")
 	if ifile == "" {
-		Install = nil
+		Config.Install = nil
 		return
 	}
 	data, err := ioutil.ReadFile(ifile)
@@ -53,7 +51,7 @@ func parseInstall() {
 		fmt.Fprintf(os.Stderr, "Problem reading install config file (%s)", err)
 		os.Exit(1)
 	}
-	if err := json.Unmarshal(data, Install); err != nil {
+	if err := json.Unmarshal(data, Config.Install); err != nil {
 		fmt.Fprintf(os.Stderr, "Problem parsing install config file (%s)", err)
 		os.Exit(1)
 	}

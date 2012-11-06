@@ -39,19 +39,17 @@ func (z *ZookeeperConfig) DurableDir() string {
 	return path.Join(z.RootDir, "durable")
 }
 
-var Zookeeper *ZookeeperConfig
-
 func parseZookeeper() {
-	Zookeeper = &ZookeeperConfig{}
+	Config.Zookeeper = &ZookeeperConfig{}
 
 	// Try parsing Zookeeper config out of environment variables
 	zw := os.Getenv("_CIR_ZW")
 	if zw != "" {
-		Zookeeper.Workers = strings.Split(zw, ",")
-		Zookeeper.RootDir = os.Getenv("_CIR_ZR")
-		if Zookeeper.RootDir == "" {
+		Config.Zookeeper.Workers = strings.Split(zw, ",")
+		Config.Zookeeper.RootDir = os.Getenv("_CIR_ZR")
+		if Config.Zookeeper.RootDir == "" {
 			fmt.Fprintf(os.Stderr, "No Zookeeper root directory in $_CIR_ZR")
-			Zookeeper = nil
+			Config.Zookeeper = nil
 		}
 		return
 	}
@@ -63,7 +61,7 @@ func parseZookeeper() {
 		fmt.Fprintf(os.Stderr, "Problem reading install file (%s)", err)
 		os.Exit(1)
 	}
-	if err := json.Unmarshal(data, Install); err != nil {
+	if err := json.Unmarshal(data, Config.Install); err != nil {
 		fmt.Fprintf(os.Stderr, "Problem parsing install file (%s)", err)
 		os.Exit(1)
 	}

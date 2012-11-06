@@ -9,8 +9,6 @@ type SparkConfig struct {
 	Anchor   []string
 }
 
-var Spark *SparkConfig
-
 var DefaultSpark = &SparkConfig{
 	ID:       circuit.ChooseRuntimeID(),
 	BindAddr: "",

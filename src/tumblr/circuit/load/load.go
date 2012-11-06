@@ -38,7 +38,7 @@ func init() {
 	case config.Worker:
 		start(true, config.Zookeeper, config.Install, config.Spark)
 	case config.Daemonizer:
-		// ???
+		???
 	}
 }
 

@@ -32,21 +32,19 @@ type BuildConfig struct {
 	ShipDir          string  // Local directory where built runtime binary and dynamic libraries will be delivered
 }
 
-var Build *BuildConfig
-
 func parseBuild() {
 	bfile := os.Getenv("CIR_BUILD")
 	if bfile == "" {
 		return
 	}
-	Build = &BuildConfig{}
+	Config.Build = &BuildConfig{}
 	data, err := ioutil.ReadFile(bfile)
 	if err != nil {
-		Build = nil
+		Config.Build = nil
 		fmt.Fprintf(os.Stderr, "Problem reading build config file %s (%s)", bfile, err)
 		os.Exit(1)
 	}
-	if err = json.Unmarshal(data, Build); err != nil {
+	if err = json.Unmarshal(data, Config.Build); err != nil {
 		fmt.Fprintf(os.Stderr, "Problem parsing build file (%s)", err)
 		os.Exit(1)
 	}

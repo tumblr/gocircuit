@@ -34,6 +34,7 @@ const RoleEnv = "CIRCUIT_ROLE"
 
 // init determines in what context we are being run and reads the configurations accordingly
 func init() {
+	Config = &WorkerConfig{}
 	Role = parseRole(os.Getenv(RoleEnv))
 	switch Role {
 	case Main:
@@ -43,8 +44,8 @@ func init() {
 	case Worker:
 		readAsDaemonizerOrWorker()
 	}
-	if Spark == nil {
-		Spark = DefaultSpark
+	if Config.Spark == nil {
+		Config.Spark = DefaultSpark
 	}
 }
 
@@ -65,28 +66,28 @@ func readAsMain() {
 		os.Exit(1)
 	}
 	defer file.Close()
-	parseAll(file)
+	parseBag(file)
 }
 
 func readAsDaemonizerOrWorker() {
-	parseAll(os.Stdin)
+	parseBag(os.Stdin)
 }
 
-type allConfig struct {
+// WorkerConfig captures the configuration parameters of all sub-systems
+// Depending on context of execution, some will be nil.
+// Zookeeper and Install should always be non-nil.
+type WorkerConfig struct {
 	Spark     *SparkConfig
 	Zookeeper *ZookeeperConfig
 	Install   *InstallConfig
 	Build     *BuildConfig
 }
+var Config *WorkerConfig
 
-func parseAll(r io.Reader) {
-	all := &allConfig{}
-	if err := json.NewDecoder(r).Decode(all); err != nil {
-		fmt.Fprintf(os.Stderr, "Problem parsing all-in-one config (%s)", err)
+func parseBag(r io.Reader) {
+	Config = &WorkerConfig{}
+	if err := json.NewDecoder(r).Decode(Config); err != nil {
+		fmt.Fprintf(os.Stderr, "Problem parsing config (%s)", err)
 		os.Exit(1)
 	}
-	Zookeeper = all.Zookeeper
-	Install = all.Install
-	Build = all.Build	
-	Spark = all.Spark
 }
