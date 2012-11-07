@@ -24,7 +24,6 @@ func init() {
 	Role = os.Getenv(RoleEnv)
 	switch Role {
 	case "", Main:
-		println("Executing main()")
 		readAsMain()
 	case Daemonizer:
 		readAsDaemonizerOrWorker()

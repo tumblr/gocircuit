@@ -2,7 +2,6 @@ package n
 
 import (
 	"bufio"
-	"encoding/gob"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -13,22 +12,6 @@ import (
 	"tumblr/circuit/use/n"
 	"tumblr/circuit/load/config"
 )
-
-func init() {
-	gob.Register(&Host{})
-}
-
-type Host struct {
-	Host string
-}
-
-func NewHost(host string) circuit.Host {
-	return &Host{host}
-}
-
-func (h Host) String() string {
-	return h.Host
-}
 
 type Config struct {
 	LibPath string
@@ -46,7 +29,7 @@ func New(libpath, binary, jaildir string) *Config {
 
 func (c *Config) Spawn(host circuit.Host, anchors ...string) (n.Process, error) {
 
-	h := host.(*Host).Host
+	h := host.(*n.Host).Host
 	cmd := exec.Command("ssh", h, "sh")
 
 	stdin, err := cmd.StdinPipe()

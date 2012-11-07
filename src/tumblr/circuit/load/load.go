@@ -21,7 +21,6 @@ import (
 	"tumblr/circuit/use/issuefs"
 	"tumblr/circuit/use/circuit"
 	un "tumblr/circuit/use/n"
-	//"tumblr/circuit/use/n/hijack"
 	
 	"tumblr/circuit/load/config" // Side-effect of reading in configurations
 )
@@ -70,7 +69,7 @@ func start(worker bool, z *config.ZookeeperConfig, i *config.InstallConfig, s *c
 	t := transport.New(s.ID, s.BindAddr, s.Host)
 
 	// Initialize language runtime
-	circuit.Bind(lang.New(t), hostParser{})
+	circuit.Bind(lang.New(t))//
 
 	// Create anchors
 	for _, a := range s.Anchor {
@@ -96,10 +95,4 @@ func start(worker bool, z *config.ZookeeperConfig, i *config.InstallConfig, s *c
 		// Hang forever
 		<-(chan int)(nil)
 	}
-}
-
-type hostParser struct{}
-
-func (hostParser) Parse(h string) circuit.Host {
-	return sn.NewHost(h)
 }

@@ -5,29 +5,17 @@ import (
 	"tumblr/circuit/sys/lang/types"
 )
 
-var (
-	link       = join.SetThenGet{Name: "circuit language runtime"}
-	hostparser = join.SetThenGet{Name: "host parser"}
-)
+var link = join.SetThenGet{Name: "circuit language runtime"}
 
-func Bind(v runtime, hp hostParser) {
+func Bind(v runtime) {
 	link.Set(v)
-	hostparser.Set(hp)
 }
 
 func get() runtime {
 	return link.Get().(runtime)
 }
 
-func getHostParser() hostParser {
-	return hostparser.Get().(hostParser)
-}
-
 // Operators
-
-func ParseHost(h string) Host {
-	return getHostParser().Parse(h)
-}
 
 func RegisterType(v interface{}) {
 	types.RegisterType(v)

@@ -30,6 +30,6 @@ func main() {
 		}
 	}
 	println("Installing circuit.")
-	Install(config.Install, config.Build, hosts)
+	Install(config.Config.Install, config.Config.Build, hosts)
 	println("Done.")
 }

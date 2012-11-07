@@ -1,11 +1,29 @@
 package n
 
 import (
+	"encoding/gob"
 	"io"
 	"tumblr/circuit/kit/join"
 	"tumblr/circuit/use/circuit"
 )
 
+// Host
+type Host struct {
+	Host string
+}
+func init() {
+	gob.Register(&Host{})
+}
+
+func ParseHost(host string) circuit.Host {
+	return &Host{host}
+}
+
+func (h Host) String() string {
+	return h.Host
+}
+
+// Process
 type Process interface {
 	Console
 	Addr() circuit.Addr
