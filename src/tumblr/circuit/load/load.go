@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"path"
 	"strconv"
 	"time"
 
@@ -27,17 +28,22 @@ import (
 
 
 func init() {
-
 	// Seed random number generator
 	rand.Seed(time.Now().UnixNano())	
 
 	switch config.Role {
-	case config.Main:
+	case "", config.Main:
+		println("Circuit role: main")
 		start(false, config.Config.Zookeeper, config.Config.Install, config.Config.Spark)
 	case config.Worker:
+		println("Circuit role: worker")
 		start(true, config.Config.Zookeeper, config.Config.Install, config.Config.Spark)
 	case config.Daemonizer:
+		println("Circuit role: daemonizer")
 		sn.Daemonize(config.Config)
+	default:
+		println("Circuit role unrecognized:", config.Role)
+		os.Exit(1)
 	}
 }
 
@@ -63,7 +69,7 @@ func start(worker bool, z *config.ZookeeperConfig, i *config.InstallConfig, s *c
 	issuefs.Bind(zissuefs.New(iconn, z.IssueDir()))
 
 	// Initialize the networking module
-	un.Bind(sn.New(i.LibPath, i.Binary, i.JailDir()))
+	un.Bind(sn.New(i.LibPath, path.Join(i.BinDir(), i.Binary), i.JailDir()))
 
 	// Initialize transport module
 	t := transport.New(s.ID, s.BindAddr, s.Host)

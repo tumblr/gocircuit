@@ -49,10 +49,9 @@ func Build(cfg *config.BuildConfig) error {
 	if err = cmd.Start(); err != nil {
 		return err
 	}
-	// Relay stderr
-	go func() {
-		io.Copy(os.Stderr, stderr)
-	}()
+	posix.ForwardStderrBatch(stderr)
+
+	// Read result (remote directory of built bundle) from stdout
 	result, _ := ioutil.ReadAll(stdout)
 	if err = cmd.Wait(); err != nil {
 		return err

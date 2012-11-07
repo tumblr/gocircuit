@@ -7,8 +7,9 @@ import (
 	"io"
 	"os/exec"
 	"strconv"
-	"tumblr/circuit/use/circuit"
+	"tumblr/circuit/kit/posix"
 	"tumblr/circuit/sys/transport"
+	"tumblr/circuit/use/circuit"
 	"tumblr/circuit/use/n"
 	"tumblr/circuit/load/config"
 )
@@ -42,6 +43,12 @@ func (c *Config) Spawn(host circuit.Host, anchors ...string) (n.Process, error) 
 		return nil, err
 	}
 
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		return nil, err
+	}
+	posix.ForwardStderr("dmzr/stderr:", stderr)
+
 	// Start process
 	if err := cmd.Start(); err != nil {
 		return nil, err
@@ -49,9 +56,15 @@ func (c *Config) Spawn(host circuit.Host, anchors ...string) (n.Process, error) 
 	defer cmd.Wait() /// Make sure that ssh does not remain zombie
 
 	// Feed shell script to execute circuit binary
-	sh := fmt.Sprintf(
-		"LD_LIBRARY_PATH=%s DYLD_LIBRARY_PATH=%s %s=%s %s\n", 
-		c.LibPath, c.LibPath, config.RoleEnv, config.Daemonizer, c.Binary)
+	var sh string
+	if c.LibPath == "" {
+		sh = fmt.Sprintf("%s=%s %s\n", config.RoleEnv, config.Daemonizer, c.Binary)
+	} else {
+		sh = fmt.Sprintf(
+			"LD_LIBRARY_PATH=%s DYLD_LIBRARY_PATH=%s %s=%s %s\n", 
+			c.LibPath, c.LibPath, config.RoleEnv, config.Daemonizer, c.Binary)
+	}
+	println(sh)
 	stdin.Write([]byte(sh))
 
 	// Write worker configuration to stdin of running worker process

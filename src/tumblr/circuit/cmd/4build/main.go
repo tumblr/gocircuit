@@ -194,7 +194,7 @@ func isGitRepo(s string) bool {
 */
 func fetchRepo(namespace, repo, gopath string) {
 
-	// Make _build/app/src
+	// Make _build/namespace/src
 	repoSrc := path.Join(x.jail, path.Join(namespace, "src"))
 	if err := os.MkdirAll(repoSrc, 0700); err != nil {
 		Fatalf("Problem creating app source path %s (%s)\n", repoSrc, err)

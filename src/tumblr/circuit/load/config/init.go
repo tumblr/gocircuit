@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	_ "tumblr/circuit/kit/debug/ctrlc"
 )
 
 // Role determines the context within which this executable was invoked
@@ -20,6 +21,7 @@ const RoleEnv = "CIRCUIT_ROLE"
 
 // init determines in what context we are being run and reads the configurations accordingly
 func init() {
+	println("checking circuit env")
 	Config = &WorkerConfig{}
 	Role = os.Getenv(RoleEnv)
 	switch Role {
@@ -29,6 +31,9 @@ func init() {
 		readAsDaemonizerOrWorker()
 	case Worker:
 		readAsDaemonizerOrWorker()
+	default:
+		fmt.Fprintf(os.Stderr, "Circuit role '%s' not recognized\n", Role)
+		os.Exit(1)
 	}
 	if Config.Spark == nil {
 		Config.Spark = DefaultSpark
