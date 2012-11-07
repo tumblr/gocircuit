@@ -47,7 +47,7 @@ func (c *Config) Spawn(host circuit.Host, anchors ...string) (n.Process, error) 
 	if err != nil {
 		return nil, err
 	}
-	posix.ForwardStderr("dmzr/stderr:", stderr)
+	posix.ForwardStderrBatch(stderr)
 
 	// Start process
 	if err := cmd.Start(); err != nil {

@@ -68,6 +68,7 @@ func Daemonize(wc *config.WorkerConfig) {
 	// Prepare exec
 	cmd := exec.Command(os.Args[0])
 	cmd.Dir = jail
+	cmd.Env = []string{fmt.Sprintf("%s=%s", config.RoleEnv, config.Daemonizer)}
 
 	// Out-of-band pipe for reading child PID and port
 	bpr, bpw, err := os.Pipe()

@@ -28,11 +28,12 @@ import (
 
 
 func init() {
+	println("circuit/load.init()")
 	// Seed random number generator
 	rand.Seed(time.Now().UnixNano())	
 
 	switch config.Role {
-	case "", config.Main:
+	case config.Main:
 		println("Circuit role: main")
 		start(false, config.Config.Zookeeper, config.Config.Install, config.Config.Spark)
 	case config.Worker:

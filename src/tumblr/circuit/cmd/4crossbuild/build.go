@@ -38,18 +38,24 @@ func Build(cfg *config.BuildConfig) error {
 	// Execute remotely
 	cmd := exec.Command("ssh", cfg.Host, "sh -il")
 	cmd.Stdin = bytes.NewBufferString(build_sh)
+
+	// Capture stdout and stderr
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return err
 	}
+	// XXX: Forwarding stderr below seems to cause a race-condition judging from the printout
+	/*
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
 		return err
 	}
+	posix.ForwardStderrBatch(stderr)
+	*/
+
 	if err = cmd.Start(); err != nil {
 		return err
 	}
-	posix.ForwardStderrBatch(stderr)
 
 	// Read result (remote directory of built bundle) from stdout
 	result, _ := ioutil.ReadAll(stdout)
