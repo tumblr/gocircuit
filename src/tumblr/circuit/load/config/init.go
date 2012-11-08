@@ -21,11 +21,8 @@ const RoleEnv = "CIRCUIT_ROLE"
 
 // init determines in what context we are being run and reads the configurations accordingly
 func init() {
-	println("circuit/load/config.init()")
-
 	Config = &WorkerConfig{}
 	Role = os.Getenv(RoleEnv)
-	fmt.Printf("RAW ROLE=|%s|\n", Role)
 	if Role == "" {
 		Role = Main
 	}

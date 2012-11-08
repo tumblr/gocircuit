@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"strconv"
+	"strings"
 	"time"
 
 	"tumblr/circuit/kit/lockfile"
@@ -28,19 +29,15 @@ import (
 
 
 func init() {
-	println("circuit/load.init()")
 	// Seed random number generator
 	rand.Seed(time.Now().UnixNano())	
 
 	switch config.Role {
 	case config.Main:
-		println("Circuit role: main")
 		start(false, config.Config.Zookeeper, config.Config.Install, config.Config.Spark)
 	case config.Worker:
-		println("Circuit role: worker")
 		start(true, config.Config.Zookeeper, config.Config.Install, config.Config.Spark)
 	case config.Daemonizer:
-		println("Circuit role: daemonizer")
 		sn.Daemonize(config.Config)
 	default:
 		println("Circuit role unrecognized:", config.Role)
@@ -76,10 +73,11 @@ func start(worker bool, z *config.ZookeeperConfig, i *config.InstallConfig, s *c
 	t := transport.New(s.ID, s.BindAddr, s.Host)
 
 	// Initialize language runtime
-	circuit.Bind(lang.New(t))//
+	circuit.Bind(lang.New(t))
 
 	// Create anchors
 	for _, a := range s.Anchor {
+		a = strings.TrimSpace(a)
 		if err := anchorfs.CreateFile(a, t.Addr()); err != nil {
 			fmt.Fprintf(os.Stderr, "Problem creating anchor '%s' (%s)\n", a, err)
 			os.Exit(1)

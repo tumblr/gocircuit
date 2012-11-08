@@ -66,9 +66,9 @@ func Daemonize(wc *config.WorkerConfig) {
 	pie(os.MkdirAll(jail, 0700))
 
 	// Prepare exec
-	cmd := exec.Command(os.Args[0])
+	cmd := exec.Command(os.Args[0], wc.Spark.ID.String())
 	cmd.Dir = jail
-	cmd.Env = []string{fmt.Sprintf("%s=%s", config.RoleEnv, config.Daemonizer)}
+	cmd.Env = []string{fmt.Sprintf("%s=%s", config.RoleEnv, config.Worker)}
 
 	// Out-of-band pipe for reading child PID and port
 	bpr, bpw, err := os.Pipe()

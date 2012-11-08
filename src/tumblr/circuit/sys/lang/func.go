@@ -13,7 +13,9 @@ func (r *Runtime) Kill(addr circuit.Addr) error {
 	return n.Kill(addr)
 }
 
-// Daemonize can only be invoked during the life of a serveGo
+// Daemonize can only be invoked inside a serveGo.
+// For the user, this means that Daemonize can be called inside functions that
+// are invoked via circuit.Spawn
 func (r *Runtime) Daemonize(fn func()) {
 	r.dlk.Lock()
 	defer r.dlk.Unlock()
@@ -97,6 +99,7 @@ func (r *Runtime) serveGo(req *goMsg, conn circuit.Conn) {
 }
 
 func (r *Runtime) Spawn(host circuit.Host, anchor []string, fn circuit.Func, in ...interface{}) (retrn []interface{}, addr circuit.Addr, err error) {
+	println("XXXXXXXXXXXXX")
 
 	// Catch all errors
 	defer func() {
@@ -107,10 +110,12 @@ func (r *Runtime) Spawn(host circuit.Host, anchor []string, fn circuit.Func, in 
 	}()
 
 	var proc n.Process
+	println("pre-spawn")
 	proc, err = n.Spawn(host, anchor...)
 	if err != nil {
 		return nil, nil, err
 	}
+	println("spawned worker ok")
 
 	addr = proc.Addr()
 	retrn = r.remoteGo(addr, fn, in...)

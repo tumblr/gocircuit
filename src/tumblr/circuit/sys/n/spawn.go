@@ -64,7 +64,6 @@ func (c *Config) Spawn(host circuit.Host, anchors ...string) (n.Process, error) 
 			"LD_LIBRARY_PATH=%s DYLD_LIBRARY_PATH=%s %s=%s %s\n", 
 			c.LibPath, c.LibPath, config.RoleEnv, config.Daemonizer, c.Binary)
 	}
-	println(sh)
 	stdin.Write([]byte(sh))
 
 	// Write worker configuration to stdin of running worker process
@@ -74,7 +73,7 @@ func (c *Config) Spawn(host circuit.Host, anchors ...string) (n.Process, error) 
 			ID:       circuit.ChooseRuntimeID(),
 			BindAddr: "",
 			Host:     h,
-			Anchor:   append(anchors, fmt.Sprintf("/host/%s\n", host.String())),
+			Anchor:   append(anchors, fmt.Sprintf("/host/%s", host.String())),
 		},
 		Zookeeper: config.Config.Zookeeper,
 		Install:   config.Config.Install,
