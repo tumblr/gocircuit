@@ -181,10 +181,6 @@ __For:
 	return repo
 }
 
-func isGitRepo(s string) bool {
-	return strings.HasSuffix(s, ".git")
-}
-
 /*
 	_build/namespace/src/cloned_user_repo/a/src/a/b/c
 	[-------------------]					repoSrc
@@ -212,12 +208,9 @@ func fetchRepo(namespace, repo, gopath string) {
 			Fatalf("Problem cloning repo %s (%s)", repo, err)
 		}
 	} else {
-		// If user repo exists in the jail, and a repo URL is given, then pull updates
-		if isGitRepo(repo) {
-			// Pull changes
-			if err = Exec(nil, repoPath, "git", "pull", "origin", "master"); err != nil {
-				Fatalf("Problem pulling repo in %s (%s)", repoPath, err)
-			}
+		// Pull changes
+		if err = Exec(nil, repoPath, "git", "pull", "origin", "master"); err != nil {
+			Fatalf("Problem pulling repo in %s (%s)", repoPath, err)
 		}
 	}
 
