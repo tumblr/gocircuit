@@ -8,6 +8,7 @@ import (
 func (r *Runtime) Listen(service string, receiver interface{}) {
 	types.RegisterType(receiver)
 	r.srv.Add(service, receiver)
+	println("registering", service)
 }
 
 // Dial returns an ptr to the permanent xvalue of the addressed remote runtime.
@@ -40,6 +41,7 @@ func (r *Runtime) serveDial(req *dialMsg, conn circuit.Conn) {
 	// Go guarantees the defer runs even if panic occurs
 	defer conn.Close()
 
+	println("incoming for", req.Service)
 	expDial, _ := r.exportValues([]interface{}{r.srv.Get(req.Service)}, conn.Addr())
 	conn.Write(&returnMsg{Out: expDial})
 	// Waiting for export acks not necessary since expDial is always a permptr.
