@@ -59,6 +59,10 @@ type _ptr struct {
 	r    *Runtime
 }
 
+func (u *_ptr) Addr() circuit.Addr {
+	return u.imph.Exporter
+}
+
 func (u *_ptr) isX() {}
 
 func (u *_ptr) IsX() {}

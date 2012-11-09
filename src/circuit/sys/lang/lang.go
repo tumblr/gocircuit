@@ -8,6 +8,10 @@ type _ref struct {
 	value interface{}
 }
 
+func (*_ref) Addr() circuit.Addr {
+	panic("not for use")
+}
+
 func (*_ref) String() string {
 	return "XREF"
 }
@@ -24,6 +28,10 @@ type _permref struct {
 
 func (*_permref) String() string {
 	return "XPERMREF"
+}
+
+func (*_permref) Addr() circuit.Addr {
+	panic("not for use")
 }
 
 func (*_permref) IsX() {}

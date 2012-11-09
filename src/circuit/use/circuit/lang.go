@@ -11,6 +11,9 @@ package circuit
 // X is a user-facing interface.
 type X interface {
 
+	// Addr returns the address of the runtime, hosting the underlying object
+	Addr() Addr
+
 	// Call invokes the method named proc on the (possibly) remote circuit
 	// runtime where the receiver resides and delivers the returned value
 	// locally.

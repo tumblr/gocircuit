@@ -80,6 +80,10 @@ type ptrMsg struct {
 	TypeID  types.TypeID
 }
 
+func (*ptrMsg) Addr() circuit.Addr { 
+	panic("not for use")
+}
+
 func (*ptrMsg) IsX() {}
 
 func (*ptrMsg) Call(proc string, in ...interface{}) []interface{} {
@@ -96,6 +100,10 @@ type ptrPtrMsg struct {
 	Src circuit.Addr
 }
 
+func (*ptrPtrMsg) Addr() circuit.Addr { 
+	panic("not for use")
+}
+
 func (*ptrPtrMsg) IsX() {}
 
 func (*ptrPtrMsg) Call(proc string, in ...interface{}) []interface{} {
@@ -110,6 +118,10 @@ func (*ptrPtrMsg) String() string {
 type permPtrMsg struct {
 	ID      handleID
 	TypeID  types.TypeID
+}
+
+func (*permPtrMsg) Addr() circuit.Addr { 
+	panic("not for use")
 }
 
 func (*permPtrMsg) IsX() {}
@@ -130,6 +142,10 @@ type permPtrPtrMsg struct {
 	ID     handleID
 	TypeID types.TypeID
 	Src    circuit.Addr
+}
+
+func (*permPtrPtrMsg) Addr() circuit.Addr {
+	panic("not for use")
 }
 
 func (*permPtrPtrMsg) IsX() {}
