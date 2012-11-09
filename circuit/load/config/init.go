@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	_ "tumblr/circuit/kit/debug/ctrlc"
+	_ "circuit/kit/debug/ctrlc"
 )
 
 // Role determines the context within which this executable was invoked

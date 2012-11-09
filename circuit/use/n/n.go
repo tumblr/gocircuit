@@ -3,8 +3,8 @@ package n
 import (
 	"encoding/gob"
 	"io"
-	"tumblr/circuit/kit/join"
-	"tumblr/circuit/use/circuit"
+	"circuit/kit/join"
+	"circuit/use/circuit"
 )
 
 // Host

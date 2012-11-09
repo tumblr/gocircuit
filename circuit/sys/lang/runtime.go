@@ -3,9 +3,9 @@ package lang
 import (
 	"log"
 	"sync"
-	"tumblr/circuit/use/circuit"
-	"tumblr/circuit/sys/lang/prof"
-	"tumblr/circuit/sys/lang/types"
+	"circuit/use/circuit"
+	"circuit/sys/lang/prof"
+	"circuit/sys/lang/types"
 )
 
 // Runtime represents that state of the circuit program at the present moment.

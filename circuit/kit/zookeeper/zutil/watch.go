@@ -4,7 +4,7 @@ import (
 	"errors"
 	"sync"
 	"time"
-	"tumblr/circuit/kit/zookeeper"
+	"circuit/kit/zookeeper"
 )
 
 // Watch returns the Children and Get values for a Zookeeper node, while

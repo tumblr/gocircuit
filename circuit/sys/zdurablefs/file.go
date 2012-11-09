@@ -6,10 +6,10 @@ import (
 	"encoding/gob"
 	"path"
 	"sync"
-	"tumblr/circuit/use/circuit"
-	"tumblr/circuit/kit/zookeeper"
-	"tumblr/circuit/kit/zookeeper/zutil"
-	"tumblr/circuit/use/durablefs"
+	"circuit/use/circuit"
+	"circuit/kit/zookeeper"
+	"circuit/kit/zookeeper/zutil"
+	"circuit/use/durablefs"
 )
 
 type File struct {

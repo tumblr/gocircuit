@@ -3,7 +3,7 @@ package transport
 import (
 	"math/rand"
 	"sync"
-	"tumblr/circuit/use/circuit"
+	"circuit/use/circuit"
 )
 
 // Within a TCP connection, the connID distinguishes a unique logical session

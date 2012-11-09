@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 	"text/template"
-	"tumblr/circuit/kit/posix"
-	"tumblr/circuit/kit/sched/limiter"
-	"tumblr/circuit/load/config"
+	"circuit/kit/posix"
+	"circuit/kit/sched/limiter"
+	"circuit/load/config"
 )
 
 const limitParallelTasks = 20

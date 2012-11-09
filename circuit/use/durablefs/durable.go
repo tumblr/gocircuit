@@ -2,8 +2,8 @@ package durablefs
 
 import (
 	"time"
-	"tumblr/circuit/kit/join"
-	"tumblr/circuit/use/circuit"
+	"circuit/kit/join"
+	"circuit/use/circuit"
 )
 
 var link = join.SetThenGet{Name: "durable file system"}

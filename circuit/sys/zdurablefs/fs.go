@@ -2,8 +2,8 @@ package zdurablefs
 
 import (
 	"path"
-	"tumblr/circuit/use/circuit"
-	"tumblr/circuit/kit/zookeeper"
+	"circuit/use/circuit"
+	"circuit/kit/zookeeper"
 )
 
 var (

@@ -3,7 +3,7 @@ package lang
 import (
 	"reflect"
 	"sync"
-	"tumblr/circuit/use/circuit"
+	"circuit/use/circuit"
 )
 
 type importGroup struct {

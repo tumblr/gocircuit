@@ -7,11 +7,11 @@ import (
 	"io"
 	"os/exec"
 	"strconv"
-	"tumblr/circuit/kit/posix"
-	"tumblr/circuit/sys/transport"
-	"tumblr/circuit/use/circuit"
-	"tumblr/circuit/use/n"
-	"tumblr/circuit/load/config"
+	"circuit/kit/posix"
+	"circuit/sys/transport"
+	"circuit/use/circuit"
+	"circuit/use/n"
+	"circuit/load/config"
 )
 
 type Config struct {

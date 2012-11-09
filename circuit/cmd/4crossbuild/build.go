@@ -10,8 +10,8 @@ import (
 	"strings"
 	"sync"
 	"text/template"
-	"tumblr/circuit/kit/posix"
-	"tumblr/circuit/load/config"
+	"circuit/kit/posix"
+	"circuit/load/config"
 )
 
 const build_sh_src = `{{.Tool}} ` +

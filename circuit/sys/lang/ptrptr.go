@@ -2,7 +2,7 @@ package lang
 
 import (
 	"strings"
-	"tumblr/circuit/use/circuit"
+	"circuit/use/circuit"
 )
 
 func (r *Runtime) callGetPtr(srcID handleID, exporter circuit.Addr) (circuit.X, error) {

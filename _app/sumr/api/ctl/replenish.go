@@ -4,10 +4,10 @@ import (
 	"path"
 	"strconv"
 	"sync"
-	"tumblr/circuit/use/circuit"
+	"circuit/use/circuit"
 	"tumblr/app/sumr/api"
-	"tumblr/circuit/kit/sched/limiter"
-	"tumblr/circuit/use/anchorfs"
+	"circuit/kit/sched/limiter"
+	"circuit/use/anchorfs"
 )
 
 type Result struct {

@@ -1,7 +1,7 @@
 package zanchorfs
 
 import (
-	"tumblr/circuit/use/circuit"
+	"circuit/use/circuit"
 )
 
 type File struct {

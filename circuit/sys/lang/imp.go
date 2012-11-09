@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"runtime"
 	"sync"
-	"tumblr/circuit/use/circuit"
-	"tumblr/circuit/sys/lang/types"
+	"circuit/use/circuit"
+	"circuit/sys/lang/types"
 )
 
 // impTabl keeps track of values that have been imported

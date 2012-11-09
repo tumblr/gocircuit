@@ -6,10 +6,10 @@ import (
 	"os"
 	"path"
 	"strings"
-	"tumblr/circuit/use/anchorfs"
-	"tumblr/circuit/use/circuit"
-	"tumblr/circuit/use/n"
-	_ "tumblr/circuit/load"
+	"circuit/use/anchorfs"
+	"circuit/use/circuit"
+	"circuit/use/n"
+	_ "circuit/load"
 )
 
 func usage() {

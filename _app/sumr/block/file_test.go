@@ -2,7 +2,7 @@ package block
 
 import (
 	"testing"
-	"tumblr/circuit/kit/fs/diskfs"
+	"circuit/kit/fs/diskfs"
 )
 
 const testNBlobs = 100

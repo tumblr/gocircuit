@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 	"time"
-	"tumblr/circuit/use/circuit"
-	"tumblr/circuit/sys/lang/types"
-	"tumblr/circuit/use/n"
+	"circuit/use/circuit"
+	"circuit/sys/lang/types"
+	"circuit/use/n"
 )
 
 func (r *Runtime) Kill(addr circuit.Addr) error {

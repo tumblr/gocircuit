@@ -11,7 +11,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
-	"tumblr/circuit/load/config"
+	"circuit/load/config"
 )
 
 // pie (Panic-If-Error) panics if err is non-nil

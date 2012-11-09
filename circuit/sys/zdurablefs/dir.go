@@ -4,9 +4,9 @@ import (
 	"path"
 	"sync"
 	"time"
-	"tumblr/circuit/kit/zookeeper"
-	"tumblr/circuit/kit/zookeeper/zutil"
-	"tumblr/circuit/use/durablefs"
+	"circuit/kit/zookeeper"
+	"circuit/kit/zookeeper/zutil"
+	"circuit/use/durablefs"
 )
 
 // TODO: Add directory garbage collection

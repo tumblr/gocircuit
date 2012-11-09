@@ -2,7 +2,7 @@ package transport
 
 import (
 	"encoding/gob"
-	"tumblr/circuit/use/circuit"
+	"circuit/use/circuit"
 )
 
 func init() {

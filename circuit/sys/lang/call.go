@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"runtime/debug"
-	"tumblr/circuit/sys/lang/types"
+	"circuit/sys/lang/types"
 )
 
 // call invokes the method of r encoded by f with respect to t, with arguments a

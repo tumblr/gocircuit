@@ -5,8 +5,8 @@ import (
 	"math/rand"
 	"reflect"
 	"sync"
-	"tumblr/circuit/use/circuit"
-	"tumblr/circuit/sys/lang/types"
+	"circuit/use/circuit"
+	"circuit/sys/lang/types"
 )
 
 // handleID is a universal ID referring to a local value

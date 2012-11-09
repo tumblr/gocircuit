@@ -5,7 +5,7 @@ import (
 	"errors"
 	"os"
 	"path"
-	fspkg "tumblr/circuit/kit/fs"
+	fspkg "circuit/kit/fs"
 )
 
 var ErrNotDir = errors.New("not a directory")

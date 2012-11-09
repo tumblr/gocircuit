@@ -2,7 +2,7 @@ package n
 
 import (
 	"testing"
-	//"tumblr/circuit/kit/debug"
+	//"circuit/kit/debug"
 )
 
 func TestKick(t *testing.T) {

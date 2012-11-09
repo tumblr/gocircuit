@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"errors"
 	"time"
-	"tumblr/circuit/kit/zookeeper"
+	"circuit/kit/zookeeper"
 )
 
 var (

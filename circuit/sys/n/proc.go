@@ -2,8 +2,8 @@ package n
 
 import (
 	"io"
-	"tumblr/circuit/use/circuit"
-	"tumblr/circuit/sys/transport"
+	"circuit/use/circuit"
+	"circuit/sys/transport"
 )
 
 type Console struct {

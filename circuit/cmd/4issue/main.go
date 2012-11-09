@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
-	"tumblr/circuit/use/issuefs"
-	_ "tumblr/circuit/load"
+	"circuit/use/issuefs"
+	_ "circuit/load"
 )
 
 func usage() {

@@ -6,7 +6,7 @@ import (
 	"math"
 	"os"
 	"sync"
-	"tumblr/circuit/kit/fs"
+	"circuit/kit/fs"
 )
 
 type File interface {

@@ -3,7 +3,7 @@ package block
 import (
 	"os"
 	"testing"
-	"tumblr/circuit/facility/fs/diskfs"
+	"circuit/facility/fs/diskfs"
 )
 
 func TestDiskWriteRead(t *testing.T) {

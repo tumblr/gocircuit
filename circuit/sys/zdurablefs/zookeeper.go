@@ -1,8 +1,8 @@
 package zdurablefs
 
 import (
-	"tumblr/circuit/kit/zookeeper"
-	"tumblr/circuit/kit/zookeeper/zutil"
+	"circuit/kit/zookeeper"
+	"circuit/kit/zookeeper/zutil"
 )
 
 func Dial(zookeepers []string) *zookeeper.Conn {

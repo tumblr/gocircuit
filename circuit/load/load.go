@@ -9,22 +9,22 @@ import (
 	"strings"
 	"time"
 
-	"tumblr/circuit/kit/lockfile"
+	"circuit/kit/lockfile"
 	
-	"tumblr/circuit/sys/lang"
-	sn "tumblr/circuit/sys/n"
-	"tumblr/circuit/sys/transport"
-	"tumblr/circuit/sys/zanchorfs"
-	"tumblr/circuit/sys/zdurablefs"
-	"tumblr/circuit/sys/zissuefs"
+	"circuit/sys/lang"
+	sn "circuit/sys/n"
+	"circuit/sys/transport"
+	"circuit/sys/zanchorfs"
+	"circuit/sys/zdurablefs"
+	"circuit/sys/zissuefs"
 
-	"tumblr/circuit/use/anchorfs"
-	"tumblr/circuit/use/durablefs"
-	"tumblr/circuit/use/issuefs"
-	"tumblr/circuit/use/circuit"
-	un "tumblr/circuit/use/n"
+	"circuit/use/anchorfs"
+	"circuit/use/durablefs"
+	"circuit/use/issuefs"
+	"circuit/use/circuit"
+	un "circuit/use/n"
 	
-	"tumblr/circuit/load/config" // Side-effect of reading in configurations
+	"circuit/load/config" // Side-effect of reading in configurations
 )
 
 

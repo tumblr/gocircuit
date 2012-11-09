@@ -119,7 +119,7 @@ func shipCircuit() string {
 const mainSrc = `
 package main
 import (
-	_ "tumblr/circuit/load"
+	_ "circuit/load"
 	{{range .}}
 	_ "{{.}}"
 	{{end}}

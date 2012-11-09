@@ -2,9 +2,9 @@ package ctl
 
 import (
 	"log"
-	"tumblr/circuit/use/circuit"
-	"tumblr/circuit/use/durablefs"
-	"tumblr/circuit/use/n"
+	"circuit/use/circuit"
+	"circuit/use/durablefs"
+	"circuit/use/n"
 )
 
 func Remove(dfile string) error {

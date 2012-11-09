@@ -4,7 +4,7 @@ import (
 	"path"
 	"strings"
 	"time"
-	"tumblr/circuit/use/circuit"
+	"circuit/use/circuit"
 )
 
 var (

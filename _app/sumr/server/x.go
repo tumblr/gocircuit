@@ -2,7 +2,7 @@ package server
 
 import (
 	"time"
-	"tumblr/circuit/use/circuit"
+	"circuit/use/circuit"
 )
 
 func (Main) Main(diskpath string, forgetafter time.Duration) (circuit.XPerm, error) {

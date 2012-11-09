@@ -5,7 +5,7 @@ import (
 	"log"
 	"runtime/pprof"
 	"time"
-	"tumblr/circuit/use/circuit"
+	"circuit/use/circuit"
 )
 
 type acid struct{}

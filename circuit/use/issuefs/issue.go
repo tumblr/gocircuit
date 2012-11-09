@@ -6,8 +6,8 @@ import (
 	"math/rand"
 	"strconv"
 	"time"
-	"tumblr/circuit/kit/join"
-	"tumblr/circuit/use/circuit"
+	"circuit/kit/join"
+	"circuit/use/circuit"
 )
 
 type Issue struct {

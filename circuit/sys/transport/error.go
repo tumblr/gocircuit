@@ -1,6 +1,6 @@
 package transport
 
-import "tumblr/circuit/use/circuit"
+import "circuit/use/circuit"
 
 var (
 	ErrEnd            = circuit.NewError("end")

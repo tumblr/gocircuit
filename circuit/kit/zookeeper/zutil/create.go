@@ -5,7 +5,7 @@ import (
 	"errors"
 	"path"
 	"strings"
-	"tumblr/circuit/kit/zookeeper"
+	"circuit/kit/zookeeper"
 )
 
 func CreateRecursive(z *zookeeper.Conn, leafPath string, aclv []zookeeper.ACL) error {

@@ -5,8 +5,8 @@ import (
 	"time"
 	"tumblr/app/sumr"
 	"tumblr/app/sumr/block"
-	"tumblr/circuit/kit/sched/limiter"
-	"tumblr/circuit/kit/fs/diskfs"
+	"circuit/kit/sched/limiter"
+	"circuit/kit/fs/diskfs"
 )
 
 type Server struct {

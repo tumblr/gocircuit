@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"testing"
 	"time"
-	"tumblr/circuit/use/circuit"
-	"tumblr/circuit/sys/lang/types"
+	"circuit/use/circuit"
+	"circuit/sys/lang/types"
 )
 
 type testBoot struct {

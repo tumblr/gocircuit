@@ -1,8 +1,8 @@
 package anchorfs
 
 import (
-	"tumblr/circuit/use/circuit"
-	"tumblr/circuit/kit/join"
+	"circuit/use/circuit"
+	"circuit/kit/join"
 )
 
 var link = join.SetThenGet{Name: "anchor file system"}

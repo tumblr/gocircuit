@@ -9,12 +9,12 @@ import (
 	"path"
 	"sync"
 	"time"
-	"tumblr/circuit/use/circuit"
-	"tumblr/circuit/kit/sched/limiter"
-	"tumblr/circuit/kit/zookeeper"
-	"tumblr/circuit/kit/zookeeper/zutil"
-	"tumblr/circuit/use/anchorfs"
-	"tumblr/circuit/use/issuefs"
+	"circuit/use/circuit"
+	"circuit/kit/sched/limiter"
+	"circuit/kit/zookeeper"
+	"circuit/kit/zookeeper/zutil"
+	"circuit/use/anchorfs"
+	"circuit/use/issuefs"
 )
 
 // TODO: Add global locks on issue read/write

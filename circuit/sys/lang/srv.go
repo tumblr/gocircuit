@@ -2,7 +2,7 @@ package lang
 
 import (
 	"sync"
-	"tumblr/circuit/use/circuit"
+	"circuit/use/circuit"
 )
 
 type srvTabl struct {

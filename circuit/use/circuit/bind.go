@@ -1,8 +1,8 @@
 package circuit
 
 import (
-	"tumblr/circuit/kit/join"
-	"tumblr/circuit/sys/lang/types"
+	"circuit/kit/join"
+	"circuit/sys/lang/types"
 )
 
 var link = join.SetThenGet{Name: "circuit language runtime"}

@@ -4,7 +4,7 @@ import (
 	"encoding/gob"
 	"net"
 	"sync"
-	"tumblr/circuit/use/circuit"
+	"circuit/use/circuit"
 )
 
 // Addr maintains a single unique instance for each addr.

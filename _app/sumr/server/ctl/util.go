@@ -5,8 +5,8 @@ import (
 	"time"
 	"tumblr/struct/xor"
 	"tumblr/app/sumr"
-	"tumblr/circuit/use/circuit"
-	"tumblr/circuit/use/durablefs"
+	"circuit/use/circuit"
+	"circuit/use/durablefs"
 )
 
 func init() {

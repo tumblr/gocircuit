@@ -8,7 +8,7 @@ import (
 	"strings"
 	"sync"
 	"time"
-	fspkg "tumblr/circuit/kit/fs"
+	fspkg "circuit/kit/fs"
 )
 
 // FS provides a read-only file system access to a local zip file

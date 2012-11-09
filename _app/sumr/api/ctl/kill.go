@@ -3,8 +3,8 @@ package ctl
 import (
 	"log"
 	"strconv"
-	"tumblr/circuit/use/anchorfs"
-	"tumblr/circuit/use/n"
+	"circuit/use/anchorfs"
+	"circuit/use/n"
 )
 
 func Kill(c *Config) error {

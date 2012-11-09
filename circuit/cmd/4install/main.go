@@ -9,7 +9,7 @@ import (
 	"io"
 	"os"
 	"strings"
-	"tumblr/circuit/load/config"
+	"circuit/load/config"
 )
 
 func main() {

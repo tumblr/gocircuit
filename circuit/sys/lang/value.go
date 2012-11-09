@@ -3,7 +3,7 @@ package lang
 import (
 	"log"
 	"strings"
-	"tumblr/circuit/use/circuit"
+	"circuit/use/circuit"
 )
 
 func (r *Runtime) serveDropPtr(q *dropPtrMsg, conn circuit.Conn) {

@@ -1,6 +1,6 @@
 package lang
 
-import "tumblr/circuit/use/circuit"
+import "circuit/use/circuit"
 
 // _ref wraps a user object, indicating to the runtime that the user has
 // elected to send this object as a ptr across runtimes.

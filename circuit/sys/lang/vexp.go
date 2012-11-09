@@ -2,7 +2,7 @@ package lang
 
 import (
 	"reflect"
-	"tumblr/circuit/use/circuit"
+	"circuit/use/circuit"
 )
 
 type exportGroup struct {

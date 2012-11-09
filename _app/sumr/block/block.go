@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 	"tumblr/app/sumr"
-	"tumblr/circuit/kit/fs"
+	"circuit/kit/fs"
 )
 
 type Block struct {

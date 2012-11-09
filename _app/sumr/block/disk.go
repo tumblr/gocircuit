@@ -7,7 +7,7 @@ import (
 	"strings"
 	"sync"
 	"time"
-	"tumblr/circuit/kit/fs"
+	"circuit/kit/fs"
 )
 
 type Disk struct {

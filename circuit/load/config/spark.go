@@ -1,6 +1,6 @@
 package config
 
-import "tumblr/circuit/use/circuit"
+import "circuit/use/circuit"
 
 type SparkConfig struct {
 	ID       circuit.RuntimeID

@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 	"sync"
-	"tumblr/circuit/use/circuit"
+	"circuit/use/circuit"
 )
 
 // gobConn keeps a Conn instance together with its gob codecs

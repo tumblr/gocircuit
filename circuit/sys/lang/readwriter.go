@@ -5,7 +5,7 @@ import (
 	"encoding/gob"
 	"io"
 	"sync"
-	"tumblr/circuit/use/circuit"
+	"circuit/use/circuit"
 )
 
 func NewBytesConn(addr string) circuit.Conn {

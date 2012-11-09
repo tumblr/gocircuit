@@ -4,7 +4,7 @@ import (
 	"encoding/gob"
 	"io"
 	"sync"
-	"tumblr/circuit/use/circuit"
+	"circuit/use/circuit"
 )
 
 type sandbox struct {

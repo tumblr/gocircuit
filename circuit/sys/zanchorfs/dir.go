@@ -7,10 +7,10 @@ import (
 	"path"
 	"sync"
 	"time"
-	"tumblr/circuit/use/circuit"
-	"tumblr/circuit/use/anchorfs"
-	"tumblr/circuit/kit/zookeeper"
-	"tumblr/circuit/kit/zookeeper/zutil"
+	"circuit/use/circuit"
+	"circuit/use/anchorfs"
+	"circuit/kit/zookeeper"
+	"circuit/kit/zookeeper/zutil"
 )
 
 /*

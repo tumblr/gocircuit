@@ -2,8 +2,8 @@ package lang
 
 import (
 	"encoding/gob"
-	"tumblr/circuit/use/circuit"
-	"tumblr/circuit/sys/lang/types"
+	"circuit/use/circuit"
+	"circuit/sys/lang/types"
 )
 
 func init() {
