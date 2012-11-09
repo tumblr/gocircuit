@@ -140,6 +140,13 @@ func buildCircuit() {
 	defer x.env.Unset("CGO_CFLAGS")
 	defer x.env.Unset("CGO_LDFLAGS")
 
+	// Re-build application package
+	for _, apkg := range x.appPkgs {
+		if err := Exec(x.env, path.Join(x.goPath["app"], "src", apkg) , x.goCmd, "install"); err != nil {
+			Fatalf("Problem compiling main.go (%s)\n", err)
+		}
+	}
+
 	// Create a package for the runtime executable
 	binpkg := binPkg()
 	if err := os.MkdirAll(binpkg, 0700); err != nil {
@@ -159,6 +166,9 @@ func buildCircuit() {
 
 	// Build circuit runtime binary
 	println("+Building", x.binary)
+	if err := Exec(x.env, binpkg, x.goCmd, "install"); err != nil {
+		Fatalf("Problem installing main.go (%s)\n", err)
+	}
 	if err := Exec(x.env, binpkg, x.goCmd, "build"); err != nil {
 		Fatalf("Problem compiling main.go (%s)\n", err)
 	}
