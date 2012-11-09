@@ -189,5 +189,5 @@ func (t *Transport) Listener() circuit.Listener {
 }
 
 func (t *Transport) Close() {
-	panic("not supported")
+	panic("Close() not supported")
 }

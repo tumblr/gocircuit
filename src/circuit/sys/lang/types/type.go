@@ -99,6 +99,11 @@ func (t *TypeChar) Zero() reflect.Value {
 	return reflect.Zero(t.Type)
 }
 
+// New returns a Value representing a pointer to a new zero value for the underlying type.
+func (t *TypeChar) New() reflect.Value {
+	return reflect.New(t.Type)
+}
+
 // MainID returns the ID of the first method in Func.
 // It is useful for types that have exactly one method.
 func (t *TypeChar) MainID() FuncID {
@@ -114,10 +119,10 @@ type FuncID int32
 type funcChar struct {
 	// ID is a collision resistent hash of the method's signature, which
 	// includes the method name, its arguments and its replies.
-	ID          FuncID
-	Method      reflect.Method
-	InTypes    []reflect.Type
-	OutTypes  []reflect.Type
+	ID       FuncID
+	Method   reflect.Method
+	InTypes  []reflect.Type
+	OutTypes []reflect.Type
 }
 
 func makeFunc(m reflect.Method, parent *TypeChar) *funcChar {

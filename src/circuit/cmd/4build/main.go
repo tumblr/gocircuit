@@ -198,14 +198,39 @@ __For:
 	return repo
 }
 
-/*
-	_build/namespace/src/cloned_user_repo/a/src/a/b/c
-	[-------------------]					repoSrc
-	[------------------------------------]			repoPath
-	[===============]					GOPATH, if gopath == ""
-	[======================================]		GOPATH, if gopath == "/a"
-*/
+func repoSchema(s string) (schema, url string) {
+	switch {
+	case strings.HasPrefix(s, "{git}"):
+		return "git", s[len("{git}"):]
+	case strings.HasPrefix(s, "{rsync}"):
+		return "rsync", s[len("{rsync}"):]
+	}
+	Fatalf("Repo '%s' has unrecognizable schema\n", s)
+	panic("unr")
+}
+
+func cloneGitRepo(repo, parent string) {
+	// If not, clone the source tree
+	if err := Exec(nil, parent, "git", "clone", repo); err != nil {
+		Fatalf("Problem cloning repo '%s' (%s)", repo, err)
+	}
+}
+
+func pullGitRepo(dir string) {
+	if err := Exec(nil, dir, "git", "pull", "origin", "master"); err != nil {
+		Fatalf("Problem pulling repo in %s (%s)", dir, err)
+	}
+}
+
+func rsyncRepo(src, dstparent string) {
+	if err := Exec(nil, "", "rsync", "-acrv", "--exclude", ".git", "--exclude", ".hg", src, dstparent); err != nil {
+		Fatalf("Problem rsyncing dir '%s' to within '%s' (%s)", src, dstparent, err)
+	}
+}
+
 func fetchRepo(namespace, repo, gopath string) {
+
+	schema, repo := repoSchema(repo)
 
 	// Make _build/namespace/src
 	repoSrc := path.Join(x.jail, path.Join(namespace, "src"))
@@ -219,16 +244,17 @@ func fetchRepo(namespace, repo, gopath string) {
 	if err != nil {
 		Fatalf("Problem stat'ing %s (%s)", repoPath, err)
 	}
-	if !ok {
-		// If not, clone the source tree
-		if err = Exec(nil, repoSrc, "git", "clone", repo); err != nil {
-			Fatalf("Problem cloning repo %s (%s)", repo, err)
+	switch schema {
+	case "git":
+		if !ok {
+			cloneGitRepo(repo, repoSrc)
+		} else {
+			pullGitRepo(repoPath)
 		}
-	} else {
-		// Pull changes
-		if err = Exec(nil, repoPath, "git", "pull", "origin", "master"); err != nil {
-			Fatalf("Problem pulling repo in %s (%s)", repoPath, err)
-		}
+	case "rsync":
+		rsyncRepo(repo, repoSrc)
+	default:
+		Fatalf("Unrecognized repo schema: %s\n", schema)
 	}
 
 	// Create build environment for building in this repo

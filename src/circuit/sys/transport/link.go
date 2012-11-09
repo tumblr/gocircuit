@@ -185,5 +185,6 @@ func (l *link) reconnect() {
 }
 
 func (l *link) acceptReconnect(g *gobConn) error {
+	panic("reconnect not supported")
 	return ErrNotSupported
 }
