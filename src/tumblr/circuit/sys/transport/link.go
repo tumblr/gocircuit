@@ -1,6 +1,7 @@
 package transport
 
 import (
+	"io"
 	"log"
 	"sync"
 )
@@ -99,7 +100,9 @@ func (l *link) lookup(id connID) *conn {
 }
 
 func (l *link) readLoop() {
+	log.Printf("start read loop: %s", l.addr)
 	for {
+		log.Printf("___ read loop: %s", l.addr)
 
 		// Read link msg
 		l.lk.Lock()
@@ -113,7 +116,11 @@ func (l *link) readLoop() {
 		if err != nil {
 			// XXX // hook reconnect mechanism
 			// Corrupt message; close link
-			log.Printf("corrupt msg received from %s (%s)", l.addr, err)
+			if err == io.EOF {
+				log.Printf("Connection to %s closed by remote", l.addr)
+			} else {
+				log.Printf("corrupt msg or network err from %s (%s)", l.addr, err)
+			}
 			l.close()
 			return
 		}

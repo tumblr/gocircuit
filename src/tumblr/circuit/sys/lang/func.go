@@ -99,7 +99,6 @@ func (r *Runtime) serveGo(req *goMsg, conn circuit.Conn) {
 }
 
 func (r *Runtime) Spawn(host circuit.Host, anchor []string, fn circuit.Func, in ...interface{}) (retrn []interface{}, addr circuit.Addr, err error) {
-	println("XXXXXXXXXXXXX")
 
 	// Catch all errors
 	defer func() {
@@ -110,12 +109,10 @@ func (r *Runtime) Spawn(host circuit.Host, anchor []string, fn circuit.Func, in 
 	}()
 
 	var proc n.Process
-	println("pre-spawn")
 	proc, err = n.Spawn(host, anchor...)
 	if err != nil {
 		return nil, nil, err
 	}
-	println("spawned worker ok")
 
 	addr = proc.Addr()
 	retrn = r.remoteGo(addr, fn, in...)

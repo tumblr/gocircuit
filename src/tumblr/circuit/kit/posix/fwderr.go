@@ -1,6 +1,7 @@
 package posix
 
 import (
+	"bufio"
 	"io"
 	"io/ioutil"
 )
@@ -14,15 +15,11 @@ func ForwardStderrBatch(stderr io.ReadCloser) {
 
 func ForwardStderr(prefix string, stderr io.ReadCloser) {
 	go func() {
-		r := newLineReader(stderr)
+		r := bufio.NewReader(stderr)
 		for {
-			line, isprefix, err := r.ReadLine()
+			line, err := r.ReadString('\n')
 			if line != "" {
-				if isprefix {
-					println(prefix, line, "[CONTD]")
-				} else {
-					println(prefix, line)
-				}
+				println(prefix, line)
 			}
 			if err != nil {
 				break
@@ -32,6 +29,7 @@ func ForwardStderr(prefix string, stderr io.ReadCloser) {
 	}()
 }
 
+// lineReader is intended to read lines delimited by any contiguous block of \r's and \n's
 type lineReader struct {
 	io.Reader
 	fill []byte

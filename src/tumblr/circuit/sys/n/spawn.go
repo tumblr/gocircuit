@@ -47,7 +47,9 @@ func (c *Config) Spawn(host circuit.Host, anchors ...string) (n.Process, error) 
 	if err != nil {
 		return nil, err
 	}
-	posix.ForwardStderrBatch(stderr)
+	//posix.ForwardStderrBatch(stderr)
+	id := circuit.ChooseRuntimeID()
+	posix.ForwardStderr(fmt.Sprintf("|%s:stderr> ", id), stderr)
 
 	// Start process
 	if err := cmd.Start(); err != nil {
@@ -67,7 +69,6 @@ func (c *Config) Spawn(host circuit.Host, anchors ...string) (n.Process, error) 
 	stdin.Write([]byte(sh))
 
 	// Write worker configuration to stdin of running worker process
-	id := circuit.ChooseRuntimeID()
 	wc := &config.WorkerConfig{
 		Spark: &config.SparkConfig{
 			ID:       circuit.ChooseRuntimeID(),
