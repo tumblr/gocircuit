@@ -4,7 +4,7 @@ import (
 	"encoding/gob"
 	"time"
 	"tumblr/struct/xor"
-	"tumblr/app/sumr"
+	"circuit/app/sumr"
 	"circuit/use/circuit"
 	"circuit/use/durablefs"
 )

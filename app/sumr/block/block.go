@@ -6,7 +6,7 @@ import (
 	"math"
 	"sync"
 	"time"
-	"tumblr/app/sumr"
+	"circuit/app/sumr"
 	"circuit/kit/fs"
 )
 

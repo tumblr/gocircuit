@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"sync"
 	"circuit/use/circuit"
-	"tumblr/app/sumr/api"
+	"circuit/app/sumr/api"
 	"circuit/kit/sched/limiter"
 	"circuit/use/anchorfs"
 )

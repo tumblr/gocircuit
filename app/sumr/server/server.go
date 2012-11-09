@@ -3,8 +3,8 @@ package server
 import (
 	"os"
 	"time"
-	"tumblr/app/sumr"
-	"tumblr/app/sumr/block"
+	"circuit/app/sumr"
+	"circuit/app/sumr/block"
 	"circuit/kit/sched/limiter"
 	"circuit/kit/fs/diskfs"
 )

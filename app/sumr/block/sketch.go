@@ -2,7 +2,7 @@ package block
 
 import (
 	"time"
-	"tumblr/app/sumr"
+	"circuit/app/sumr"
 )
 
 // Sketch summarizes a set of points. 

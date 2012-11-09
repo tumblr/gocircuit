@@ -3,7 +3,7 @@ package api
 import (
 	"circuit/use/circuit"
 	"circuit/kit/sched/limiter"
-	"tumblr/app/sumr/client"
+	"circuit/app/sumr/client"
 )
 
 var (

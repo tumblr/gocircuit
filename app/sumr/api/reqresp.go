@@ -3,7 +3,7 @@ package api
 import (
 	"encoding/json"
 	"io"
-	"tumblr/app/sumr"
+	"circuit/app/sumr"
 )
 
 // Response is the common response object

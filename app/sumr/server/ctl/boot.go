@@ -3,8 +3,8 @@ package ctl
 import (
 	"log"
 	"sync"
-	"tumblr/app/sumr"
-	"tumblr/app/sumr/server"
+	"circuit/app/sumr"
+	"circuit/app/sumr/server"
 	"circuit/use/circuit"
 	"circuit/kit/sched/limiter"
 	"tumblr/struct/xor"
