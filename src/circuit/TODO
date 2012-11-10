@@ -1,9 +1,3 @@
-symptom: on second ping from monitor, postfilter dies
-	why is monitoring re-dialing the tcp connection for the second try?
-		alrady the booter program has an xperm to postfilter with incorrect runtime id
-
-monitor func should daemonize
-
 spam issue track deployment
 4cpu
 4doc

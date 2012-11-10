@@ -92,7 +92,6 @@ func (r *Runtime) serveGo(req *goMsg, conn circuit.Conn) {
 		return
 	}
 	expReply, ptrPtr := r.exportValues(reply, conn.Addr())
-	fmt.Fprintf(os.Stderr, "serveGo[%s] thisAddr=%s expReply: %#v\n", t.Name(), r.XAddr(), expReply)
 	err = conn.Write(&returnMsg{Out: expReply})
 	r.readGotPtrPtr(ptrPtr, conn)
 

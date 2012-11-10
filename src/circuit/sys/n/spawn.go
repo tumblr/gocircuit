@@ -71,7 +71,7 @@ func (c *Config) Spawn(host circuit.Host, anchors ...string) (n.Process, error) 
 	// Write worker configuration to stdin of running worker process
 	wc := &config.WorkerConfig{
 		Spark: &config.SparkConfig{
-			ID:       circuit.ChooseRuntimeID(),
+			ID:       id,
 			BindAddr: "",
 			Host:     h,
 			Anchor:   append(anchors, fmt.Sprintf("/host/%s", host.String())),
@@ -117,7 +117,7 @@ func (c *Config) Spawn(host circuit.Host, anchors ...string) (n.Process, error) 
 	if err != nil {
 		return nil, err
 	}
-	// println("n.Spawn -> pid=", pid, "addr=", addr.(*transport.Addr).String())
+	//println("n.Spawn -> pid=", pid, "addr=", addr.(*transport.Addr).String())
 
 	return &Process{
 		addr:   addr.(*transport.Addr),
