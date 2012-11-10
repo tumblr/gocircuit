@@ -3,7 +3,7 @@ package prof
 import (
 	"sync"
 	"time"
-	"tumblr/stat"
+	"circuit/kit/stat"
 )
 
 // Profile keeps various load-related statistics for a worker
