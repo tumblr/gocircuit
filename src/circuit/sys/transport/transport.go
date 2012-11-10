@@ -3,6 +3,7 @@ package transport
 import (
 	"encoding/gob"
 	"fmt"
+	"log"
 	"net"
 	"os"
 	"strings"
@@ -102,7 +103,7 @@ func (t *Transport) loop() {
 		if err != nil {
 			panic(err)  // Best not to be quiet about it
 		}
-		t.link(c)
+		t.link(c, nil)
 	}
 }
 
@@ -127,7 +128,7 @@ func (t *Transport) dialLink(a *Addr) (*link, error) {
 	if err != nil {
 		return nil, err
 	}
-	l, err := t.link(c)
+	l, err := t.link(c, a)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +141,7 @@ func (t *Transport) drop(id circuit.RuntimeID) {
 	t.lk.Unlock()
 }
 
-func (t *Transport) link(c *net.TCPConn) (*link, error) {
+func (t *Transport) link(c *net.TCPConn, a *Addr) (*link, error) {
 	g := newGobConn(c)
 
 	// Send-receive welcome, ala mutual authentication
@@ -157,6 +158,12 @@ func (t *Transport) link(c *net.TCPConn) (*link, error) {
 		return nil, err
 	}
 	wg.Wait() // Wait to finish sending welcome msg
+
+	if a != nil && a.ID != welcome.ID {
+		log.Printf("Dialed worker, real ID %s != expected ID %s", welcome.ID.String(), a.ID.String())
+		g.Close()
+		return nil, ErrAuth
+	}
 
 	addr := t.addrtabl.Normalize(&Addr{
 		ID:   welcome.ID, 

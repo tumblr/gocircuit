@@ -1,6 +1,7 @@
 package types
 
 import (
+	"fmt"
 	"reflect"
 	"sync"
 	"unicode"
@@ -88,6 +89,11 @@ func makeType(receiver interface{}) *TypeChar {
 	}
 
 	return k
+}
+
+// Name returns the canonical name of this circuit type
+func (t *TypeChar) Name() string {
+	return fmt.Sprintf("%s.%s(%s)", t.Type.PkgPath(), t.Type.Name(), t.Type.String())
 }
 
 func (t *TypeChar) FuncWithID(id FuncID) *funcChar {

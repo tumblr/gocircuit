@@ -111,7 +111,7 @@ func (l *link) readLoop() {
 
 		m, err := swap.Read()
 		if err != nil {
-			// XXX // hook reconnect mechanism
+			// TODO // implement and hook reconnect mechanism here
 			// Corrupt message; close link
 			if err == io.EOF {
 				log.Printf("Connection to %s closed by remote", l.addr)
@@ -185,6 +185,5 @@ func (l *link) reconnect() {
 }
 
 func (l *link) acceptReconnect(g *gobConn) error {
-	panic("reconnect not supported")
 	return ErrNotSupported
 }

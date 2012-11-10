@@ -1,8 +1,6 @@
-seems that monitor's connection to postfilter is what kills both
-	why is postfilter dying after incoming request form monitor
-		symptom: on second ping from monitor, postfilter dies
-		why is monitoring re-dialing the tcp connection for the second try?
-		why is not the second accept not handled well in postfilter's core
+symptom: on second ping from monitor, postfilter dies
+	why is monitoring re-dialing the tcp connection for the second try?
+		alrady the booter program has an xperm to postfilter with incorrect runtime id
 
 monitor func should daemonize
 
