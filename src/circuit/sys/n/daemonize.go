@@ -59,6 +59,16 @@ func dbg(n, s string) {
 	stdin.Close()
 }
 
+func environLib() []string {
+	var r []string
+	for _, line := range os.Environ() {
+		if strings.HasPrefix(line, "LD_") || strings.HasPrefix(line, "DYLD_") {
+			r = append(r, line)
+		}
+	}
+	return r
+}
+
 func Daemonize(wc *config.WorkerConfig) {
 
 	// Make jail directory
@@ -68,7 +78,7 @@ func Daemonize(wc *config.WorkerConfig) {
 	// Prepare exec
 	cmd := exec.Command(os.Args[0], wc.Spark.ID.String())
 	cmd.Dir = jail
-	cmd.Env = append(os.Environ(), fmt.Sprintf("%s=%s", config.RoleEnv, config.Worker))
+	cmd.Env = append(environLib(), fmt.Sprintf("%s=%s", config.RoleEnv, config.Worker))
 
 	// Out-of-band pipe for reading child PID and port
 	bpr, bpw, err := os.Pipe()
