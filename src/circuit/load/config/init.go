@@ -83,7 +83,7 @@ func parseBag(r io.Reader) {
 		fmt.Fprintf(os.Stderr, "Problem parsing config (%s)", err)
 		os.Exit(1)
 	}
-	if Config.Spark == nil {
+	if Config.Install == nil {
 		Config.Install = &InstallConfig{}
 	}
 }
