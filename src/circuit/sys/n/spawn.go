@@ -66,6 +66,7 @@ func (c *Config) Spawn(host circuit.Host, anchors ...string) (n.Process, error) 
 			"LD_LIBRARY_PATH=%s DYLD_LIBRARY_PATH=%s %s=%s %s\n", 
 			c.LibPath, c.LibPath, config.RoleEnv, config.Daemonizer, c.Binary)
 	}
+	println(sh)
 	stdin.Write([]byte(sh))
 
 	// Write worker configuration to stdin of running worker process
