@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"io"
 	"io/ioutil"
+	"strings"
 )
 
 func ForwardStderrBatch(stderr io.ReadCloser) {
