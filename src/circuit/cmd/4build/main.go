@@ -274,6 +274,12 @@ func fetchRepo(namespace, repo, gopath string) {
 }
 
 func buildGoCompiler(rebuild bool) {
+	// Oddly, On Linux the dynamic linker seems to need Zookeeper libs even to compile Go,
+	// likely in effect of an existing CGO_LDFLAGS.
+	x.env.Set("LD_LIBRARY_PATH", x.zlib)
+	// So, to be safe, we provision this for OSX as well.
+	x.env.Set("DYLD_LIBRARY_PATH", x.zlib)
+
 	// Check whether compiler subdirectory directory exists,
 	// $jail/go
 	ok, err := Exists(path.Join(x.jail, "/go"))
