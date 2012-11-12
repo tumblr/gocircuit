@@ -56,6 +56,10 @@ func main() {
 
 	// Initialize build environment
 	x.binary = *flagBinary
+	if strings.TrimSpace(x.binary) == "" {
+		println("Missing name of target binary")
+		os.Exit(1)
+	}
 	x.env = OSEnv()
 	x.jail = *flagJail
 	x.appPkgs = []string{*flagPkg}
