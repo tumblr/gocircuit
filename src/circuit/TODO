@@ -1,3 +1,5 @@
+4crossbuild does not relay stderr when caused by exit error
+
 spam issue track deployment
 4hardkill
 4tail

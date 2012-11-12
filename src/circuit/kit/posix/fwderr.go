@@ -19,7 +19,7 @@ func ForwardStderr(prefix string, stderr io.ReadCloser) {
 		for {
 			line, err := r.ReadString('\n')
 			if line != "" {
-				println(prefix, line)
+				println(prefix, strings.TrimRight(line, "\n \t"))
 			}
 			if err != nil {
 				break
