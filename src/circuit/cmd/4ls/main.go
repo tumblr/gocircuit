@@ -8,17 +8,29 @@ import (
 	"path"
 	"circuit/use/anchorfs"
 	_ "circuit/load"
+	"strings"
 )
 
-var flagFull = flag.Bool("f", true, "Print out full path of files and directories")
+var flagShort = flag.Bool("s", false, "Do not print full path")
 
 func main() {
 	flag.Parse()
 	if len(flag.Args()) != 1 {
-		println("Usage:", os.Args[0], "[-f] AnchorPath")
+		println("Usage:", os.Args[0], "[-s] AnchorPath")
+		println("	-s Do not print full path")
+		println("	Examples of AnchorPath: /host, /host/...")
 		os.Exit(1)
 	}
-	query := flag.Args()[0]
+	var recurse bool
+	q := strings.TrimSpace(flag.Args()[0])
+	if strings.HasSuffix(q, "...") {
+		q = q[:len(q)-len("...")]
+		recurse = true
+	}
+	ls(q, recurse, *flagShort)
+}
+
+func ls(query string, recurse, short bool) {
 	dir, err := anchorfs.OpenDir(query)
 	if err != nil {
 		log.Printf("Problem opening (%s)", err)
@@ -36,15 +48,18 @@ func main() {
 	}
 	// Print sub-directories
 	for _, d := range dirs {
-		if *flagFull {
+		if !*flagShort {
 			fmt.Println(path.Join(query, d))
 		} else {
 			fmt.Printf("/%s\n", d)
 		}
+		if recurse {
+			ls(path.Join(query, d), recurse, short)
+		}
 	}
 	// Print files
 	for f, _ := range files {
-		if *flagFull {
+		if !*flagShort {
 			fmt.Println(path.Join(query, f.String()))
 		} else {
 			fmt.Printf("%s\n", f)
