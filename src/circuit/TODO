@@ -1,17 +1,14 @@
 4crossbuild does not relay stderr when caused by exit error
 
-spam issue track deployment
 4clear
-4hardkill
 4tail
 4cpu
 4doc
 4top
 
-??? tool to fetch out/err of successfully-started runtimes
 ____________________________________________________
 
-4lsof (list registered listeners, etc. resources)
+4lsof (list registered listeners, etc. resources) and also dup the lsof of the unix process
 4stat, 4watch(anchor)
 zombie detect/kill mechanism (procs not in anchor fs)
 	add hidden flat registration space for runtime IDS in anchor file system

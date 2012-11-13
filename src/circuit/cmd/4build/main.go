@@ -51,6 +51,9 @@ var x struct {
 	goPath    map[string]string
 }
 
+// Command-line tools to be built
+var cmdPkg = []string{"4clearhelper"}
+
 func main() {
 	flag.Parse()
 
@@ -99,15 +102,26 @@ func shipCircuit() string {
 		Fatalf("Problem making packaging directory (%s)\n", err)
 	}
 
-	// Copy binaries over to shipping directory
+	// Copy worker binary over to shipping directory
 	println("+Packaging", x.binary)
-	binpkg := binPkg()
+	binpkg := workerPkgPath()
 	shipFile := path.Join(tmpdir, x.binary)
 	if _, err = CopyFile(path.Join(binpkg, x.binary), shipFile); err != nil {
-		Fatalf("Problem copying circuit binary (%s)\n", err)
+		Fatalf("Problem copying circuit worker binary (%s)\n", err)
 	}
 	if err = os.Chmod(shipFile, 0755); err != nil {
-		Fatalf("Problem chmod'ing circuit binary (%s)\n", err)
+		Fatalf("Problem chmod'ing circuit worker binary (%s)\n", err)
+	}
+
+	// Copy command-line helper tools over to shipping directory
+	for _, cpkg := range cmdPkg {
+		shipHelper := path.Join(tmpdir, cpkg)
+		if _, err = CopyFile(path.Join(helperPkgPath(cpkg), cpkg), shipHelper); err != nil {
+			Fatalf("Problem copying circuit helper binary (%s)\n", err)
+		}
+		if err = os.Chmod(shipHelper, 0755); err != nil {
+			Fatalf("Problem chmod'ing circuit helper binary (%s)\n", err)
+		}
 	}
 
 	// zookeeper lib
@@ -131,8 +145,12 @@ import (
 func main() {}
 `
 
-func binPkg() string {
+func workerPkgPath() string {
 	return path.Join(x.goPath["circuit"], "src", "autopkg", x.binary)	
+}
+
+func helperPkgPath(helper string) string {
+	return path.Join(x.goPath["circuit"], "src/circuit/cmd", helper)
 }
 
 func buildCircuit() {
@@ -152,17 +170,15 @@ func buildCircuit() {
 		Fatalf("Problem removing app pkg directory (%s)\n", err)
 	}
 
-	// Re-build application package
-	/*
-	for _, apkg := range x.appPkgs {
-		if err := Exec(x.env, path.Join(x.goPath["app"], "src", apkg) , x.goCmd, "install"); err != nil {
-			Fatalf("Problem compiling main.go (%s)\n", err)
+	// Re-build command-line tools
+	for _, cpkg := range cmdPkg {
+		if err := Exec(x.env, path.Join(x.goPath["circuit"], "src/circuit/cmd", cpkg) , x.goCmd, "build"); err != nil {
+			Fatalf("Problem compiling %s (%s)\n", cpkg, err)
 		}
 	}
-	*/
 
 	// Create a package for the runtime executable
-	binpkg := binPkg()
+	binpkg := workerPkgPath()
 	if err := os.MkdirAll(binpkg, 0700); err != nil {
 		Fatalf("Problem creating runtime package %s (%s)\n", binpkg, err)
 	}

@@ -29,6 +29,14 @@ func (i *InstallConfig) VarDir() string {
 	return path.Join(i.RootDir, "var")
 }
 
+func (i *InstallConfig) BinaryPath() string {
+	return path.Join(i.BinDir(), i.Binary)
+}
+
+func (i *InstallConfig) ClearHelperPath() string {
+	return path.Join(i.BinDir(), "4clear-helper")
+}
+
 func parseInstall() {
 	Config.Install = &InstallConfig{}
 
