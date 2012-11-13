@@ -1,3 +1,4 @@
+// 4cat dumps the contents of a specified worker's standard error to the local terminal
 package main
 
 import (

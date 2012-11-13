@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 )
 
-func Run(prog, dir string, stdin string, argv ...string) (stdout, stderr string, err error) {
+func Exec(prog, dir string, stdin string, argv ...string) (stdout, stderr string, err error) {
 	cmd := exec.Command(prog, argv...)
 	cmd.Dir = dir
 
@@ -44,21 +44,21 @@ func Run(prog, dir string, stdin string, argv ...string) (stdout, stderr string,
 }
 
 func Shell(shellStdin string) (stdout, stderr string, err error) {
-	return Run("sh", "", shellStdin)
+	return Exec("sh", "", shellStdin)
 }
 
 func RemoteShell(remoteHost, remoteShellStdin string) (stdout, stderr string, err error) {
-	return Run("ssh", "", remoteShellStdin, remoteHost, "sh -il")
+	return Exec("ssh", "", remoteShellStdin, remoteHost, "sh -il")
 }
 
 func DownloadDir(remoteHost, remoteDir, sourceDir string) error {
-	_, _, err := Run("rsync", "", "", "-acrv", "--rsh=ssh", remoteHost + ":" + remoteDir + "/", sourceDir + "/")
+	_, _, err := Exec("rsync", "", "", "-acrv", "--rsh=ssh", remoteHost + ":" + remoteDir + "/", sourceDir + "/")
 	return err
 }
 
 // UploadDir copies the contents of sourceDir recursively into remoteDir.
 // remoteDir must be present on the remote host.
 func UploadDir(remoteHost, sourceDir, remoteDir string) error {
-	_, _, err := Run("rsync", "", "", "-acrv", "--rsh=ssh", sourceDir + "/", remoteHost + ":" + remoteDir + "/")
+	_, _, err := Exec("rsync", "", "", "-acrv", "--rsh=ssh", sourceDir + "/", remoteHost + ":" + remoteDir + "/")
 	return err
 }
