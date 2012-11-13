@@ -35,8 +35,8 @@ func PermRef(v interface{}) XPerm {
 	return get().PermRef(v)
 }
 
-func XAddr() Addr {
-	return get().XAddr()
+func WorkerAddr() Addr {
+	return get().WorkerAddr()
 }
 
 func SetBoot(v interface{}) {

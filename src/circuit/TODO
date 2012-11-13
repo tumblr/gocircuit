@@ -1,25 +1,20 @@
-4crossbuild does not relay stderr when caused by exit error
+printout subscribers
+topic-specific subscriptions
 
 4tail
 4doc
 4top
-
 ____________________________________________________
 
 4lsof (list registered listeners, etc. resources) and also dup the lsof of the unix process
-4stat, 4watch(anchor)
 zombie detect/kill mechanism (procs not in anchor fs)
 	add hidden flat registration space for runtime IDS in anchor file system
 	add permanent flat registration space, where workers check in and out
-
 __________________________________________________________
 OPEN-SOURCE
 
 manual
 godoc online
-
-fix 4crossbuild incremental printout of subordinate stderr (same for n.Spawn)
-	there is some print race condition in 4crossbuild
 
 TUMBLR/config is only needed in main role (maybe mechanism badly designed)
 	also, should it guess regime (air/ewr) from circuit's config?
@@ -27,7 +22,7 @@ TUMBLR/config is only needed in main role (maybe mechanism badly designed)
 __________________________________________
 POST OPEN-SOURCE
 
-4xb takeover upload to hosts?
+4crossbuild takeover upload to hosts?
 add method for gob registration of types in circuit (use custom circuit type names?)
 
 reconnect mechanism

@@ -1,7 +1,7 @@
 package circuit
 
 type runtime interface {
-	XAddr() Addr
+	WorkerAddr() Addr
 	SetBoot(interface{})
 	Spawn(Host, []string, Func, ...interface{}) ([]interface{}, Addr, error)
 	Daemonize(func())

@@ -44,7 +44,7 @@ func New(t circuit.Transport) *Runtime {
 	return r
 }
 
-func (r *Runtime) XAddr() circuit.Addr {
+func (r *Runtime) WorkerAddr() circuit.Addr {
 	return r.dialer.Addr()
 }
 

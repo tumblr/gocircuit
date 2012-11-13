@@ -40,7 +40,7 @@ func (fs *FS) Add(msg string/*, affected circuit.Addr*/) int64 {
 	issue := &issuefs.Issue{
 		ID:       issuefs.ChooseID(),
 		Time:     time.Now(),
-		Reporter: circuit.XAddr(),
+		Reporter: circuit.WorkerAddr(),
 		//Affected: affected,
 		Anchor:   anchorfs.Created(),
 		Msg:      msg,
