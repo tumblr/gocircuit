@@ -12,6 +12,7 @@ import (
 	"text/template"
 	"circuit/kit/posix"
 	"circuit/load/config"
+	"fmt"
 )
 
 const build_sh_src = `{{.Tool}} ` +
@@ -36,7 +37,7 @@ func Build(cfg *config.BuildConfig) error {
 	}
 
 	// Execute remotely
-	cmd := exec.Command("ssh", cfg.Host, "sh -il")
+	cmd := exec.Command("ssh", cfg.Host, "sh")
 	cmd.Stdin = bytes.NewBufferString(build_sh)
 
 	// Capture stdout and stderr
@@ -44,14 +45,12 @@ func Build(cfg *config.BuildConfig) error {
 	if err != nil {
 		return err
 	}
-	// XXX: Forwarding stderr below seems to cause a race-condition judging from the printout
-	/*
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
 		return err
 	}
-	posix.ForwardStderrBatch(stderr)
-	*/
+	prefix := fmt.Sprintf("%s:4build>", cfg.Host)
+	posix.ForwardStderr(prefix, stderr)
 
 	if err = cmd.Start(); err != nil {
 		return err

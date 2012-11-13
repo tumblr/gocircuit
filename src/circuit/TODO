@@ -1,9 +1,6 @@
 4crossbuild does not relay stderr when caused by exit error
-changing binary names in build config results in building old names as well
-4clear does not seem to remove zombie jails
 
 4tail
-4cpu
 4doc
 4top
 
