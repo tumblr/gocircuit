@@ -6,6 +6,7 @@ import (
 	"runtime/pprof"
 	"time"
 	"circuit/use/circuit"
+	"runtime"
 )
 
 type acid struct{}
@@ -44,4 +45,14 @@ func (s *acid) CPUProfile(duration time.Duration) ([]byte, error) {
 	time.Sleep(duration)
 	pprof.StopCPUProfile()
 	return w.Bytes(), nil
+}
+
+type Stat struct {
+	runtime.MemStats
+}
+
+func (s *acid) Stat() *Stat {
+	r := &Stat{}
+	runtime.ReadMemStats(&r.MemStats)
+	return r
 }

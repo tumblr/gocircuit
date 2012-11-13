@@ -1,11 +1,9 @@
-printout subscribers
-topic-specific subscriptions
-
+4top
 4tail
 4doc
-4top
 ____________________________________________________
 
+topic-specific subscriptions
 4lsof (list registered listeners, etc. resources) and also dup the lsof of the unix process
 zombie detect/kill mechanism (procs not in anchor fs)
 	add hidden flat registration space for runtime IDS in anchor file system

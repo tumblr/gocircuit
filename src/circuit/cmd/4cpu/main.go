@@ -3,7 +3,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	_ "circuit/load"
 	"circuit/use/anchorfs"
@@ -29,18 +28,18 @@ func main() {
 	// Find anchor file
 	file, err := anchorfs.OpenFile(os.Args[1])
 	if err != nil {
-		log.Printf("Problem opening (%s)", err)
+		fmt.Fprintf(os.Stderr, "Problem opening (%s)\n", err)
 		os.Exit(1)
 	}
 	x, err := circuit.TryDial(file.Owner(), "acid")
 	if err != nil {
-		log.Printf("Problem dialing acid service (%s)", err)
+		fmt.Fprintf(os.Stderr, "Problem dialing acid service (%s)\n", err)
 		os.Exit(1)
 	}
 
 	defer func() {
 		if p := recover(); p != nil {
-			log.Printf("Worker disappeared during call (%#v)", p)
+			fmt.Fprintf(os.Stderr, "Worker disappeared during call (%#v)\n", p)
 			os.Exit(1)
 		}
 	}()
@@ -48,7 +47,7 @@ func main() {
 	// Connect to worker
 	retrn := x.Call("CPUProfile", dur)
 	if err, ok := retrn[1].(error); ok && err != nil {
-		log.Printf("Problem obtaining CPU profile (%s)", err)
+		fmt.Fprintf(os.Stderr, "Problem obtaining CPU profile (%s)\n", err)
 		os.Exit(1)
 	}
 	fmt.Println(string(retrn[0].([]byte)))
