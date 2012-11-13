@@ -35,9 +35,9 @@ func main() {
 			continue
 		}
 
-		workerJail := path.Join(jailDir, fi.Name(), "lock")
+		workerJail := path.Join(jailDir, fi.Name())
 		println("Clearing", workerJail)
-		l, err := lockfile.Create(workerJail)
+		l, err := lockfile.Create(path.Join(workerJail, "lock"))
 		if err != nil {
 			// This worker is alive; still holding lock; move on
 			println(err.Error())
