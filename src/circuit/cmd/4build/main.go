@@ -52,7 +52,7 @@ var x struct {
 }
 
 // Command-line tools to be built
-var cmdPkg = []string{"4clearhelper"}
+var cmdPkg = []string{"4clear-helper"}
 
 func main() {
 	flag.Parse()

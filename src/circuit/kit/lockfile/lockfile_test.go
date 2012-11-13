@@ -5,7 +5,7 @@ import (
 )
 
 func TestLockFile(t *testing.T) {
-	const name = "¶testdir/test.lock"
+	const name = "/tmp/test.lock"
 	lock, err := Create(name)
 	if err != nil {
 		t.Fatalf("create lock (%s)", err)
