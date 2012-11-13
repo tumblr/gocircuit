@@ -58,6 +58,7 @@ type fs interface {
 	List() []*Issue
 	Subscribe(email string) error
 	Unsubscribe(email string) error
+	Subscribers() ([]string, error)
 }
 
 // Bindings
@@ -81,6 +82,10 @@ func List() []*Issue {
 
 func Resolve(id int64) error {
 	return get().Resolve(id)
+}
+
+func Subscribers() ([]string, error) {
+	return get().Subscribers()
 }
 
 func Subscribe(email string) error {

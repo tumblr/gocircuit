@@ -8,7 +8,7 @@ import (
 )
 
 func usage() {
-	println("Usage:", os.Args[0], "(ls | resolve ID | subscribe Email | unsubscribe Email)")
+	println("Usage:", os.Args[0], "(ls | resolve ID | subscribers | subscribe Email | unsubscribe Email)")
 	os.Exit(1)
 }
 
@@ -24,6 +24,15 @@ func main() {
 		if err := issuefs.Subscribe(os.Args[2]); err != nil {
 			println("Email already subscribed")
 			os.Exit(1)
+		}
+	case "subscribers":
+		subs, err := issuefs.Subscribers()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Problem reading subscribers from Zookeeper (%s)\n", err)
+			os.Exit(1)
+		}
+		for _, s := range subs {
+			fmt.Printf("%s\n", s)
 		}
 	case "unsubscribe":
 		if len(os.Args) != 3 {

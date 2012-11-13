@@ -109,6 +109,16 @@ func (fs *FS) Resolve(id int64) error {
 	return nil
 }
 
+func (fs *FS) Subscribers() ([]string, error) {
+	fs.Lock()
+	defer fs.Unlock()
+	emails, _, err := fs.z.Children(path.Join(fs.root, "listener"))
+	if err != nil {
+		return nil, err
+	}
+	return emails, nil
+}
+
 func (fs *FS) Subscribe(email string) error {
 	fs.Lock()
 	defer fs.Unlock()
