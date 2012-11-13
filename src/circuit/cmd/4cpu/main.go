@@ -8,13 +8,25 @@ import (
 	_ "circuit/load"
 	"circuit/use/anchorfs"
 	"circuit/use/circuit"
+	"strconv"
+	"time"
 )
 
 func main() {
-	if len(os.Args) != 2 {
-		println("Usage:", os.Args[0], "AnchorPath")
+	if len(os.Args) != 3 {
+		println("Usage:", os.Args[0], "AnchorPath DurationSeconds")
 		os.Exit(1)
 	}
+	
+	// Parse duration
+	dursec, err := strconv.Atoi(os.Args[2])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Problem parsing duration (%s)\n", err)
+		os.Exit(1)
+	}
+	dur := time.Duration(int64(dursec)*1e9)
+
+	// Find anchor file
 	file, err := anchorfs.OpenFile(os.Args[1])
 	if err != nil {
 		log.Printf("Problem opening (%s)", err)
@@ -33,9 +45,10 @@ func main() {
 		}
 	}()
 
-	retrn := x.Call("RuntimeProfile", "goroutine", 1)
+	// Connect to worker
+	retrn := x.Call("CPUProfile", dur)
 	if err, ok := retrn[1].(error); ok && err != nil {
-		log.Printf("Problem obtaining runtime profile (%s)", err)
+		log.Printf("Problem obtaining CPU profile (%s)", err)
 		os.Exit(1)
 	}
 	fmt.Println(string(retrn[0].([]byte)))
