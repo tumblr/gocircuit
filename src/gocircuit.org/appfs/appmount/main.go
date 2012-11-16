@@ -20,8 +20,8 @@ import (
 	"sync"
 	"runtime"
 
-	"code.google.com/p/rsc/appfs/client"
-	"code.google.com/p/rsc/appfs/proto"
+	"gocircuit.org/appfs/client"
+	"gocircuit.org/appfs/proto"
 	"code.google.com/p/rsc/fuse"
 	"code.google.com/p/rsc/keychain"
 )
