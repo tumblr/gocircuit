@@ -5,7 +5,7 @@ import (
 )
 
 // Limiter schedules go routines for execution, while ensuring that no more than a
-// pre-set limit run at a time.
+// pre-set limit run at any time.
 type Limiter struct {
 	ch chan struct{}
 	wg sync.WaitGroup
