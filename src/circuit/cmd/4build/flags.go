@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"path"
 	"os"
+	"strings"
 )
 
 var (
@@ -25,6 +26,8 @@ var (
 
 	flagCircuitRepo = flag.String("cir", "git@github.com:tumblr/gocircuit.git", "Circuit repository")
 	flagCircuitPath = flag.String("cirsrc", ".", "GOPATH relative to circuit repository")
+
+	flagPrefixPath  = flag.String("prefixpath", "", "Prefix to add to default PATH environment")
 )
 
 // Flags is used to persist the state of command-line flags in the jail
@@ -40,6 +43,7 @@ type Flags struct {
 	ZLib        string
 	CircuitRepo string
 	CircuitPath string
+	PrefixPath  string
 }
 
 func (flags *Flags) FlagsFile() string {
@@ -58,17 +62,18 @@ type FlagsChanged struct {
 
 func getFlags() *Flags {
 	return &Flags{
-		Binary:      *flagBinary,
-		Jail:        *flagJail,
-		AppRepo:     *flagAppRepo,
-		AppPath:     *flagAppPath,
-		Pkg:         *flagPkg,
+		Binary:      strings.TrimSpace(*flagBinary),
+		Jail:        strings.TrimSpace(*flagJail),
+		AppRepo:     strings.TrimSpace(*flagAppRepo),
+		AppPath:     strings.TrimSpace(*flagAppPath),
+		Pkg:         strings.TrimSpace(*flagPkg),
 		Show:        *flagShow,
 		RebuildGo:   *flagRebuildGo,
-		ZInclude:    *flagZInclude,
-		ZLib:        *flagZLib,
-		CircuitRepo: *flagCircuitRepo,
-		CircuitPath: *flagCircuitPath,
+		ZInclude:    strings.TrimSpace(*flagZInclude),
+		ZLib:        strings.TrimSpace(*flagZLib),
+		CircuitRepo: strings.TrimSpace(*flagCircuitRepo),
+		CircuitPath: strings.TrimSpace(*flagCircuitPath),
+		PrefixPath:  strings.TrimSpace(*flagPrefixPath),
 	}
 }
 

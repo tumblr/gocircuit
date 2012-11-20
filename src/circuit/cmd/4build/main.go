@@ -45,6 +45,9 @@ func main() {
 		os.Exit(1)
 	}
 	x.env = OSEnv()
+	if flags.PrefixPath != "" {
+		x.env.Set("PATH", flags.PrefixPath + ":" + x.env.Get("PATH"))
+	}
 	x.jail = flags.Jail
 	x.appPkgs = []string{flags.Pkg}
 	x.zinclude = flags.ZInclude

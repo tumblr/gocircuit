@@ -20,7 +20,7 @@ const build_sh_src = `{{.Tool}} ` +
 	`'-app={{.AppRepo}}' '-appsrc={{.AppSrc}}' ` +
 	`'-pkg={{.Pkg}}' '-show={{.Show}}' '-rebuildgo={{.RebuildGo}}' ` +
 	`'-zinclude={{.ZookeeperInclude}}' '-zlib={{.ZookeeperLib}}' ` +
-	`'-cir={{.CircuitRepo}}' '-cirsrc={{.CircuitSrc}}' `
+	`'-cir={{.CircuitRepo}}' '-cirsrc={{.CircuitSrc}}' '-prefixpath={{.PrefixPath}}' `
 
 func Build(cfg *config.BuildConfig) error {
 	// Prepare sh script

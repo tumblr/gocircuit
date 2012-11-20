@@ -28,6 +28,7 @@ type BuildConfig struct {
 	CircuitSrc       string
 
 	Host             string  // Host where build takes place
+	PrefixPath       string  // PATH to pre-pend to default PATH environment on build host
 	Tool             string  // Build tool path on build host
 	ShipDir          string  // Local directory where built runtime binary and dynamic libraries will be delivered
 }
