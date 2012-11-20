@@ -1,5 +1,3 @@
-4build: rsync method should not fetch object files, repo special files, executables, etc.
-
 tumblr app structure
 4out, 4err
 4tail
