@@ -28,6 +28,9 @@ func Fatalf(fmt_ string, arg_ ...interface{}) {
 func MakeTempDir() (string, error) {
 	tempRoot := os.TempDir()
 	abs := path.Join(tempRoot, strconv.FormatInt(rand.Int63(), 16))
+	if err := os.RemoveAll(abs); err != nil {
+		return "", err
+	}
 	if err := os.MkdirAll(abs, 0755); err != nil {
 		return "", err
 	}

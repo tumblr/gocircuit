@@ -4,7 +4,6 @@ package main
 
 import (
 	"bytes"
-	"flag"
 	"io/ioutil"
 	"path"
 	"os"
@@ -12,30 +11,12 @@ import (
 	"text/template"
 )
 
-var (
-	flagBinary           = flag.String("binary", "4r", "Preferred name for the resulting runtime binary")
-	flagJail             = flag.String("jail", path.Join(os.Getenv("HOME"), "_circuit/build"), "Build jail directory")
-
-	flagAppRepo          = flag.String("app", "", "App repository")
-	flagAppPath          = flag.String("appsrc", "", "GOPATH relative to app repository")
-
-	flagPkg              = flag.String("pkg", "", "Package to import for side-effects in circuit runtime binary")
-
-	flagShow             = flag.Bool("show", false, "Show output of underlying build commands")
-	flagRebuildGo        = flag.Bool("rebuildgo", false, "Force fetch and rebuild of the Go compiler")
-
-	flagZookeeperInclude = flag.String("zinclude", path.Join(os.Getenv("HOME"), "local/include/c-client-src") , "Zookeeper C headers directory")
-	flagZookeeperLib     = flag.String("zlib", path.Join(os.Getenv("HOME"), "local/lib") , "Zookeeper libraries directory")
-
-	flagCircuitRepo      = flag.String("cir", "git@github.com:tumblr/gocircuit.git", "Circuit repository")
-	flagCircuitPath      = flag.String("cirsrc", ".", "GOPATH relative to circuit repository")
-)
-
 /*
 	Build jail layout:
-		_build/go
-		_build/app/src
-		_build/circuit/src
+		/flags
+		/go
+		/app/src
+		/circuit/src
 */
 
 var x struct {
@@ -55,19 +36,19 @@ var x struct {
 var cmdPkg = []string{"4clear-helper"}
 
 func main() {
-	flag.Parse()
+	flags, flagsChanged := LoadFlags()
 
 	// Initialize build environment
-	x.binary = *flagBinary
+	x.binary = flags.Binary
 	if strings.TrimSpace(x.binary) == "" {
 		println("Missing name of target binary")
 		os.Exit(1)
 	}
 	x.env = OSEnv()
-	x.jail = *flagJail
-	x.appPkgs = []string{*flagPkg}
-	x.zinclude = *flagZookeeperInclude
-	x.zlib = *flagZookeeperLib
+	x.jail = flags.Jail
+	x.appPkgs = []string{flags.Pkg}
+	x.zinclude = flags.ZInclude
+	x.zlib = flags.ZLib
 	x.goPath = make(map[string]string)
 
 	// Make jail if not present
@@ -77,13 +58,14 @@ func main() {
 	}
 
 	Errorf("Building Go compiler\n")
-	buildGoCompiler(*flagRebuildGo)
+	buildGoCompiler(flags.RebuildGo)
 
 	Errorf("Updating circuit repository\n")
-	fetchRepo("circuit", *flagCircuitRepo, *flagCircuitPath)
+	// If repo name or fetch method has changed, remove any pre-existing clone
+	fetchRepo("circuit", flags.CircuitRepo, flags.CircuitPath, flagsChanged.CircuitRepo)
 
 	Errorf("Updating app repository\n")
-	fetchRepo("app", *flagAppRepo, *flagAppPath)
+	fetchRepo("app", flags.AppRepo, flags.AppPath, flagsChanged.AppRepo)
 
 	Errorf("Building circuit binaries\n")
 	buildCircuit()
@@ -94,6 +76,8 @@ func main() {
 
 	// Print temporary directory containing bundle
 	Printf("%s\n", bundleDir)
+
+	SaveFlags(flags)
 }
 
 func shipCircuit() string {
@@ -179,6 +163,9 @@ func buildCircuit() {
 
 	// Create a package for the runtime executable
 	binpkg := workerPkgPath()
+	if err := os.RemoveAll(binpkg); err != nil {
+		Fatalf("Problem removing old autopkg directory %s (%s)\n", binpkg, err)
+	}
 	if err := os.MkdirAll(binpkg, 0700); err != nil {
 		Fatalf("Problem creating runtime package %s (%s)\n", binpkg, err)
 	}
@@ -248,12 +235,19 @@ func rsyncRepo(src, dstparent string) {
 	}
 }
 
-func fetchRepo(namespace, repo, gopath string) {
+func fetchRepo(namespace, repo, gopath string, fetchFresh bool) {
 
 	schema, repo := repoSchema(repo)
 
+	// If fetching fresh, remove pre-existing clones
+	if fetchFresh {
+		if err := os.RemoveAll(path.Join(x.jail, namespace)); err != nil {
+			Fatalf("Problem removing old repo clone (%s)\n", err)
+		}
+	}
+
 	// Make _build/namespace/src
-	repoSrc := path.Join(x.jail, path.Join(namespace, "src"))
+	repoSrc := path.Join(x.jail, namespace, "src")
 	if err := os.MkdirAll(repoSrc, 0700); err != nil {
 		Fatalf("Problem creating app source path %s (%s)\n", repoSrc, err)
 	}
