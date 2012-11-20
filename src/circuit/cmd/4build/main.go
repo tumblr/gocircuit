@@ -299,8 +299,7 @@ func buildGoCompiler(rebuild bool) {
 	if err != nil {
 		Fatalf("Problem stat'ing %s (%s)", path.Join(x.jail, "/go"), err)
 	}
-	//Errorf("EEE %#v\n", x.env.Environ())
-	Exec(x.env, x.jail, "env")
+	//Exec(x.env, x.jail, "which", "hg")
 	if !ok {
 		// If not, fetch the source tree
 		if err = Exec(x.env, x.jail, "hg", "clone", "-u", "tip", "https://code.google.com/p/go"); err != nil {
