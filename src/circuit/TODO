@@ -1,23 +1,16 @@
 tumblr app structure
-4out, 4err
-4tail
+	not seeing greeting message "using tumblr env ..."
+	not seeing jail for postfilter sometimes
+
+4jailcat
+4jailtail
 4doc
 ____________________________________________________
-
 topic-specific subscriptions
 4lsof (list registered listeners, etc. resources) and also dup the lsof of the unix process
 zombie detect/kill mechanism (procs not in anchor fs)
 	add hidden flat registration space for runtime IDS in anchor file system
 	add permanent flat registration space, where workers check in and out
-__________________________________________________________
-OPEN-SOURCE
-
-manual
-godoc online
-
-TUMBLR/config is only needed in main role (maybe mechanism badly designed)
-	also, should it guess regime (air/ewr) from circuit's config?
-
 __________________________________________
 POST OPEN-SOURCE
 
