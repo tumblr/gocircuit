@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"circuit/sys/lang"
+	"circuit/sys/acid"
 	"circuit/use/anchorfs"
 	"circuit/use/circuit"
 	_ "circuit/load"
@@ -82,7 +82,7 @@ func topFile(anchor string, id circuit.RuntimeID, addr circuit.Addr) {
 		}
 	}()
 
-	r := x.Call("Stat")[0].(*lang.Stat)
+	r := x.Call("Stat")[0].(*acid.Stat)
 	fmt.Printf("%40s: user=%s sys=%s #malloc=%d #free=%d\n", 
 		anchor, FormatBytes(r.MemStats.Alloc), FormatBytes(r.MemStats.Sys),
 		r.MemStats.Mallocs, r.MemStats.Frees,
