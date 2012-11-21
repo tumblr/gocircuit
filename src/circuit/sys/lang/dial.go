@@ -36,6 +36,10 @@ func (r *Runtime) TryDial(addr circuit.Addr, service string) (circuit.X, error) 
 	return r.importEitherPtr(retrn, addr)
 }
 
+func (r *Runtime) DialSelf(service string) interface{} {
+	return r.srv.Get(service)
+}
+
 func (r *Runtime) serveDial(req *dialMsg, conn circuit.Conn) {
 	// Go guarantees the defer runs even if panic occurs
 	defer conn.Close()

@@ -7,6 +7,7 @@ type runtime interface {
 	Daemonize(func())
 	Kill(Addr) error
 	Dial(Addr, string) X
+	DialSelf(string) interface{}
 	TryDial(Addr, string) (X, error)
 	Listen(string, interface{})
 	Export(...interface{}) interface{}

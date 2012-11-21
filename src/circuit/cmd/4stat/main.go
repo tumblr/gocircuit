@@ -18,9 +18,9 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Problem opening (%s)", err)
 		os.Exit(1)
 	}
-	x, err := circuit.TryDial(file.Owner(), os.Args[2])
+	x, err := circuit.TryDial(file.Owner(), "acid")
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Problem dialing '%s' service (%s)", os.Args[2], err)
+		fmt.Fprintf(os.Stderr, "Problem dialing 'acid' service (%s)", err)
 		os.Exit(1)
 	}
 
@@ -31,8 +31,8 @@ func main() {
 		}
 	}()
 
-	retrn := x.Call("Stat")
-	fmt.Println(retrn[0].(Stringer).String())
+	retrn := x.Call("StatServiceOnBehalf", os.Args[2])
+	fmt.Println(retrn[0].(string))
 }
 
 type Stringer interface {

@@ -79,6 +79,10 @@ func Dial(addr Addr, service string) X {
 	return get().Dial(addr, service)
 }
 
+func DialSelf(service string) interface{} {
+	return get().DialSelf(service)
+}
+
 // Listen registers receiver as a ..
 func Listen(service string, receiver interface{}) {
 	get().Listen(service, receiver)

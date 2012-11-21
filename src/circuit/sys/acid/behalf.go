@@ -1,0 +1,36 @@
+package acid
+
+import (
+	"circuit/use/circuit"
+	"fmt"
+	"reflect"
+)
+
+type Stringer interface {
+	String() string
+}
+
+func (s *Acid) StatServiceOnBehalf(service string) (r string) {
+
+	// If anything goes wrong, let's not panic the worker
+	defer func() {
+		if p := recover(); p != nil {
+			r = fmt.Sprintf("Stat likely not supported:\n%#v", p)
+		}
+	}()
+
+	// Obtain service object in this worker
+	srv := circuit.DialSelf(service)
+	if srv == nil {
+		return "Service not available"
+	}
+
+	// Find Stat method in service receiver s
+	sv := reflect.ValueOf(srv)
+	out := sv.MethodByName("Stat").Call(nil)
+	if len(out) != 1 {
+		return "Service's Stat method returns more than one value"
+	}
+
+	return out[0].Interface().(Stringer).String()
+}

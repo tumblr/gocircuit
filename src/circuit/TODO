@@ -5,6 +5,7 @@ tumblr app structure
 update circuit's firehose driver
 	test firehose driver for correct reconnects
 
+4stat does not know the types of remote services, so can't import handles
 pass slice and map
 	4jailcat
 	4jailtail
