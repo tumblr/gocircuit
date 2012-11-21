@@ -1,4 +1,4 @@
-package lang
+package acid
 
 import (
 	"bytes"
@@ -9,19 +9,27 @@ import (
 	"runtime"
 )
 
-type acid struct{}
+func New() *Acid {
+	return &Acid{}
+}
+
+type Acid struct{}
+
+func init() {
+	circuit.RegisterType(New())
+}
 
 /*
-func (s *acid) Stat(runtime.Frame) *profile.WorkerStat {
+func (s *Acid) Stat(runtime.Frame) *profile.WorkerStat {
 	return s.profile.Stat()
 }
 */
 
 // Ping is a nop. Its intended use is as a basic check whether a worker is still alive.
-func (s *acid) Ping() {}
+func (s *Acid) Ping() {}
 
 // RuntimeProfile exposes the Go runtime profiling framework of this worker
-func (s *acid) RuntimeProfile(name string, debug int) ([]byte, error) {
+func (s *Acid) RuntimeProfile(name string, debug int) ([]byte, error) {
 	prof := pprof.Lookup(name)
 	if prof == nil {
 		return nil, circuit.NewError("no such profile")
@@ -33,7 +41,7 @@ func (s *acid) RuntimeProfile(name string, debug int) ([]byte, error) {
 	return w.Bytes(), nil
 }
 
-func (s *acid) CPUProfile(duration time.Duration) ([]byte, error) {
+func (s *Acid) CPUProfile(duration time.Duration) ([]byte, error) {
 	if duration > time.Hour {
 		return nil, circuit.NewError("cpu profile duration exceeds 1 hour")
 	}
@@ -51,7 +59,7 @@ type Stat struct {
 	runtime.MemStats
 }
 
-func (s *acid) Stat() *Stat {
+func (s *Acid) Stat() *Stat {
 	r := &Stat{}
 	runtime.ReadMemStats(&r.MemStats)
 	return r

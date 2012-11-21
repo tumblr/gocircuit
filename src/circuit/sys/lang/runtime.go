@@ -4,6 +4,7 @@ import (
 	"log"
 	"sync"
 	"circuit/use/circuit"
+	"circuit/sys/acid"
 	"circuit/sys/lang/prof"
 	"circuit/sys/lang/types"
 )
@@ -40,7 +41,7 @@ func New(t circuit.Transport) *Runtime {
 			r.accept(t)
 		}
 	}()
-	r.Listen("acid", &acid{})
+	r.Listen("acid", acid.New())
 	return r
 }
 
