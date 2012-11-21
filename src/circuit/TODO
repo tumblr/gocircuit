@@ -1,11 +1,13 @@
 tumblr app structure
 	not seeing greeting message "using tumblr env ..."
 	not seeing jail for postfilter sometimes
-update circuit's firehose driver
 
-4jailcat
-4jailtail
-4doc
+update circuit's firehose driver
+	test firehose driver for correct reconnects
+
+pass slice and map
+	4jailcat
+	4jailtail
 
 Ref -> XVal (ExportValue)?
 RefFile -> XFile (ExportFile)?
