@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	_ "circuit/load"
 	"circuit/use/anchorfs"
@@ -16,18 +15,18 @@ func main() {
 	}
 	file, err := anchorfs.OpenFile(os.Args[1])
 	if err != nil {
-		log.Printf("Problem opening (%s)", err)
+		fmt.Fprintf(os.Stderr, "Problem opening (%s)", err)
 		os.Exit(1)
 	}
 	x, err := circuit.TryDial(file.Owner(), os.Args[2])
 	if err != nil {
-		log.Printf("Problem dialing '%s' service (%s)", os.Args[2], err)
+		fmt.Fprintf(os.Stderr, "Problem dialing '%s' service (%s)", os.Args[2], err)
 		os.Exit(1)
 	}
 
 	defer func() {
 		if p := recover(); p != nil {
-			log.Printf("Worker disappeared during call (%#v)", p)
+			fmt.Fprintf(os.Stderr, "Worker disappeared during call (%#v)", p)
 			os.Exit(1)
 		}
 	}()
