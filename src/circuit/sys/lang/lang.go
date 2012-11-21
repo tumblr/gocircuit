@@ -46,6 +46,9 @@ func (*_permref) Call(proc string, in ...interface{}) []interface{} {
 // passed cross-runtime, the runtime will pass v as via a cross-runtime pointer
 // rather than by value.
 func (*Runtime) Ref(v interface{}) circuit.X {
+	if v == nil {
+		return nil
+	}
 	return Ref(v)
 }
 
@@ -67,6 +70,9 @@ func Ref(v interface{}) circuit.X {
 }
 
 func (*Runtime) PermRef(v interface{}) circuit.XPerm {
+	if v == nil {
+		return nil
+	}
 	return PermRef(v)
 }
 

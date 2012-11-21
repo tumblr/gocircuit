@@ -44,7 +44,7 @@ func (r *Runtime) serveDial(req *dialMsg, conn circuit.Conn) {
 	// Go guarantees the defer runs even if panic occurs
 	defer conn.Close()
 
-	expDial, _ := r.exportValues([]interface{}{r.srv.Get(req.Service)}, conn.Addr())
+	expDial, _ := r.exportValues([]interface{}{PermRef(r.srv.Get(req.Service))}, conn.Addr())
 	conn.Write(&returnMsg{Out: expDial})
 	// Waiting for export acks not necessary since expDial is always a permptr.
 }
