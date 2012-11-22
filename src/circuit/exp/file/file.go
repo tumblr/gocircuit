@@ -17,23 +17,51 @@ type FileClient struct {
 	circuit.X
 }
 
+func asError(x interface{}) error {
+	if x == nil {
+		return nil
+	}
+	return x.(error)
+}
+
+func asFileInfo(x interface{}) os.FileInfo {
+	if x == nil {
+		return nil
+	}
+	return x.(os.FileInfo)
+}
+
+func asFileInfoSlice(x interface{}) []os.FileInfo {
+	if x == nil {
+		return nil
+	}
+	return x.([]os.FileInfo)
+}
+
+func asBytes(x interface{}) []byte {
+	if x == nil {
+		return nil
+	}
+	return x.([]byte)
+}
+
 func (fcli *FileClient) Close() error {
-	return fcli.Call("Close")[0].(error)
+	return asError(fcli.Call("Close")[0])
 }
 
 func (fcli *FileClient) Stat() (os.FileInfo, error) {
 	r := fcli.Call("Stat")
-	return r[0].(os.FileInfo), r[1].(error)
+	return asFileInfo(r[0]), asError(r[1])
 }
 
 func (fcli *FileClient) Readdir(count int) ([]os.FileInfo, error) {
 	r := fcli.Call("Readdir", count)
-	return r[0].([]os.FileInfo), r[1].(error)
+	return asFileInfoSlice(r[0]), asError(r[1])
 }
 
 func (fcli *FileClient) Read(p []byte) (int, error) {
 	r := fcli.Call("Read", len(p))
-	q, err := r[0].([]byte), r[1].(error)
+	q, err := asBytes(r[0]), asError(r[1])
 	if len(q) > len(p) {
 		panic("corrupt file server")
 	}
@@ -43,20 +71,20 @@ func (fcli *FileClient) Read(p []byte) (int, error) {
 
 func (fcli *FileClient) Seek(offset int64, whence int) (int64, error) {
 	r := fcli.Call("Seek", offset, whence)
-	return r[0].(int64), r[1].(error)
+	return r[0].(int64), asError(r[1])
 }
 
 func (fcli *FileClient) Truncate(size int64) error {
-	return fcli.Call("Truncate", size)[0].(error)
+	return asError(fcli.Call("Truncate", size)[0])
 }
 
 func (fcli *FileClient) Write(p []byte) (int, error) {
 	r := fcli.Call("Write", p)
-	return r[0].(int), r[1].(error)
+	return r[0].(int), asError(r[1])
 }
 
 func (fcli *FileClient) Sync() error {
-	return fcli.Call("Sync")[0].(error)
+	return asError(fcli.Call("Sync")[0])
 }
 
 // NewFileServer returns a file object which can be passed across runtimes.
