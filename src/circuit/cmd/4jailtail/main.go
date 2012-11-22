@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"os"
 	_ "circuit/load"
+	"circuit/kit/tele/file"
 	"circuit/use/anchorfs"
 	"circuit/use/circuit"
+	"io"
 )
 
 func main() {
@@ -13,12 +15,12 @@ func main() {
 		println("Usage:", os.Args[0], "AnchorPath PathWithinJail")
 		os.Exit(1)
 	}
-	file, err := anchorfs.OpenFile(os.Args[1])
+	f, err := anchorfs.OpenFile(os.Args[1])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Problem opening (%s)", err)
 		os.Exit(1)
 	}
-	x, err := circuit.TryDial(file.Owner(), "acid")
+	x, err := circuit.TryDial(f.Owner(), "acid")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Problem dialing 'acid' service (%s)", err)
 		os.Exit(1)
@@ -32,11 +34,10 @@ func main() {
 		}
 	}()
 
-	retrn := x.Call("JailOpen", os.Args[2])
-	println("Got it")
-	_/*fclix*/, err = retrn[0].(circuit.X), retrn[1].(error)
-	if err != nil {
-		println("jail open error", err.Error())
+	r := x.Call("JailOpen", os.Args[2])
+	if r[1] != nil {
+		fmt.Fprintf(os.Stderr, "Open problem: %#v\n", r[1])
 		os.Exit(1)
 	}
+	io.Copy(os.Stdout, file.NewFileClient(r[0].(circuit.X)))
 }

@@ -5,7 +5,12 @@ import (
 	"os"
 	"runtime"
 	"circuit/use/circuit"
+	"encoding/gob"
 )
+
+func init() {
+	gob.Register(&os.PathError{})
+}
 
 // NewFileClient consumes a circuit pointer, backed by a FileServer on a remote worker, and
 // returns a local proxy object with convinient access methods

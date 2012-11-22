@@ -2,19 +2,18 @@ package acid
 
 import (
 	"circuit/use/circuit"
-	"circuit/exp/file"
+	"circuit/kit/tele/file"
 	"circuit/load/config"
 	"os"
 	"path"
 )
 
+// JailOpen opens a file within this worker's jail directory and prepares a
+// cross-circuit pointer to the open file
 func (a *Acid) JailOpen(jailFile string) (circuit.X, error) {
-	println("JailOpen:", jailFile)
-	f, err := os.Open(path.Join(config.Config.Install.JailDir(), jailFile))
+	f, err := os.Open(path.Join(config.Config.Install.JailDir(), circuit.WorkerAddr().RuntimeID().String(), jailFile))
 	if err != nil {
-		println("joerr", err.Error())
 		return nil, err
 	}
-	println("aha")
 	return circuit.Ref(file.NewFileServer(f)), nil
 }
