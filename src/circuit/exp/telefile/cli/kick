@@ -1,2 +1,2 @@
 #!/bin/sh
-4crossbuild -v && echo localhost | 4install && echo "--------------------------------" && ./cli
+4crossbuild -v && echo localhost | 4install && echo "--------------------------------" && gb && ./cli
