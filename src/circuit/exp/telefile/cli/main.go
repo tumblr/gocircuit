@@ -19,5 +19,8 @@ func main() {
 		return
 	}
 	fcli := file.NewFileClient(r[0].(circuit.X))
+	defer func() {
+		recover()
+	}()
 	io.Copy(os.Stdout, fcli)
 }
