@@ -1,9 +1,17 @@
 package acid
 
 import (
-	"circuit/kit/fs"
+	"circuit/use/circuit"
+	"circuit/exp/file"
+	"circuit/load/config"
+	"os"
+	"path"
 )
 
-func (a *Acid) Open(jailFile string) fs.File {
-	panic("unimp")
+func (a *Acid) Open(jailFile string) (circuit.X, error) {
+	f, err := os.Open(path.Join(config.Config.Install.JailDir(), jailFile))
+	if err != nil {
+		return nil, err
+	}
+	return circuit.Ref(file.NewFileServer(f)), nil
 }
