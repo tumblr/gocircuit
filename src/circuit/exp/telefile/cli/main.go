@@ -7,6 +7,8 @@ import (
 	_ "circuit/load"
 	"circuit/use/circuit"
 	"circuit/use/n"
+	"io"
+	"os"
 )
 
 func main() {
@@ -16,6 +18,6 @@ func main() {
 		println("Oh oh", err.Error())
 		return
 	}
-	/*fcli :=*/ file.NewFileClient(r[0].(circuit.X))
-	// XXX
+	fcli := file.NewFileClient(r[0].(circuit.X))
+	io.Copy(os.Stdout, fcli)
 }
