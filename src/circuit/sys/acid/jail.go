@@ -8,7 +8,7 @@ import (
 	"path"
 )
 
-func (a *Acid) Open(jailFile string) (circuit.X, error) {
+func (a *Acid) JailOpen(jailFile string) (circuit.X, error) {
 	f, err := os.Open(path.Join(config.Config.Install.JailDir(), jailFile))
 	if err != nil {
 		return nil, err
