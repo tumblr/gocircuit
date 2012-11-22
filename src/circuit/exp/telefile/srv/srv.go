@@ -1,7 +1,7 @@
 package srv
 
 import (
-	"circuit/exp/file"
+	"circuit/kit/tele/file"
 	"circuit/use/circuit"
 	"os"
 	"time"

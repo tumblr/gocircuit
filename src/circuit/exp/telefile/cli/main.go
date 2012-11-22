@@ -1,7 +1,7 @@
 package main
 
 import (
-	"circuit/exp/file"
+	"circuit/kit/tele/file"
 	"circuit/exp/telefile/srv"
 
 	_ "circuit/load"
