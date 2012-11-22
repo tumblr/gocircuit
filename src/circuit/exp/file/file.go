@@ -45,21 +45,35 @@ func asBytes(x interface{}) []byte {
 	return x.([]byte)
 }
 
-func (fcli *FileClient) Close() error {
+func fileRecover(pe *error) {
+	if p := recover(); p != nil {
+		*pe = circuit.NewError("server died")
+	}
+}
+
+func (fcli *FileClient) Close() (err error) {
+	defer fileRecover(&err)
+
 	return asError(fcli.Call("Close")[0])
 }
 
-func (fcli *FileClient) Stat() (os.FileInfo, error) {
+func (fcli *FileClient) Stat() (_ os.FileInfo, err error) {
+	defer fileRecover(&err)
+
 	r := fcli.Call("Stat")
 	return asFileInfo(r[0]), asError(r[1])
 }
 
-func (fcli *FileClient) Readdir(count int) ([]os.FileInfo, error) {
+func (fcli *FileClient) Readdir(count int) (_ []os.FileInfo, err error) {
+	defer fileRecover(&err)
+
 	r := fcli.Call("Readdir", count)
 	return asFileInfoSlice(r[0]), asError(r[1])
 }
 
-func (fcli *FileClient) Read(p []byte) (int, error) {
+func (fcli *FileClient) Read(p []byte) (_ int, err error) {
+	defer fileRecover(&err)
+
 	r := fcli.Call("Read", len(p))
 	q, err := asBytes(r[0]), asError(r[1])
 	if len(q) > len(p) {
@@ -69,21 +83,29 @@ func (fcli *FileClient) Read(p []byte) (int, error) {
 	return len(q), err
 }
 
-func (fcli *FileClient) Seek(offset int64, whence int) (int64, error) {
+func (fcli *FileClient) Seek(offset int64, whence int) (_ int64, err error) {
+	defer fileRecover(&err)
+
 	r := fcli.Call("Seek", offset, whence)
 	return r[0].(int64), asError(r[1])
 }
 
-func (fcli *FileClient) Truncate(size int64) error {
+func (fcli *FileClient) Truncate(size int64) (err error) {
+	defer fileRecover(&err)
+
 	return asError(fcli.Call("Truncate", size)[0])
 }
 
-func (fcli *FileClient) Write(p []byte) (int, error) {
+func (fcli *FileClient) Write(p []byte) (_ int, err error) {
+	defer fileRecover(&err)
+
 	r := fcli.Call("Write", p)
 	return r[0].(int), asError(r[1])
 }
 
-func (fcli *FileClient) Sync() error {
+func (fcli *FileClient) Sync() (err error) {
+	defer fileRecover(&err)
+
 	return asError(fcli.Call("Sync")[0])
 }
 

@@ -233,7 +233,7 @@ func pullGitRepo(dir string) {
 }
 
 func rsyncRepo(src, dstparent string) {
-	if err := Exec(nil, "", "rsync", "-acrv", "--exclude", ".git", "--exclude", ".hg", "--exclude", "*.a", src, dstparent); err != nil {
+	if err := Exec(nil, "", "rsync", "-acrv", "--delete", "--exclude", ".git", "--exclude", ".hg", "--exclude", "*.a", src, dstparent); err != nil {
 		Fatalf("Problem rsyncing dir '%s' to within '%s' (%s)", src, dstparent, err)
 	}
 }
