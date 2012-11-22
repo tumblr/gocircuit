@@ -4,6 +4,7 @@ import (
 	"circuit/exp/file"
 	"circuit/use/circuit"
 	"os"
+	"time"
 )
 
 type App struct{}
@@ -17,5 +18,6 @@ func (App) Open(filepath string) circuit.X {
 	if err != nil {
 		return nil
 	}
+	circuit.Daemonize(func() { time.Sleep(5*time.Second) })
 	return circuit.Ref(file.NewFileServer(f))
 }
