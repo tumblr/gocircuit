@@ -23,6 +23,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Problem dialing 'acid' service (%s)", err)
 		os.Exit(1)
 	}
+	println("Connected")
 
 	defer func() {
 		if p := recover(); p != nil {
@@ -32,6 +33,7 @@ func main() {
 	}()
 
 	retrn := x.Call("JailOpen", os.Args[2])
+	println("Got it")
 	_/*fclix*/, err = retrn[0].(circuit.X), retrn[1].(error)
 	if err != nil {
 		println("jail open error", err.Error())
