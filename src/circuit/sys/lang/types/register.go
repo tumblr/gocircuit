@@ -10,9 +10,9 @@ var (
 	FuncTabl *TypeTabl = makeTypeTabl() // Type table for functions
 )
 
-// RegisterType registers the type of x with the type table.
+// RegisterValue registers the type of x with the type table.
 // Types need to be registered before values can be imported.
-func RegisterType(value interface{}) {
+func RegisterValue(value interface{}) {
 	ValueTabl.Add(makeType(value))
 }
 

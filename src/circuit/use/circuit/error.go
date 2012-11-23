@@ -2,11 +2,13 @@ package circuit
 
 import (
 	"encoding/gob"
+	"errors"
 	"fmt"
 )
 
 func init() {
 	gob.Register(&errorString{})
+	gob.Register(errors.New(""))
 }
 
 // NewError creates a simple text-based error that is serializable

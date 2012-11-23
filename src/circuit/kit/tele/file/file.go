@@ -129,7 +129,7 @@ type FileServer struct {
 }
 
 func init() {
-	circuit.RegisterType(&FileServer{})
+	circuit.RegisterValue(&FileServer{})
 }
 
 func (fsrv *FileServer) Close() error {

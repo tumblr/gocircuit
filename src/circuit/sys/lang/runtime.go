@@ -53,7 +53,7 @@ func (r *Runtime) SetBoot(v interface{}) {
 	r.blk.Lock()
 	defer r.blk.Unlock()
 	if v != nil {
-		types.RegisterType(v)
+		types.RegisterValue(v)
 	}
 	r.boot = v
 }

@@ -16,7 +16,7 @@ func New() *Acid {
 type Acid struct{}
 
 func init() {
-	circuit.RegisterType(New())
+	circuit.RegisterValue(New())
 }
 
 /*

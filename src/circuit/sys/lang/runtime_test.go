@@ -81,7 +81,7 @@ func TestRe(t *testing.T) {
 		r[i] = New(l[i])
 		r[i].Listen("test", &testBoot{fmt.Sprintf("π%d", i)})
 	}
-	types.RegisterType(&testGreeter{})
+	types.RegisterValue(&testGreeter{})
 
 	// R1 gets boot value of R0
 	r1b0, err := r[1].TryDial(l[0].Addr(), "test")

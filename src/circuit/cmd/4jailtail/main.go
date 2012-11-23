@@ -25,7 +25,6 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Problem dialing 'acid' service (%s)", err)
 		os.Exit(1)
 	}
-	println("Connected")
 
 	defer func() {
 		if p := recover(); p != nil {

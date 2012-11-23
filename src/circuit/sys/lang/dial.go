@@ -6,7 +6,7 @@ import (
 )
 
 func (r *Runtime) Listen(service string, receiver interface{}) {
-	types.RegisterType(receiver)
+	types.RegisterValue(receiver)
 	r.srv.Add(service, receiver)
 }
 

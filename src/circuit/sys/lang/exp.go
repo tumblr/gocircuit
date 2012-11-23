@@ -76,7 +76,7 @@ func (exp *expTabl) Add(receiver interface{}, importer circuit.Addr) *expHandle 
 	}
 
 	// Build exported handle object
-	fmt.Printf("recv (%#T): %#v\n", receiver, receiver)
+	// fmt.Printf("recv (%#T): %#v\n", receiver, receiver)
 	typ := exp.tt.TypeOf(receiver)
 	if typ.Type != reflect.TypeOf(receiver) {
 		panic("bug: wrong type")

@@ -24,7 +24,7 @@ type API struct {
 }
 
 func init() {
-	circuit.RegisterType(&API{}) // Register as circuit value
+	circuit.RegisterValue(&API{}) // Register as circuit value
 }
 
 func New(dfile string, port int, readOnly bool) (api *API, err error) {

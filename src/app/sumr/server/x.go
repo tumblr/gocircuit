@@ -17,5 +17,5 @@ func (Main) Main(diskpath string, forgetafter time.Duration) (circuit.XPerm, err
 type Main struct {}
 func init() {
 	circuit.RegisterFunc(Main{})
-	circuit.RegisterType(&Server{})
+	circuit.RegisterValue(&Server{})
 }

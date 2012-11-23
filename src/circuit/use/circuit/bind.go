@@ -19,11 +19,11 @@ func get() runtime {
 
 // Operators
 
-// RegisterType regiseters the type of v so that cross-worker pointers to local values of the same type as v
-// can be passed as arguments or return values of cross-worker function invokations. RegisterType should
+// RegisterValue regiseters the type of v so that cross-worker pointers to local values of the same type as v
+// can be passed as arguments or return values of cross-worker function invokations. RegisterValue should
 // typically be invoked within the init function of the package that defines the type.
-func RegisterType(v interface{}) {
-	types.RegisterType(v)
+func RegisterValue(v interface{}) {
+	types.RegisterValue(v)
 }
 
 func RegisterFunc(fn Func) {
