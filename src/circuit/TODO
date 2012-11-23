@@ -7,10 +7,8 @@ update circuit's firehose driver
 
 4stat does not know the types of remote services, so can't import handles
 pass slice and map
-	4jailcat
-	4jailtail
 
-Ref -> XVal (ExportValue)?
+Ref -> Tele XVal (ExportValue)?
 RefFile -> XFile (ExportFile)?
 ____________________________________________________
 CAVEAT:
