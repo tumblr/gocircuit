@@ -125,11 +125,12 @@ const mainSrc = `
 package main
 import (
 	_ "circuit/load"
-	{{range .}}
-	_ "{{.}}"
+	{{range .}}_ "{{.}}"
 	{{end}}
 )
-func main() {}
+func main() {
+	<-(chan struct{})(nil)
+}
 `
 
 func workerPkgPath() string {

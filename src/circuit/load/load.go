@@ -96,8 +96,6 @@ func start(worker bool, z *config.ZookeeperConfig, i *config.InstallConfig, s *c
 		if err := backpipe.Close(); err != nil {
 			panic(err)
 		}
-
-		// Hang forever
-		<-(chan int)(nil)
+		// Hang forever is done in the auto-generated, by 4build, worker main method
 	}
 }

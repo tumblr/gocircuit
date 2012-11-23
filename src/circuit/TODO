@@ -1,17 +1,18 @@
-tumblr app structure
-	not seeing greeting message "using tumblr env ..."
-	not seeing jail for postfilter sometimes
-
 update circuit's firehose driver
 	move to kit/tumblr/firehose
 	test firehose driver for correct reconnects
 
 errors.errorString not registered
+	automatically convert unregistered errors into a circuit error
 
 pass slice and map
 
 Ref -> Tele XVal (ExportValue)?
-RefFile -> XFile (ExportFile)?
+
+4jailtail
+	anchor file system graveyard
+	find dead workers in graveyard
+	use new worker to pass file
 ____________________________________________________
 CAVEAT:
 When passing a slice in an x-call, changes to the underlying array at the callee 
