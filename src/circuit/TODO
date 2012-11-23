@@ -1,6 +1,5 @@
 update circuit's firehose driver
 	Cannot read user reputation (unexpected type)
-	move to kit/tumblr/firehose
 
 errors.errorString not registered
 	automatically convert unregistered errors into a circuit error
@@ -15,7 +14,7 @@ Ref -> Tele XVal (ExportValue)?
 	find dead workers in graveyard
 	use new worker to pass file
 ____________________________________________________
-CAVEAT:
+EXCEPTION, document:
 When passing a slice in an x-call, changes to the underlying array at the callee 
 will not be reflected at the called.
 Similarly for maps.
