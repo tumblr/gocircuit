@@ -10,7 +10,7 @@ type Stringer interface {
 	String() string
 }
 
-func (s *Acid) StatServiceOnBehalf(service string) (r string) {
+func (s *Acid) OnBehalfCallStringer(service, proc string) (r string) {
 
 	// If anything goes wrong, let's not panic the worker
 	defer func() {
@@ -27,7 +27,7 @@ func (s *Acid) StatServiceOnBehalf(service string) (r string) {
 
 	// Find Stat method in service receiver s
 	sv := reflect.ValueOf(srv)
-	out := sv.MethodByName("Stat").Call(nil)
+	out := sv.MethodByName(proc).Call(nil)
 	if len(out) != 1 {
 		return "Service's Stat method returns more than one value"
 	}

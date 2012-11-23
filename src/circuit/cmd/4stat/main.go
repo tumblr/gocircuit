@@ -10,7 +10,7 @@ import (
 
 func main() {
 	if len(os.Args) != 3 {
-		println("Usage:", os.Args[0], "AnchorPath ServiceName")
+		println("Usage:", os.Args[0], "AnchorPath Service")
 		os.Exit(1)
 	}
 	file, err := anchorfs.OpenFile(os.Args[1])
@@ -31,10 +31,6 @@ func main() {
 		}
 	}()
 
-	retrn := x.Call("StatServiceOnBehalf", os.Args[2])
-	fmt.Println(retrn[0].(string))
-}
-
-type Stringer interface {
-	String() string
+	r := x.Call("OnBehalfCallStringer", os.Args[2], "Stat")
+	fmt.Println(r[0].(string))
 }
