@@ -1,6 +1,6 @@
 update circuit's firehose driver
+	Cannot read user reputation (unexpected type)
 	move to kit/tumblr/firehose
-	test firehose driver for correct reconnects
 
 errors.errorString not registered
 	automatically convert unregistered errors into a circuit error
@@ -10,6 +10,7 @@ pass slice and map
 Ref -> Tele XVal (ExportValue)?
 
 4jailtail
+	bug: does not scroll
 	anchor file system graveyard
 	find dead workers in graveyard
 	use new worker to pass file
