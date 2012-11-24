@@ -1,13 +1,9 @@
 update circuit's firehose driver
 	Cannot read user reputation (unexpected type)
 
-errors.errorString not registered
-	automatically convert unregistered errors into a circuit error
-
-pass slice and map
+doc: passed slice and map cannot be modified
 
 Ref -> Tele XVal (ExportValue)?
-Addr.RuntimeID() -> ID()
 
 4jailtail
 	bug: does not scroll
@@ -20,12 +16,6 @@ Addr.RuntimeID() -> ID()
 	use new worker to pass file
 
 4build: optionally use existing go installation
-
-____________________________________________________
-EXCEPTION, document:
-When passing a slice in an x-call, changes to the underlying array at the callee 
-will not be reflected at the called.
-Similarly for maps.
 ____________________________________________________
 topic-specific subscriptions
 4lsof (list registered listeners, etc. resources) and also dup the lsof of the unix process

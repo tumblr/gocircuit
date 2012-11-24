@@ -15,11 +15,6 @@ func (a *Acid) JailTail(jailFile string) (circuit.X, error) {
 	abs := path.Join(config.Config.Install.JailDir(), circuit.WorkerAddr().RuntimeID().String(), jailFile)
 	
 	cmd := exec.Command("/bin/sh", "-c", "tail -f " + abs)
-	/*
-	stdin, err := cmd.StdinPipe()
-	if err != nil {
-		return nil, circuit.FlattenError(err)
-	}*/
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
@@ -30,21 +25,21 @@ func (a *Acid) JailTail(jailFile string) (circuit.X, error) {
 		return nil, circuit.FlattenError(err)
 	}
 
-	/*sh := []byte("tail -f " + abs)
-	if _, err = stdin.Write(sh); err != nil {
-		return nil, circuit.FlattenError(err)
-	}
-	if err = stdin.Close(); err != nil {
-		return nil, circuit.FlattenError(err)
-	}*/
-
-	return circuit.Ref(teleio.NewServer(&tailStdout{stdout})), nil
+	return circuit.Ref(teleio.NewServer(&tailStdout{stdout, cmd})), nil
 }
 
 type tailStdout struct {
 	io.ReadCloser
+	cmd *exec.Cmd
 }
 
 func (*tailStdout) Write([]byte) (int, error) {
 	panic("write not supported")
+}
+
+func (t *tailStdout) Close() error {
+	println("CLOSING TAIL")
+	err := t.ReadCloser.Close()
+	t.cmd.Process.Kill()
+	return circuit.FlattenError(err)
 }
