@@ -16,6 +16,13 @@ func NewError(fmt_ string, arg_ ...interface{}) error {
 	return &errorString{fmt.Sprintf(fmt_, arg_...)}
 }
 
+func FlattenError(err error) error {
+	if err == nil {
+		return nil
+	}
+	return NewError(err.Error())
+}
+
 type errorString struct {
 	S string
 }

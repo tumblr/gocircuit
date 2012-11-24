@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 	_ "circuit/load"
-	"circuit/kit/tele/file"
+	teleio "circuit/kit/tele/io"
 	"circuit/use/anchorfs"
 	"circuit/use/circuit"
 	"io"
@@ -33,10 +33,21 @@ func main() {
 		}
 	}()
 
-	r := x.Call("JailOpen", os.Args[2])
+	r := x.Call("JailTail", os.Args[2])
 	if r[1] != nil {
-		fmt.Fprintf(os.Stderr, "Open problem: %#v\n", r[1])
+		fmt.Fprintf(os.Stderr, "Open problem: %s\n", r[1].(error))
 		os.Exit(1)
 	}
-	io.Copy(os.Stdout, file.NewFileClient(r[0].(circuit.X)))
+	io.Copy(os.Stdout, teleio.NewClient(r[0].(circuit.X)))
+	/*
+	tailr := teleio.NewClient(r[0].(circuit.X))
+	for {
+		p := make([]byte, 1e3)
+		n, err := tailr.Read(p)
+		if err != nil {
+			println(err.Error(),"+++")
+			break
+		}
+		println("n=", n)
+	}*/
 }

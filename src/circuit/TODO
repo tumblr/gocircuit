@@ -7,12 +7,20 @@ errors.errorString not registered
 pass slice and map
 
 Ref -> Tele XVal (ExportValue)?
+Addr.RuntimeID() -> ID()
 
 4jailtail
 	bug: does not scroll
+	bug: each execution seems to use the same ID for the 4jailtail worker itself
+	bug: when 4jailtail quites the remote tail process does not disappear
+	bug: when the remote tail process is killed, 4jailtail hangs waiting
+
 	anchor file system graveyard
 	find dead workers in graveyard
 	use new worker to pass file
+
+4build: optionally use existing go installation
+
 ____________________________________________________
 EXCEPTION, document:
 When passing a slice in an x-call, changes to the underlying array at the callee 
