@@ -1,21 +1,18 @@
-update circuit's firehose driver
-	Cannot read user reputation (unexpected type)
-
-doc: passed slice and map cannot be modified
+trending
+	test on ewr
 
 Ref -> Tele XVal (ExportValue)?
 
+4clear:
+	ewr env: removes lives jails
+
 4jailtail
-	bug: does not scroll
-	bug: each execution seems to use the same ID for the 4jailtail worker itself
-	bug: when 4jailtail quites the remote tail process does not disappear
+	bug: when 4jailtail quit the remote tail process does not disappear (they get write error, in one case)
 	bug: when the remote tail process is killed, 4jailtail hangs waiting
 
 	anchor file system graveyard
 	find dead workers in graveyard
 	use new worker to pass file
-
-4build: optionally use existing go installation
 ____________________________________________________
 topic-specific subscriptions
 4lsof (list registered listeners, etc. resources) and also dup the lsof of the unix process
@@ -25,7 +22,8 @@ zombie detect/kill mechanism (procs not in anchor fs)
 __________________________________________
 POST OPEN-SOURCE
 
-4crossbuild takeover upload to hosts?
+4build: optionally use existing go installation
+4crossbuild: takeover upload to hosts?
 add method for gob registration of types in circuit (use custom circuit type names?)
 
 reconnect mechanism
