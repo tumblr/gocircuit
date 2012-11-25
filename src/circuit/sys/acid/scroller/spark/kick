@@ -1,0 +1,3 @@
+#!/bin/sh
+4crossbuild -v && echo localhost | 4install && echo "--------------------------------" && go build && ./spark \
+	&& 4jailtail `4ls /... | grep 'scroller/R'` err

@@ -4,54 +4,54 @@ import (
 	"time"
 )
 
-type MomentCarousel struct {
-	duration  int64
-	slots     []Moment
-	head      int64
+type SlidingMoment struct {
+	slotdur  int64
+	slots    []Moment
+	head     int64
 }
 
-func NewMomentCarousel(nslots int, duration time.Duration) *MomentCarousel {
-	x := &MomentCarousel{}
-	x.Init(nslots, duration)
+func NewSlidingMoment(resolution int, duration time.Duration) *SlidingMoment {
+	x := &SlidingMoment{}
+	x.Init(resolution, duration)
 	return x
 }
 
-func (x *MomentCarousel) Init(nslots int, duration time.Duration) {
-	slots := make([]Moment, nslots)
+func (x *SlidingMoment) Init(resolution int, duration time.Duration) {
+	slots := make([]Moment, resolution)
 	for i, _ := range slots {
 		slots[i].Init()
 	}
-	x.duration = int64(duration)
+	x.slotdur = int64(duration) / int64(resolution)
 	x.slots = slots
 }
 
-func (x *MomentCarousel) TimeSpan() time.Duration {
-	return time.Duration(x.duration * int64(len(x.slots)))
+func (x *SlidingMoment) TimeSpan() time.Duration {
+	return time.Duration(x.slotdur * int64(len(x.slots)))
 }
 
 // Moment returns a pointer to the current moment structure corresponding to the time t
-func (x *MomentCarousel) Slot(t time.Time) *Moment {
-	slot := t.UnixNano() / x.duration
+func (x *SlidingMoment) Slot(t time.Time) *Moment {
+	slot := t.UnixNano() / x.slotdur
 	if !x.spin(slot) {
 		return nil
 	}
 	return &x.slots[int(slot % int64(len(x.slots)))]
 }
 
-func (x *MomentCarousel) Slots() ([]*Moment, time.Time) {
+func (x *SlidingMoment) Slots() ([]*Moment, time.Time) {
 	result := make([]*Moment, len(x.slots))
 	j := int(x.head % int64(len(x.slots))) + len(x.slots)
 	for i := 0; i < len(result); i++ {
 		result[i] = &x.slots[j % len(x.slots)]
 		j--
 	}
-	return result, time.Unix(0, x.head * x.duration)
+	return result, time.Unix(0, x.head * x.slotdur)
 }
 
 // spin rotates the circular slot buffer forward to ensure that the requested
 // time falls within an interval slot. If the time t is before the earliest
 // time in the buffer, spin is a nop and returns false.
-func (x *MomentCarousel) spin(slot int64) bool {
+func (x *SlidingMoment) spin(slot int64) bool {
 	if slot + int64(len(x.slots)) <= x.head {
 		return false
 	}
@@ -68,7 +68,7 @@ func (x *MomentCarousel) spin(slot int64) bool {
 	return true
 }
 
-func (x *MomentCarousel) TailWeight(tail int) float64 {
+func (x *SlidingMoment) TailWeight(tail int) float64 {
 	slots, _ := x.Slots()
 	var result float64
 	for i := 0; i < tail; i++ {
@@ -77,7 +77,7 @@ func (x *MomentCarousel) TailWeight(tail int) float64 {
 	return result
 }
 
-func (x *MomentCarousel) Weight() float64 {
+func (x *SlidingMoment) Weight() float64 {
 	var result float64
 	for i, _ := range x.slots {
 		result += x.slots[i].Weight()
@@ -85,7 +85,7 @@ func (x *MomentCarousel) Weight() float64 {
 	return result
 }
 
-func (x *MomentCarousel) Mass() float64 {
+func (x *SlidingMoment) Mass() float64 {
 	var result float64
 	for i, _ := range x.slots {
 		result += x.slots[i].Mass()

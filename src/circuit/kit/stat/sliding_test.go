@@ -6,7 +6,7 @@ import (
 )
 
 func TestCarousel(t *testing.T) {
-	c := NewMomentCarousel(10, time.Second)
+	c := NewSlidingMoment(10, time.Second)
 
 	now := time.Now().UnixNano()
 	for i := 0; i < 20; i++ {
