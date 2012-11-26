@@ -1,6 +1,3 @@
-trending
-	carousel
-
 Ref -> Tele XVal (ExportValue)?
 
 4clear:
@@ -9,6 +6,7 @@ Ref -> Tele XVal (ExportValue)?
 4jailtail
 	bug: when 4jailtail quit the remote tail process does not disappear (they get write error, in one case)
 	bug: when the remote tail process is killed, 4jailtail hangs waiting
+	can tail also be made child process so it dies when worker dies
 
 	anchor file system graveyard
 	find dead workers in graveyard
