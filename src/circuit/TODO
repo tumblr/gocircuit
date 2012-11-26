@@ -1,7 +1,7 @@
 Ref -> Tele XVal (ExportValue)?
 
 4clear:
-	ewr env: removes lives jails
+	ewr env: removes live jails
 
 4jailtail
 	bug: when 4jailtail quit the remote tail process does not disappear (they get write error, in one case)
