@@ -113,6 +113,10 @@ func (sa stringAddr) String() string {
 	return sa.Addr
 }
 
+func (sa stringAddr) Host() circuit.Host {
+	panic("not implemented")
+}
+
 func (sa stringAddr) RuntimeID() circuit.RuntimeID {
 	return 0
 }

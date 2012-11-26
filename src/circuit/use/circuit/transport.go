@@ -4,6 +4,7 @@ package circuit
 // The implementing type must be registered with gob.
 type Addr interface {
 	String() string
+	Host() Host
 
 	// RuntimeID is tentatively part of the transport address so that, if
 	// needed, we can verify the identity of the runtime we are talking to. 

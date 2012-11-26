@@ -27,6 +27,10 @@ func (a stringAddr) RuntimeID() circuit.RuntimeID {
 	return 0
 }
 
+func (a stringAddr) Host() circuit.Host {
+	panic("not implemented")
+}
+
 func (a stringAddr) String() string {
 	return string(a)
 }

@@ -20,7 +20,13 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Problem opening (%s)", err)
 		os.Exit(1)
 	}
-	x, err := circuit.TryDial(f.Owner(), "acid")
+
+	tailViaSSH(f.Owner(), os.Args[2])
+}
+
+func tailViaCircuit(addr circuit.Addr, jailpath string) {
+
+	x, err := circuit.TryDial(addr, "acid")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Problem dialing 'acid' service (%s)", err)
 		os.Exit(1)
@@ -33,12 +39,14 @@ func main() {
 		}
 	}()
 
-	r := x.Call("JailTail", os.Args[2])
+	r := x.Call("JailTail", jailpath)
 	if r[1] != nil {
 		fmt.Fprintf(os.Stderr, "Open problem: %s\n", r[1].(error))
 		os.Exit(1)
 	}
+
 	io.Copy(os.Stdout, teleio.NewClient(r[0].(circuit.X)))
+
 	/*
 	tailr := teleio.NewClient(r[0].(circuit.X))
 	for {
