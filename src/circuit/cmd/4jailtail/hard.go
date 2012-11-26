@@ -11,7 +11,7 @@ import (
 
 func tailViaSSH(addr circuit.Addr, jailpath string) {
 
-	abs := path.Join(config.Config.Install.JailDir(), jailpath)
+	abs := path.Join(config.Config.Install.JailDir(), addr.RuntimeID().String(), jailpath)
 
 	cmd := exec.Command("ssh", addr.Host().String(), "tail -f " + abs)
 
