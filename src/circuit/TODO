@@ -5,18 +5,23 @@ Ref -> Tele XVal (ExportValue)?
 
 4jailtail
 	bug: when 4jailtail quit the remote tail process does not disappear (they get write error, in one case)
+		garbage collection kicks in?
 	bug: when the remote tail process is killed, 4jailtail hangs waiting
 	can tail also be made child process so it dies when worker dies
 
+add test app for garbage collection
+
+anchor graveyard
 	anchor file system graveyard
 	find dead workers in graveyard
 	use new worker to pass file
 ____________________________________________________
-topic-specific subscriptions
 4lsof (list registered listeners, etc. resources) and also dup the lsof of the unix process
 zombie detect/kill mechanism (procs not in anchor fs)
 	add hidden flat registration space for runtime IDS in anchor file system
 	add permanent flat registration space, where workers check in and out
+
+
 __________________________________________
 POST OPEN-SOURCE
 
@@ -43,3 +48,4 @@ garbage collect empty dirs in durable
 	tool to list all files and clear them, etc.
 
 advanced rate-limiter
+topic-specific subscriptions

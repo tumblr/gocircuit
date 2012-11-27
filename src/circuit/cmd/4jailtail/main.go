@@ -21,10 +21,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	tailViaSSH(f.Owner(), os.Args[2])
+	tailViaCircuit(f.Owner(), os.Args[2])
 }
 
-func tailViaCircuit(addr circuit.Addr, jailpath string) {
+func tailViaSSH(addr circuit.Addr, jailpath string) {
 
 	x, err := circuit.TryDial(addr, "acid")
 	if err != nil {
