@@ -2,7 +2,6 @@ package debug
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -26,11 +25,22 @@ func InstallTimeoutPanic(ns int64) {
 func InstallCtrlCPanic() {
 	go func() {
 		//defer SavePanicTrace()
-		ch := make(chan os.Signal)
-		signal.Notify(ch, os.Interrupt, os.Kill)
-		for s := range ch {
-			log.Printf("ctrl-c/kill interruption: %s\n", s)
-			panic("ctrl-c/kill")
+		ch := make(chan os.Signal, 1)
+		signal.Notify(ch, os.Interrupt)
+		for _ = range ch {
+			panic("ctrl-c")
+		}
+	}()
+}
+
+// InstallKillPanic installs a kill signal handler that panics
+func InstallKillPanic() {
+	go func() {
+		//defer SavePanicTrace()
+		ch := make(chan os.Signal, 1)
+		signal.Notify(ch, os.Kill)
+		for _ = range ch {
+			panic("sigkill")
 		}
 	}()
 }

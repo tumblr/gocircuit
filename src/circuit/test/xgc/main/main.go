@@ -3,6 +3,7 @@ package main
 import (
 	_ "circuit/load"
 	"circuit/test/xgc/worker"
+	_ "circuit/kit/debug/ctrlc"
 	"circuit/use/circuit"
 	"circuit/use/n"
 	"runtime"
@@ -34,6 +35,7 @@ func main() {
 		panic(err)
 	}
 	d = nil // Make sure we are not holding the object
+	runtime.GC()
 
 	println(addr.String())
 	println("Waiting for finalizer call ...")

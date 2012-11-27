@@ -125,6 +125,7 @@ const mainSrc = `
 package main
 import (
 	_ "circuit/load"
+	_ "circuit/kit/debug/kill"
 	{{range .}}_ "{{.}}"
 	{{end}}
 )
