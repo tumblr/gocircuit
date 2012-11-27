@@ -1,3 +1,6 @@
+CONFIG FRICTION:
+	circuit configs are user specific since they contain hardcoded absolute paths
+------------------------------------------
 Ref -> Tele XVal (ExportValue)?
 
 4clear:
