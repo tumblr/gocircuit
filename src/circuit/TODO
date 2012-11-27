@@ -1,11 +1,6 @@
 CONFIG FRICTION:
 	circuit configs are user specific since they contain hardcoded absolute paths
 ------------------------------------------
-Ref -> Tele XVal (ExportValue)?
-
-4clear:
-	ewr env: removes live jails
-
 4jailtail
 	bug: when 4jailtail quit the remote tail process does not disappear (they get write error, in one case)
 		garbage collection kicks in?
@@ -18,7 +13,9 @@ anchor graveyard
 	anchor file system graveyard
 	find dead workers in graveyard
 	use new worker to pass file
+
 ____________________________________________________
+Ref -> Tele XVal (ExportValue)?
 4lsof (list registered listeners, etc. resources) and also dup the lsof of the unix process
 zombie detect/kill mechanism (procs not in anchor fs)
 	add hidden flat registration space for runtime IDS in anchor file system

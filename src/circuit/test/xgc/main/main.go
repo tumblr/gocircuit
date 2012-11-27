@@ -8,6 +8,10 @@ import (
 	"runtime"
 )
 
+// TODO:
+//	Spawn does not return
+//	Make sure finalizer called BECAUSE worker died or worker asked us to release handle
+
 type Dummy struct{}
 func init() { circuit.RegisterValue(&Dummy{}) }
 
@@ -20,7 +24,6 @@ func main() {
 		println("finalizing dummy")
 		close(ch)
 	})
-	d = nil
 
 	// Test: 
 	//	Spawn a worker and pass an x-pointer to it; 
@@ -30,6 +33,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	d = nil // Make sure we are not holding the object
+
 	println(addr.String())
 	println("Waiting for finalizer call ...")
 	<-ch
