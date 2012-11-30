@@ -33,6 +33,7 @@ type Transport struct {
 	bind       *Addr
 	listener   *net.TCPListener
 	addrtabl   *addrTabl
+
 	// How many unacknowledged messages we are willing to keep per link, before
 	// we start blocking on writes
 	pipelining int  
@@ -40,7 +41,7 @@ type Transport struct {
 	lk         sync.Mutex
 	remote     map[circuit.RuntimeID]*link
 
-	ach        chan *conn
+	ach        chan *conn  // Channel for accepting new connections
 }
 
 func NewClient(id circuit.RuntimeID) *Transport {

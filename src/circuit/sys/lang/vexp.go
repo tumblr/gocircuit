@@ -50,7 +50,7 @@ func (r *Runtime) exportRewrite(src, dst reflect.Value, importer circuit.Addr, e
 	return false
 }
 
-// If importer is nil, a permanent ptr is exported
+// exportPtr returns *permPtrMsg if importer is nil, and *ptrMsg otherwise.
 func (r *Runtime) exportPtr(v interface{}, importer circuit.Addr) interface{} {
 	exph := r.exp.Add(v, importer)
 
@@ -65,7 +65,12 @@ func (r *Runtime) exportPtr(v interface{}, importer circuit.Addr) interface{} {
 	_, ok := r.live[importer]
 	if !ok {
 		r.live[importer] = struct{}{}
+
+		// The anonymous function creates a "lifeline" connection to the worker importing v.
+		// When this conncetion is broken, v is released.
 		go func() {
+
+			// Defer removal of v's handle from the export table to the end of this function
 			defer func() {
 				r.lk.Lock()
 				delete(r.live, importer)
@@ -76,11 +81,13 @@ func (r *Runtime) exportPtr(v interface{}, importer circuit.Addr) interface{} {
 
 			conn, err := r.dialer.Dial(importer)
 			if err != nil {
+				println("problem dialing lifeline to", importer.String(), err.Error())
 				return
 			}
 			defer conn.Close()
 
 			if conn.Write(&dontReplyMsg{}) != nil {
+				println("problem writing on lifeline to", importer.String(), err.Error())
 				return
 			}
 			// Read returns when the remote dies and 

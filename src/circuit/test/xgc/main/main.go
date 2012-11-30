@@ -3,7 +3,6 @@ package main
 import (
 	_ "circuit/load"
 	"circuit/test/xgc/worker"
-	_ "circuit/kit/debug/ctrlc"
 	"circuit/use/circuit"
 	"circuit/use/n"
 	"runtime"
@@ -13,15 +12,10 @@ import (
 //	Spawn does not return
 //	Make sure finalizer called BECAUSE worker died or worker asked us to release handle
 
-type Dummy struct{}
-func init() { circuit.RegisterValue(&Dummy{}) }
-
-func (*Dummy) Ping() {}
-
 func main() {
 	ch := make(chan int)
-	d := &Dummy{}
-	runtime.SetFinalizer(d, func(h *Dummy) {
+	d := &worker.Dummy{}
+	runtime.SetFinalizer(d, func(h *worker.Dummy) {
 		println("finalizing dummy")
 		close(ch)
 	})

@@ -1,3 +1,5 @@
 #!/bin/sh
-4crossbuild -v && echo localhost | 4install && echo "--------------------------------" && go build && ./main \
-	&& 4ls /... | grep 'xgc/R'
+echo localhost | 4clear && \
+4crossbuild -v && echo localhost | 4install && \
+echo "--------------------------------" && go build && ./main \
+&& 4ls /... | grep 'xgc/R'

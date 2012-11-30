@@ -1,13 +1,17 @@
+finish language rules doc
 CONFIG FRICTION:
 	circuit configs are user specific since they contain hardcoded absolute paths
+
+A newly started worker would get its job from an incoming "Go" call. This 
+calls also defines the death semantics. If this call doesn't arrive for a network
+or type-mismatch reason, worker should die on its own after waiting for a "Go" a bit.
+
 ------------------------------------------
 4jailtail
 	bug: when 4jailtail quit the remote tail process does not disappear (they get write error, in one case)
 		garbage collection kicks in?
 	bug: when the remote tail process is killed, 4jailtail hangs waiting
 	can tail also be made child process so it dies when worker dies
-
-add test app for garbage collection
 
 anchor graveyard
 	anchor file system graveyard

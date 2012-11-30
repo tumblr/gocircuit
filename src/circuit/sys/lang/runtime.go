@@ -60,13 +60,15 @@ func (r *Runtime) SetBoot(v interface{}) {
 
 func (r *Runtime) accept(l circuit.Listener) {
 	conn := l.Accept()
-	req, err := conn.Read()
-	if err != nil {
-		panic(err)
-		return
-	}
-	// Demux the request
+	// The transport layer assumes that the user is always blocked on
+	// transport.Accept and conn.Read for all accepted connections.
+	// This is achieved by forking the goroutine below.
 	go func() {
+		req, err := conn.Read()
+		if err != nil {
+			println("unexpected eof conn", err.Error())
+			return
+		}
 		// Importing reptr variables involves waiting on other runtimes,
 		// we fork request handling to dedicated go routines.
 		// No rate-limiting/throttling is performed in the circuit.

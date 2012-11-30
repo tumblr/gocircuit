@@ -34,6 +34,7 @@ func InstallCtrlCPanic() {
 }
 
 // InstallKillPanic installs a kill signal handler that panics
+// From the command-line, this signal is agitated with kill -ABRT
 func InstallKillPanic() {
 	go func() {
 		//defer SavePanicTrace()

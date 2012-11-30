@@ -140,17 +140,20 @@ func (l *link) readLoop() {
 			if c == nil {
 				// Unknown user connection.
 				// Usually a late packet, arriving after a local conn.Close
+				println("late message")
 				continue  // Drop
 			}
 			c.sendRead(msg.Payload)
 
 		default:
+			println("dropping")
 			// Drop unknown messages for forward compatibility
 		}
 	}
 }
 
-func (l *link) Write(payload interface{}) error {
+func (l *link) Write(payload interface{}) (err error) {
+
 	l.lk.Lock()
 	swap := l.swap
 	l.lk.Unlock()
@@ -158,7 +161,7 @@ func (l *link) Write(payload interface{}) error {
 	if swap == nil {
 		return ErrAlreadyClosed
 	}
-	if err := swap.Write(payload); err != nil {
+	if err = swap.Write(payload); err != nil {
 		// XXX // hook reconnect mechanism
 		l.close()
 		return err
