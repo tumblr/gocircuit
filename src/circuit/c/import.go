@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-func packageImports (pkg *ast.Package) map[string]struct{} {
+func packageImports(pkg *ast.Package) map[string]struct{} {
 	imprts := make(map[string]struct{}) 
 	for _, file := range pkg.Files {
 		for _, impSpec := range file.Imports {
