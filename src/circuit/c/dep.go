@@ -6,7 +6,7 @@ import (
 
 // CompileDep returns the names of all packages required to build pkgs
 // that are inside the gopath tree.
-func (b *Build) CompileDep(pkgs ...string) ([]string, error) {
+func (b *Layout) CompileDep(pkgs ...string) ([]string, error) {
 	depTabl := newDepTable(b)
 	for _, pkg := range pkgs {
 		if err := depTabl.Add(pkg); err != nil {
@@ -19,7 +19,7 @@ func (b *Build) CompileDep(pkgs ...string) ([]string, error) {
 // depTable maintains the dependent packages for a list of incrementally added
 // target packages
 type depTable struct {
-	build  *Build
+	build  *Layout
 	pkgs   map[string]*depPkg
 	follow []string
 }
@@ -28,7 +28,7 @@ type depPkg struct {
 	imports  []string
 }
 
-func newDepTable(b *Build) *depTable {
+func newDepTable(b *Layout) *depTable {
 	return &depTable{
 		build:  b,
 		pkgs:   make(map[string]*depPkg),
@@ -66,10 +66,11 @@ func (dt *depTable) loop() error {
 			}
 		}
 
-		// Make pkg structure
+		// Make pkg structure and enqueue new imports
 		dpkg := &depPkg{}
 		for pkg, _ := range imps {
 			dpkg.imports = append(dpkg.imports, pkg)
+			dt.follow = append(dt.follow, pkg)
 		}
 
 		// Save pkg structure

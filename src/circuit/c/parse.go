@@ -20,11 +20,11 @@ type Skeleton struct {
 }
 
 // ParsePkg parses a package and returns the result in a new Skeleton
-func (b *Build) ParsePkg(pkg string, mode parser.Mode) (ps *Skeleton, err error) {
+func (l *Layout) ParsePkg(pkg string, mode parser.Mode) (ps *Skeleton, err error) {
 	ps = &Skeleton{}
 	ps.FileSet = token.NewFileSet()
 	
-	_, pkgpath, err := b.GoPaths.FindPkg(pkg)
+	_, pkgpath, err := l.FindPkg(pkg, true)
 	if err != nil {
 		return nil, err
 	}

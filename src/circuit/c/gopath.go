@@ -24,20 +24,31 @@ func NewGoPaths(gopathlist string) GoPaths {
 // If found, it returns the gopath as well as the absolute package path.
 func (gopaths GoPaths) FindPkg(pkg string) (gopath, pkgpath string, err error) {
 	for _, gp := range gopaths {
-		pkgpath = path.Join(gp, "src", pkg)
-		fi, err := os.Stat(pkgpath)
-		if os.IsNotExist(err) {
+		pkgpath, err = existPkg(gp, pkg)
+		if err == ErrNotFound {
 			continue
 		}
 		if err != nil {
 			return "", "", err
 		}
-		if !fi.IsDir() {
-			continue
-		}
 		return gp, pkgpath, nil
 	}
-	return "", "", errors.New("pkg not found in any gopath")
+	return "", "", ErrNotFound
+}
+
+func existPkg(gopath, pkg string) (pkgpath string, err error) {
+	pkgpath = path.Join(gopath, "src", pkg)
+	fi, err := os.Stat(pkgpath)
+	if os.IsNotExist(err) {
+		return "", ErrNotFound
+	}
+	if err != nil {
+		return "", err
+	}
+	if !fi.IsDir() {
+		return "", ErrNotFound
+	}
+	return pkgpath, nil
 }
 
 func (gopaths GoPaths) FindWorkingPath(dir string) (string, error) {
@@ -47,7 +58,7 @@ func (gopaths GoPaths) FindWorkingPath(dir string) (string, error) {
 
 	dir = path.Clean(dir)
 	for _, gp := range order {
-		if strings.HasPrefix(dir, gp) {
+		if strings.HasPrefix(dir, path.Join(gp, "src")) {
 			return gp, nil
 		}
 	}
