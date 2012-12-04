@@ -19,7 +19,7 @@ func (b *Layout) CompileDep(pkgs ...string) ([]string, error) {
 // depTable maintains the dependent packages for a list of incrementally added
 // target packages
 type depTable struct {
-	build  *Layout
+	layout *Layout
 	pkgs   map[string]*depPkg
 	follow []string
 }
@@ -28,9 +28,9 @@ type depPkg struct {
 	imports  []string
 }
 
-func newDepTable(b *Layout) *depTable {
+func newDepTable(l *Layout) *depTable {
 	return &depTable{
-		build:  b,
+		layout: l,
 		pkgs:   make(map[string]*depPkg),
 		follow: nil,
 	}
@@ -52,7 +52,7 @@ func (dt *depTable) loop() error {
 		}
 
 		// Parse package source
-		skel, err := dt.build.ParsePkg(pop, parser.ImportsOnly)
+		skel, err := dt.layout.ParsePkg(pop, parser.ImportsOnly)
 		if err != nil {
 			return err
 		}
@@ -62,7 +62,9 @@ func (dt *depTable) loop() error {
 		for _, pkg := range skel.Pkgs {
 			pimps := pkgImports(pkg)
 			for i, _ := range pimps {
-				imps[i] = struct{}{}
+				if i != "C" {
+					imps[i] = struct{}{}
+				}
 			}
 		}
 

@@ -8,9 +8,9 @@ import (
 	"strings"
 )
 
-func filterGo(fi os.FileInfo) bool {
+func filterGoNoTest(fi os.FileInfo) bool {
 	n := fi.Name()
-	return len(n) > 0 && strings.HasSuffix(n, ".go") && n[0] != '_'
+	return len(n) > 0 && strings.HasSuffix(n, ".go") && n[0] != '_' && strings.Index(n, "_test.go") < 0
 }
 
 // Skeleton holds a set of parsed packages and their common file set
@@ -29,7 +29,7 @@ func (l *Layout) ParsePkg(pkg string, mode parser.Mode) (ps *Skeleton, err error
 		return nil, err
 	}
 
-	if ps.Pkgs, err = parser.ParseDir(ps.FileSet, pkgpath, filterGo, mode); err != nil {
+	if ps.Pkgs, err = parser.ParseDir(ps.FileSet, pkgpath, filterGoNoTest, mode); err != nil {
 		return nil, err
 	}
 	return ps, nil

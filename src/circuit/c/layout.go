@@ -31,7 +31,7 @@ func NewWorkingLayout() (*Layout, error) {
 // If includeGoRoot is set, goroot is checked first.
 func (l *Layout) FindPkg(pkg string, includeGoRoot bool) (gopath, pkgpath string, err error) {
 	if includeGoRoot {
-		pkgpath, err = existPkg(l.goRoot, pkg)
+		pkgpath, err = existPkg(l.goRoot, path.Join("pkg", pkg))
 		if err == nil {
 			return l.goRoot, pkgpath, nil
 		}
