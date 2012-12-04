@@ -8,30 +8,70 @@ import (
 	"strings"
 )
 
+// GoPaths is a structure providing query facilities for a GOPATH environment
+type GoPaths []string
 
-// GetWorkingGoPath returns the most specific GOPATH for the current working directory
-func GetWorkingGoPath() (string, error) {
-	wd, err := os.Getwd()
-	if err != nil {
-		return "", err
-	}
-	return GetGoPath(wd)
-}
-
-// GetGoPath returns the most specific GOPATH for the given directory
-func GetGoPath(dir string) (string, error) {
-	gopaths := strings.Split(os.Getenv("GOPATH"), ":")
+// NewGoPaths creates a GoPaths structure from the colon-separated list of paths gopathlist
+func NewGoPaths(gopathlist string) GoPaths {
+	gopaths := strings.Split(gopathlist, ":")
 	for i, gp := range gopaths {
 		gopaths[i] = path.Clean(gp)
 	}
-	sort.Sort(descendingLenStrings(gopaths))
-	dir = path.Clean(dir)
+	return GoPaths(gopaths)
+}
+
+// FindPkg looks for pkg in each gopath in order of appearance.
+// If found, it returns the gopath as well as the absolute package path.
+func (gopaths GoPaths) FindPkg(pkg string) (gopath, pkgpath string, err error) {
 	for _, gp := range gopaths {
+		pkgpath = path.Join(gp, "src", pkg)
+		fi, err := os.Stat(pkgpath)
+		if os.IsNotExist(err) {
+			continue
+		}
+		if err != nil {
+			return "", "", err
+		}
+		if !fi.IsDir() {
+			continue
+		}
+		return gp, pkgpath, nil
+	}
+	return "", "", errors.New("pkg not found in any gopath")
+}
+
+func (gopaths GoPaths) FindWorkingPath(dir string) (string, error) {
+	order := make([]string, len(gopaths))
+	copy(order, gopaths)
+	sort.Sort(descendingLenStrings(order))
+
+	dir = path.Clean(dir)
+	for _, gp := range order {
 		if strings.HasPrefix(dir, gp) {
 			return gp, nil
 		}
 	}
-	return "", errors.New("gopath not found")
+
+	return "", errors.New("working gopath not found")
+}
+
+// GetGoPaths returns a gopath structure for the current environment GOPATH
+func GetGoPaths() GoPaths {
+	return NewGoPaths(os.Getenv("GOPATH"))
+}
+
+// FindGoPath returns the most specific GOPATH for the given directory
+func FindGoPath(dir string) (string, error) {
+	return GetGoPaths().FindWorkingPath(dir)
+}
+
+// FindWorkingGoPath returns the most specific GOPATH for the current working directory
+func FindWorkingGoPath() (string, error) {
+	wd, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	return FindGoPath(wd)
 }
 
 type descendingLenStrings []string

@@ -1,4 +1,6 @@
+= register all public types that have public methods
 
+= register all public functions that return public types
 
 = public types
 	that have >0 public methods
