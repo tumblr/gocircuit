@@ -9,7 +9,7 @@ import (
 // Layout describes a Go compilation environment
 type Layout struct {
 	goRoot        string    // GOROOT directory
-	workingGoPath string    // GOPATH of the user Go repo
+	workingGoPath string    // A distinct GOPATH
 	goPaths       GoPaths   // All GOPATH paths
 }
 
