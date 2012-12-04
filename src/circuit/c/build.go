@@ -5,6 +5,7 @@ import (
 	"go/parser"
 	"go/printer"
 	"go/token"
+	"path"
 )
 
 type Build struct {
@@ -52,6 +53,7 @@ func (b *Build) Build(pkgs ...string) error {
 		// Print each file in the package in turn
 		for _, pkgAST := range skel.Pkgs {
 			for fileName, fileAST := range pkgAST.Files {
+				_, fileName = path.Split(fileName)
 				if err := b.printFile(pkg, fileName, skel.FileSet, fileAST); err != nil {
 					return err
 				}

@@ -9,11 +9,12 @@ func TestDep(t *testing.T) {
 	if err != nil {
 		t.Fatalf("layout (%s)", err)
 	}
-	dep, err := l.CompileDep("circuit/load")
+	_, err = l.CompileDep("circuit/load")
 	if err != nil {
 		t.Fatalf("compute dep (%s)", err)
 	}
+	/*
 	for _, d := range dep {
 		println(d)
-	}
+	}*/
 }
