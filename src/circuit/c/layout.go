@@ -9,8 +9,16 @@ import (
 // Layout describes a Go compilation environment
 type Layout struct {
 	goRoot        string    // GOROOT directory
-	workingGoPath string    // A distinct GOPATH
 	goPaths       GoPaths   // All GOPATH paths
+	workingGoPath string    // A distinct GOPATH
+}
+
+func NewLayout(goroot string, gopaths GoPaths, working string) *Layout {
+	return &Layout{
+		goRoot:        goroot,
+		goPaths:       gopaths,
+		workingGoPath: working,
+	}
 }
 
 // NewWorkingLayout creates a new build environment, where the working

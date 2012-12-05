@@ -15,14 +15,9 @@ type Build struct {
 	deps    []string
 }
 
-func NewBuild(jaildir string) (b *Build, err error) {
+func NewBuild(layout *Layout, jaildir string) (b *Build, err error) {
 
-	b = &Build{}
-
-	// Derive the user source layout from the environment
-	if b.layout, err = NewWorkingLayout(); err != nil {
-		return nil, err
-	}
+	b = &Build{layout: layout}
 
 	// Create a new compilation jail
 	if b.jail, err = NewJail(jaildir); err != nil {
