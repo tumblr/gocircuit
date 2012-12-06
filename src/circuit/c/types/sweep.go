@@ -1,34 +1,21 @@
 package types
 
 import (
+	"circuit/c/errors"
 	"go/ast"
 	"go/token"
-	"reflect"
 )
 
-type TypeTable struct {
-	types map[string]*Type
-}
-
-type Type struct {
-	Spec  *ast.TypeSpec
-	Name  string
-	Kind  reflect.Kind
-	Elem  *Type
-	Procs []*Proc
-}
-
-type Proc struct {
-	AST *ast.Node
-}
-
-func NewTypeTable() *TypeTable {
-	return &TypeTable{
-		types: make(map[string]*Type),
+func (tt *TypeTable) AddPackage(fset *token.FileSet, pkgPath string, pkg *ast.Package) error {
+	for _, file := range pkg.Files {
+		if err := tt.addFile(fset, pkgPath, file); err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
-func (tt *TypeTable) ParseFile(fset *ast.FileSet, f *ast.File) error {
+func (tt *TypeTable) addFile(fset *token.FileSet, pkgPath string, f *ast.File) error {
 	for _, decl := range f.Decls {
 		switch q := decl.(type) {
 		// GenDecl captures a single or multi-type declaration block, e.g.:
@@ -42,22 +29,33 @@ func (tt *TypeTable) ParseFile(fset *ast.FileSet, f *ast.File) error {
 				break
 			}
 			for _, spec := range q.Specs {
-				typ, err := ParseTypeSpec(fset, spec.(*ast.TypeSpec))
-				if err != nil {
+				if err := tt.addTypeSpec(fset, pkgPath, spec.(*ast.TypeSpec)); err != nil {
 					return err
 				}
 			}
 		}
 	}
+	return nil
 }
 
-func ParseTypeSpec(fset *ast.FileSet, spec *ast.TypeSpec) (*Type, error) {
-	r := &Type{
-		Name: spec.Name.Ident.Name,
-		Spec: spec,
+func (tt *TypeTable) addTypeSpec(fset *token.FileSet, pkgPath string, spec *ast.TypeSpec) error {
+	t := &Type{
+		Name:    spec.Name.Name,
+		PkgPath: pkgPath,
+		Spec:    spec,
 	}
-	
+	if _, ok := tt.types[t.FullName()]; ok {
+		return errors.NewSource(fset, spec.Name.NamePos, "type %s already defined", t.FullName())
+	}
+	tt.types[t.FullName()] = t
+	return nil
+}
+
+/*
+func (tt *TypeTable) linkType(…) … {
+	…
 	switch q := spec.Type.(type) {
+	// Built-in types or references to other types in this package
 	case *ast.Ident:
 		?
 	case *ast.ParenExpr:
@@ -68,6 +66,7 @@ func ParseTypeSpec(fset *ast.FileSet, spec *ast.TypeSpec) (*Type, error) {
 		// r.Elem will be filled in during a follow up sweep of all types
 		r.Kind = reflect.Ptr
 	case *ast.ArrayType:
+		XX // Slice or array kind?
 		r.Kind = reflect.Array
 	case *ast.ChanType:
 		r.Kind = reflect.Chan
@@ -80,8 +79,9 @@ func ParseTypeSpec(fset *ast.FileSet, spec *ast.TypeSpec) (*Type, error) {
 	case *ast.StructType:
 		r.Kind = reflect.Struct
 	default:
-		return nil, NewError(fset, spec.Name.NamePos, "unexpected type definition")
+		return nil, errors.NewSource(fset, spec.Name.NamePos, "unexpected type definition")
 	}
 
 	return r
 }
+*/

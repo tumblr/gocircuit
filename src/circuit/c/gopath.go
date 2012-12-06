@@ -1,7 +1,7 @@
 package c
 
 import (
-	"errors"
+	"circuit/c/errors"
 	"os"
 	"path"
 	"sort"
@@ -25,7 +25,7 @@ func NewGoPaths(gopathlist string) GoPaths {
 func (gopaths GoPaths) FindPkg(pkg string) (gopath, pkgpath string, err error) {
 	for _, gp := range gopaths {
 		pkgpath, err = existPkg(gp, pkg)
-		if err == ErrNotFound {
+		if err == errors.ErrNotFound {
 			continue
 		}
 		if err != nil {
@@ -33,20 +33,20 @@ func (gopaths GoPaths) FindPkg(pkg string) (gopath, pkgpath string, err error) {
 		}
 		return gp, pkgpath, nil
 	}
-	return "", "", ErrNotFound
+	return "", "", errors.ErrNotFound
 }
 
 func existPkg(gopath, pkg string) (pkgpath string, err error) {
 	pkgpath = path.Join(gopath, "src", pkg)
 	fi, err := os.Stat(pkgpath)
 	if os.IsNotExist(err) {
-		return "", ErrNotFound
+		return "", errors.ErrNotFound
 	}
 	if err != nil {
 		return "", err
 	}
 	if !fi.IsDir() {
-		return "", ErrNotFound
+		return "", errors.ErrNotFound
 	}
 	return pkgpath, nil
 }

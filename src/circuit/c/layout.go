@@ -1,6 +1,7 @@
 package c
 
 import (
+	"circuit/c/errors"
 	"os"
 	"path"
 	"strings"
@@ -43,7 +44,7 @@ func (l *Layout) FindPkg(pkg string, includeGoRoot bool) (gopath, pkgpath string
 		if err == nil {
 			return l.goRoot, pkgpath, nil
 		}
-		if err != ErrNotFound {
+		if err != errors.ErrNotFound {
 			return "", "", err
 		}
 	}

@@ -2,8 +2,8 @@ package c
 
 import (
 	"go/ast"
-	"go/parser"
 	"go/token"
+	"go/parser"
 	"os"
 	"strings"
 )
@@ -13,24 +13,14 @@ func filterGoNoTest(fi os.FileInfo) bool {
 	return len(n) > 0 && strings.HasSuffix(n, ".go") && n[0] != '_' && strings.Index(n, "_test.go") < 0
 }
 
-// Skeleton holds a set of parsed packages and their common file set
-type Skeleton struct {
-	FileSet *token.FileSet
-	Pkgs    map[string]*ast.Package
-}
-
-// ParsePkg parses a package and returns the result in a new Skeleton
-func (l *Layout) ParsePkg(pkg string, mode parser.Mode) (ps *Skeleton, err error) {
-	ps = &Skeleton{}
-	ps.FileSet = token.NewFileSet()
-	
-	_, pkgpath, err := l.FindPkg(pkg, true)
-	if err != nil {
+// ParsePkg parses package pkg, using FileSet fset
+func ParsePkg(l *Layout, fset *token.FileSet, pkgPath string, mode parser.Mode) (pkgs map[string]*ast.Package, err error) {
+	if _, pkgPath, err = l.FindPkg(pkgPath, true); err != nil {
 		return nil, err
 	}
 
-	if ps.Pkgs, err = parser.ParseDir(ps.FileSet, pkgpath, filterGoNoTest, mode); err != nil {
+	if pkgs, err = parser.ParseDir(fset, pkgPath, filterGoNoTest, mode); err != nil {
 		return nil, err
 	}
-	return ps, nil
+	return pkgs, nil
 }

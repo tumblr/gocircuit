@@ -1,18 +1,21 @@
 package c
 
 import (
+	"circuit/c/errors"
+	"circuit/c/types"
 	"go/ast"
 	"go/parser"
-	"go/printer"
 	"go/token"
-	"path"
 )
 
 type Build struct {
-	layout  *Layout
-	jail    *Jail
+	layout    *Layout
+	jail      *Jail
 
-	deps    []string
+	fileSet   *token.FileSet
+	pkgs      map[string]*ast.Package  // pkgPath to package AST
+	depTable  *DepTable
+	typeTable *types.TypeTable
 }
 
 func NewBuild(layout *Layout, jaildir string) (b *Build, err error) {
@@ -32,39 +35,62 @@ func (b *Build) Build(pkgs ...string) error {
 	var err error
 
 	// Calculate package dependencies
-	if b.deps, err = b.layout.CompileDep(pkgs...); err != nil {
+	b.fileSet = token.NewFileSet()
+	b.pkgs = make(map[string]*ast.Package)
+	if err = b.compileDep(pkgs...); err != nil {
 		return err
 	}
 
-	// Process each package
-	for _, pkg := range b.deps {
+	// Parse types
+	b.typeTable = types.NewTypeTable()
+	if err = b.parseTypes(); err != nil {
+		return err
+	}
 
-		// Parse package
-		skel, err := b.layout.ParsePkg(pkg, parser.ParseComments)
-		if err != nil {
-			return err
-		}
-
-		// Print each file in the package in turn
-		for _, pkgAST := range skel.Pkgs {
-			for fileName, fileAST := range pkgAST.Files {
-				_, fileName = path.Split(fileName)
-				if err := b.printFile(pkg, fileName, skel.FileSet, fileAST); err != nil {
-					return err
-				}
-			}
-		}
+	for _, typ := range b.typeTable.List() {
+		println(typ)
 	}
 
 	return nil
 }
 
-func (b *Build) printFile(pkg, fileName string, fset *token.FileSet, file *ast.File) error {
-	f, err := b.jail.CreateSrcFile(pkg, fileName)
+// ParsePkg parses the requested package path and saves the resulting package
+// AST node into the pkgs field
+func (b *Build) ParsePkg(pkgPath string) (map[string]*ast.Package, error) {
+	pkgs, err := ParsePkg(b.layout, b.fileSet, pkgPath, parser.ParseComments)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	defer f.Close()
+	// Save package AST into global map
+	for pkgPath_, pkg := range pkgs {
+		if pkgPath_ != pkgPath {
+			return nil, errors.New("parsed package name %s does not match directory name %s", pkgPath_, pkgPath)
+		}
+		if _, present := b.pkgs[pkgPath]; present {
+			return nil, errors.New("package %s already parsed", pkgPath)
+		}
+		b.pkgs[pkgPath] = pkg
+	}
+	return pkgs, nil
+}
 
-	return printer.Fprint(f, fset, file)
+// compileDep causes all packages that pkgs depend on to be parsed
+func (b *Build) compileDep(pkgPaths ...string) error {
+	b.depTable = NewDepTable(b)
+	for _, pkgPath := range pkgPaths {
+		if err := b.depTable.Add(pkgPath); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// parseTypes finds all type declarations and registers them with a global map
+func (b *Build) parseTypes() error {
+	for pkgPath, pkg := range b.pkgs {
+		if err := b.typeTable.AddPackage(b.fileSet, pkgPath, pkg); err != nil {
+			return err
+		}
+	}
+	return nil
 }
