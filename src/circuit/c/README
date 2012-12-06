@@ -16,7 +16,7 @@
 	one interface type:
 		interface containing public methods of value type
 
-= given multiple target packages,
+√ given multiple target packages,
 	compute dependency packages
 	parse types thru-out tree
 	rewrite
