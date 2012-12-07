@@ -57,6 +57,7 @@ func (b *Build) Build(pkgs ...string) error {
 // ParsePkg parses the requested package path and saves the resulting package
 // AST node into the pkgs field
 func (b *Build) ParsePkg(pkgPath string) (map[string]*ast.Package, error) {
+	Log("+ %s", pkgPath)
 	pkgs, err := ParsePkg(b.layout, b.fileSet, pkgPath, parser.ParseComments)
 	if err != nil {
 		return nil, err
@@ -76,6 +77,10 @@ func (b *Build) ParsePkg(pkgPath string) (map[string]*ast.Package, error) {
 
 // compileDep causes all packages that pkgs depend on to be parsed
 func (b *Build) compileDep(pkgPaths ...string) error {
+	Log("Calculating dependencies ...")
+	Indent()
+	defer Unindent()
+
 	b.depTable = NewDepTable(b)
 	for _, pkgPath := range pkgPaths {
 		if err := b.depTable.Add(pkgPath); err != nil {

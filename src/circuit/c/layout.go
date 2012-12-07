@@ -38,17 +38,18 @@ func NewWorkingLayout() (*Layout, error) {
 
 // FindPkg returns the first gopath that contains package pkg.
 // If includeGoRoot is set, goroot is checked first.
-func (l *Layout) FindPkg(pkg string, includeGoRoot bool) (gopath, pkgpath string, err error) {
+func (l *Layout) FindPkg(pkgPath string, includeGoRoot bool) (pkgAbs string, err error) {
 	if includeGoRoot {
-		pkgpath, err = existPkg(l.goRoot, path.Join("pkg", pkg))
+		pkgAbs, err = GoRootExistPkg(l.goRoot, pkgPath)
 		if err == nil {
-			return l.goRoot, pkgpath, nil
+			return pkgAbs, nil
 		}
 		if err != errors.ErrNotFound {
-			return "", "", err
+			return "", err
 		}
 	}
-	return l.goPaths.FindPkg(pkg)
+	_, pkgAbs, err = l.goPaths.FindPkg(pkgPath)
+	return pkgAbs, err
 }
 
 // FindWorkingPath returns the first gopath that parents the absolute directory dir.

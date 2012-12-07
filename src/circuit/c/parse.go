@@ -15,11 +15,12 @@ func filterGoNoTest(fi os.FileInfo) bool {
 
 // ParsePkg parses package pkg, using FileSet fset
 func ParsePkg(l *Layout, fset *token.FileSet, pkgPath string, mode parser.Mode) (pkgs map[string]*ast.Package, err error) {
-	if _, pkgPath, err = l.FindPkg(pkgPath, true); err != nil {
+	var pkgAbs string
+	if pkgAbs, err = l.FindPkg(pkgPath, true); err != nil {
 		return nil, err
 	}
 
-	if pkgs, err = parser.ParseDir(fset, pkgPath, filterGoNoTest, mode); err != nil {
+	if pkgs, err = parser.ParseDir(fset, pkgAbs, filterGoNoTest, mode); err != nil {
 		return nil, err
 	}
 	return pkgs, nil

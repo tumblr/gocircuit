@@ -1,5 +1,9 @@
 package a
 
+import (
+	_ "strings"
+)
+
 type T1 (int)
 
 func (t T1) P1() {

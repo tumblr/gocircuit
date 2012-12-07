@@ -22,23 +22,25 @@ func NewGoPaths(gopathlist string) GoPaths {
 
 // FindPkg looks for pkg in each gopath in order of appearance.
 // If found, it returns the gopath as well as the absolute package path.
-func (gopaths GoPaths) FindPkg(pkg string) (gopath, pkgpath string, err error) {
+func (gopaths GoPaths) FindPkg(pkgPath string) (goPath, pkgAbs string, err error) {
 	for _, gp := range gopaths {
-		pkgpath, err = existPkg(gp, pkg)
+		pkgAbs, err = GoPathExistPkg(gp, pkgPath)
 		if err == errors.ErrNotFound {
 			continue
 		}
 		if err != nil {
 			return "", "", err
 		}
-		return gp, pkgpath, nil
+		return gp, pkgAbs, nil
 	}
 	return "", "", errors.ErrNotFound
 }
 
-func existPkg(gopath, pkg string) (pkgpath string, err error) {
-	pkgpath = path.Join(gopath, "src", pkg)
-	fi, err := os.Stat(pkgpath)
+// GoPathExistPkg returns the absolute path to package sources,
+// if package pkg is found inside gopath
+func GoPathExistPkg(goPath, pkgPath string) (pkgAbs string, err error) {
+	pkgAbs = path.Join(goPath, "src", pkgPath)
+	fi, err := os.Stat(pkgAbs)
 	if os.IsNotExist(err) {
 		return "", errors.ErrNotFound
 	}
@@ -48,7 +50,22 @@ func existPkg(gopath, pkg string) (pkgpath string, err error) {
 	if !fi.IsDir() {
 		return "", errors.ErrNotFound
 	}
-	return pkgpath, nil
+	return pkgAbs, nil
+}
+
+func GoRootExistPkg(goRoot, pkgPath string) (pkgAbs string, err error) {
+	pkgAbs = path.Join(goRoot, "src/pkg", pkgPath)
+	fi, err := os.Stat(pkgAbs)
+	if os.IsNotExist(err) {
+		return "", errors.ErrNotFound
+	}
+	if err != nil {
+		return "", err
+	}
+	if !fi.IsDir() {
+		return "", errors.ErrNotFound
+	}
+	return pkgAbs, nil
 }
 
 func (gopaths GoPaths) FindWorkingPath(dir string) (string, error) {
