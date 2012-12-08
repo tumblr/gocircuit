@@ -14,9 +14,9 @@ func filterGoNoTest(fi os.FileInfo) bool {
 }
 
 // ParsePkg parses package pkg, using FileSet fset
-func ParsePkg(l *Layout, fset *token.FileSet, pkgPath string, mode parser.Mode) (pkgs map[string]*ast.Package, err error) {
+func ParsePkg(l *Layout, fset *token.FileSet, pkgPath string, includeGoRoot bool, mode parser.Mode) (pkgs map[string]*ast.Package, err error) {
 	var pkgAbs string
-	if pkgAbs, err = l.FindPkg(pkgPath, true); err != nil {
+	if pkgAbs, err = l.FindPkg(pkgPath, includeGoRoot); err != nil {
 		return nil, err
 	}
 

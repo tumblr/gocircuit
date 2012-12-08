@@ -1,1 +1,2 @@
 * recognize // +build ignore
+* recognize source file naming patterns xxx_os_arch.go, etc.

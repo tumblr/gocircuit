@@ -58,17 +58,22 @@ func (b *Build) Build(pkgs ...string) error {
 // ParsePkg parses the requested package path and saves the resulting package
 // AST node into the pkgs field
 func (b *Build) ParsePkg(pkgPath string) (map[string]*ast.Package, error) {
-	Log("+ %s", pkgPath)
-	pkgs, err := ParsePkg(b.layout, b.fileSet, pkgPath, parser.ParseComments)
+	pkgs, err := ParsePkg(b.layout, b.fileSet, pkgPath, false, parser.ParseComments)
 	if err != nil {
-		return nil, err
+		Log("- %s skipping", pkgPath)
+		// This is intended for Go's packages itself, which we don't want to parse for now
+		return nil, nil
 	}
+	Log("+ %s", pkgPath)
 	// Save package AST into global map
 	for pkgName, pkg := range pkgs {
 		// Note that only one package is expected in pkgs
 		_, pkgDirName := path.Split(pkgPath)
 		if pkgName != pkgDirName {
-			return nil, errors.New("parsed package name %s does not match directory name %s", pkgName, pkgDirName)
+			// Package source directories will often contain files with main or xxx_test package clauses.
+			// We ignore those, by guessing they are not part of the program.
+			// The correct way to handle those is to recognize the comment directive: // +build ignore
+			continue
 		}
 		if _, present := b.pkgs[pkgPath]; present {
 			return nil, errors.New("package %s already parsed", pkgPath)
