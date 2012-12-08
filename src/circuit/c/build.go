@@ -6,6 +6,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"path"
 )
 
 type Build struct {
@@ -63,9 +64,11 @@ func (b *Build) ParsePkg(pkgPath string) (map[string]*ast.Package, error) {
 		return nil, err
 	}
 	// Save package AST into global map
-	for pkgPath_, pkg := range pkgs {
-		if pkgPath_ != pkgPath {
-			return nil, errors.New("parsed package name %s does not match directory name %s", pkgPath_, pkgPath)
+	for pkgName, pkg := range pkgs {
+		// Note that only one package is expected in pkgs
+		_, pkgDirName := path.Split(pkgPath)
+		if pkgName != pkgDirName {
+			return nil, errors.New("parsed package name %s does not match directory name %s", pkgName, pkgDirName)
 		}
 		if _, present := b.pkgs[pkgPath]; present {
 			return nil, errors.New("package %s already parsed", pkgPath)
