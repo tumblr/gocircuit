@@ -5,16 +5,13 @@ import (
 	"circuit/c/types"
 	"go/ast"
 	"go/parser"
-	"go/token"
-	"path"
 )
 
 type Build struct {
 	layout    *Layout
 	jail      *Jail
 
-	fileSet   *token.FileSet
-	pkgs      map[string]*ast.Package  // pkgPath to package AST
+	pkgs      map[string]*PkgSource  // pkgPath to parsed package source
 	depTable  *DepTable
 	typeTable *types.TypeTable
 }
@@ -31,14 +28,13 @@ func NewBuild(layout *Layout, jaildir string) (b *Build, err error) {
 	return b, nil
 }
 
-func (b *Build) Build(pkgs ...string) error {
+func (b *Build) Build(pkgPaths ...string) error {
 
 	var err error
 
 	// Calculate package dependencies
-	b.fileSet = token.NewFileSet()
-	b.pkgs = make(map[string]*ast.Package)
-	if err = b.compileDep(pkgs...); err != nil {
+	b.pkgs = make(map[string]*PkgSource)
+	if err = b.compileDep(pkgPaths...); err != nil {
 		return err
 	}
 
@@ -48,7 +44,7 @@ func (b *Build) Build(pkgs ...string) error {
 		return err
 	}
 
-	for _, typ := range b.typeTable.List() {
+	for _, typ := range b.typeTable.ListFullNames() {
 		println(typ)
 	}
 
@@ -58,29 +54,21 @@ func (b *Build) Build(pkgs ...string) error {
 // ParsePkg parses the requested package path and saves the resulting package
 // AST node into the pkgs field
 func (b *Build) ParsePkg(pkgPath string) (map[string]*ast.Package, error) {
-	pkgs, err := ParsePkg(b.layout, b.fileSet, pkgPath, false, parser.ParseComments)
+	pkgSrc, err := b.layout.ParsePkg(pkgPath, false, parser.ParseComments)
 	if err != nil {
 		Log("- %s skipping", pkgPath)
 		// This is intended for Go's packages itself, which we don't want to parse for now
 		return nil, nil
 	}
 	Log("+ %s", pkgPath)
+
 	// Save package AST into global map
-	for pkgName, pkg := range pkgs {
-		// Note that only one package is expected in pkgs
-		_, pkgDirName := path.Split(pkgPath)
-		if pkgName != pkgDirName {
-			// Package source directories will often contain files with main or xxx_test package clauses.
-			// We ignore those, by guessing they are not part of the program.
-			// The correct way to handle those is to recognize the comment directive: // +build ignore
-			continue
-		}
-		if _, present := b.pkgs[pkgPath]; present {
-			return nil, errors.New("package %s already parsed", pkgPath)
-		}
-		b.pkgs[pkgPath] = pkg
+	if _, present := b.pkgs[pkgPath]; present {
+		return nil, errors.New("package %s already parsed", pkgPath)
 	}
-	return pkgs, nil
+	b.pkgs[pkgPath] = pkgSrc
+
+	return pkgSrc.Pkgs, nil
 }
 
 // compileDep causes all packages that pkgs depend on to be parsed
@@ -100,8 +88,11 @@ func (b *Build) compileDep(pkgPaths ...string) error {
 
 // parseTypes finds all type declarations and registers them with a global map
 func (b *Build) parseTypes() error {
-	for pkgPath, pkg := range b.pkgs {
-		if err := b.typeTable.AddPackage(b.fileSet, pkgPath, pkg); err != nil {
+	for pkgPath, pkgSrc := range b.pkgs {
+		if pkgSrc.MainPkg == nil {
+			continue
+		}
+		if err := b.typeTable.AddPackage(pkgSrc.FileSet, pkgPath, pkgSrc.MainPkg); err != nil {
 			return err
 		}
 	}

@@ -2,6 +2,7 @@ package c
 
 import (
 	"fmt"
+	"go/token"
 	"os"
 	"sync"
 )
@@ -29,4 +30,12 @@ func Log(fmt_ string, arg_ ...interface{}) {
 	}
 	fmt.Fprintf(os.Stderr, fmt_, arg_...)
 	println("")
+}
+
+func LogFileSet(fset *token.FileSet) {
+	Log("FileSet:")
+	fset.Iterate(func(f *token.File) bool {
+		Log("  %s", f.Name())
+		return true
+	})
 }

@@ -15,7 +15,7 @@ func NewTypeTable() *TypeTable {
 	}
 }
 
-func (tt *TypeTable) List() []string {
+func (tt *TypeTable) ListFullNames() []string {
 	var pp []string
 	for pkgPath, _ := range tt.types {
 		pp = append(pp, pkgPath)

@@ -1,7 +1,6 @@
 package c
 
 import (
-	"circuit/c/errors"
 	"os"
 	"path"
 	"strings"
@@ -36,20 +35,16 @@ func NewWorkingLayout() (*Layout, error) {
 	}, nil
 }
 
-// FindPkg returns the first gopath that contains package pkg.
+// FindPkg returns the ...
 // If includeGoRoot is set, goroot is checked first.
-func (l *Layout) FindPkg(pkgPath string, includeGoRoot bool) (pkgAbs string, err error) {
+func (l *Layout) FindPkg(pkgPath string, includeGoRoot bool) (srcDir string, err error) {
 	if includeGoRoot {
-		pkgAbs, err = GoRootExistPkg(l.goRoot, pkgPath)
-		if err == nil {
-			return pkgAbs, nil
-		}
-		if err != errors.ErrNotFound {
+		if err = ExistPkg(path.Join(l.goRoot, "src", "pkg", pkgPath)); err != nil {
 			return "", err
 		}
+		return path.Join(l.goRoot, "src", "pkg"), nil
 	}
-	_, pkgAbs, err = l.goPaths.FindPkg(pkgPath)
-	return pkgAbs, err
+	return l.goPaths.FindPkg(pkgPath)
 }
 
 // FindWorkingPath returns the first gopath that parents the absolute directory dir.
