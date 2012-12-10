@@ -1,4 +1,4 @@
-package vflush
+package c
 
 import (
 	"fmt"
