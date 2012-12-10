@@ -11,7 +11,7 @@ type Build struct {
 	layout    *Layout
 	jail      *Jail
 
-	pkgs      map[string]*PkgSource  // pkgPath to parsed package source
+	pkgs      map[string]*PkgSrc  // pkgPath to parsed package source
 	depTable  *DepTable
 	typeTable *types.TypeTable
 }
@@ -33,7 +33,7 @@ func (b *Build) Build(pkgPaths ...string) error {
 	var err error
 
 	// Calculate package dependencies
-	b.pkgs = make(map[string]*PkgSource)
+	b.pkgs = make(map[string]*PkgSrc)
 	if err = b.compileDep(pkgPaths...); err != nil {
 		return err
 	}
@@ -44,8 +44,18 @@ func (b *Build) Build(pkgPaths ...string) error {
 		return err
 	}
 
+	// dbg
 	for _, typ := range b.typeTable.ListFullNames() {
 		println(typ)
+	}
+
+	if err = b.transformRegisterInterfaces(); err != nil {
+		return err
+	}
+
+	// Flush rewritten source into jail
+	if err = b.flush(); err != nil {
+		return err
 	}
 
 	return nil
@@ -92,7 +102,7 @@ func (b *Build) parseTypes() error {
 		if pkgSrc.MainPkg == nil {
 			continue
 		}
-		if err := b.typeTable.AddPackage(pkgSrc.FileSet, pkgPath, pkgSrc.MainPkg); err != nil {
+		if err := b.typeTable.AddPkg(pkgSrc.FileSet, pkgPath, pkgSrc.MainPkg); err != nil {
 			return err
 		}
 	}

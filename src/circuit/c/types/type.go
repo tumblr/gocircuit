@@ -7,10 +7,12 @@ import (
 )
 
 type Type struct {
+
 	// Sweep 1
 	Spec    *ast.TypeSpec
 	Name    string
 	PkgPath string
+
 	// Sweep 2
 	Kind    reflect.Kind
 	Elem    *Type

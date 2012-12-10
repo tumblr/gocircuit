@@ -9,22 +9,22 @@ import (
 	"strings"
 )
 
-// PkgSource captures a parsed Go source package
-type PkgSource struct {
-	SrcDir  string            // GOPATH/src or GOROOT/src/pkg
-	FileSet *token.FileSet    // File names are relative to SrcDir
-	PkgPath string
-	Pkgs    map[string]*ast.Package
-	MainPkg *ast.Package      // Package named after the containing source directory, or main
+// PkgSrc captures a parsed Go source package
+type PkgSrc struct {
+	FileSet *token.FileSet           // File names are relative to SrcDir
+	SrcDir  string                   // SrcDir/PkgPath = absolute local path to package directory
+	PkgPath string                   // Package import path
+	Pkgs    map[string]*ast.Package  // Package name to package AST
+	MainPkg *ast.Package             // Package named after the containing source directory, or main
 }
 
-func (p *PkgSource) Name() string {
+func (p *PkgSrc) Name() string {
 	_, name := path.Split(p.PkgPath)
 	return name
 }
 
 // ParsePkg parses package pkg, using FileSet fset
-func (l *Layout) ParsePkg(pkgPath string, includeGoRoot bool, mode parser.Mode) (pkgSrc *PkgSource, err error) {
+func (l *Layout) ParsePkg(pkgPath string, includeGoRoot bool, mode parser.Mode) (pkgSrc *PkgSrc, err error) {
 	
 	// Find source root for pkgPath
 	var srcDir string
@@ -68,7 +68,7 @@ func (l *Layout) ParsePkg(pkgPath string, includeGoRoot bool, mode parser.Mode) 
 	// We ignore those, by guessing they are not part of the program.
 	// The correct way to ignore is to recognize the comment directive: // +build ignore
 
-	return &PkgSource{
+	return &PkgSrc{
 		SrcDir:  srcDir,
 		FileSet: fset,
 		PkgPath: pkgPath,
