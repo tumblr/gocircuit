@@ -49,7 +49,7 @@ func (b *Build) Build(pkgPaths ...string) error {
 		println(typ)
 	}
 
-	if err = b.transformRegisterInterfaces(); err != nil {
+	if err = b.RegisterValues(); err != nil {
 		return err
 	}
 

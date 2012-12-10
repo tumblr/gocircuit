@@ -5,7 +5,12 @@ import (
 	"go/ast"
 )
 
+// TODO: Move value registrations to separate packages, to avoid confusion with
+// multiple packages per packge directory?
+//
 // TODO: copy type declarations if not from main package
+// TODO: currently type registration assumes typeName is a struct, enforce it
+// TODO: Upgrade RegisterValue to add both value and pointer types
 
 // For every package path, and every parsed package (name) inside of it, fish
 // out all public types and register them with the circuit type system in a
@@ -16,7 +21,7 @@ import (
 // circuit app is implemented in a "main" package and the corresponding circuit
 // worker must be aware of the types declared in that "main" package.
 //
-func (b *Build) transformRegisterInterfaces() error {
+func (b *Build) RegisterValues() error {
 
 	// For every package directory
 	for _, pkgSrc := range b.pkgs {
@@ -40,13 +45,13 @@ func (b *Build) transformRegisterInterfaces() error {
 			}
 
 			// Write interface registrations
-			registerValues(astFile, typeNames)
+			registerPkgValues(astFile, typeNames)
 		}
 	}
 	return nil
 }
 
-func registerValues(file *ast.File, typeNames []string) {
+func registerPkgValues(file *ast.File, typeNames []string) {
 
 	// Create init function declaration
 	fdecl := &ast.FuncDecl{

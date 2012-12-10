@@ -9,6 +9,7 @@ import (
 func (tt *TypeTable) AddPkg(fset *token.FileSet, pkgPath string, pkg *ast.Package) error {
 	return CompilePkg(fset, pkg, func(spec *ast.TypeSpec) error {
 		t := &Type{
+			FileSet: fset,
 			Name:    spec.Name.Name,
 			PkgPath: pkgPath,
 			Spec:    spec,

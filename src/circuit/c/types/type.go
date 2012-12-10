@@ -2,6 +2,7 @@ package types
 
 import (
 	"go/ast"
+	"go/token"
 	"path"
 	"reflect"
 )
@@ -9,6 +10,7 @@ import (
 type Type struct {
 
 	// Sweep 1
+	FileSet *token.FileSet
 	Spec    *ast.TypeSpec
 	Name    string
 	PkgPath string
