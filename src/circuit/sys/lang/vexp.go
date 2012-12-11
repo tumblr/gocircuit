@@ -52,6 +52,7 @@ func (r *Runtime) exportRewrite(src, dst reflect.Value, importer circuit.Addr, e
 
 // exportPtr returns *permPtrMsg if importer is nil, and *ptrMsg otherwise.
 func (r *Runtime) exportPtr(v interface{}, importer circuit.Addr) interface{} {
+	// Add exported value to export table
 	exph := r.exp.Add(v, importer)
 
 	if importer == nil {

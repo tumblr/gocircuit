@@ -6,11 +6,10 @@ import (
 	"circuit/use/circuit"
 	"circuit/use/n"
 	"runtime"
+	_ "circuit/kit/debug/ctrlc"
 )
 
-// TODO:
-//	Spawn does not return
-//	Make sure finalizer called BECAUSE worker died or worker asked us to release handle
+// TODO: Make sure finalizer called BECAUSE worker died or worker asked us to release handle
 
 func main() {
 	ch := make(chan int)

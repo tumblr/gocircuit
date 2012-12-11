@@ -7,6 +7,7 @@ import (
 	"sync"
 	"circuit/use/circuit"
 	"circuit/sys/lang/types"
+	"runtime"
 )
 
 // handleID is a universal ID referring to a local value
@@ -163,4 +164,5 @@ func (exp *expTabl) RemoveImporter(importer circuit.Addr) {
 	for _, exph := range impTabl {
 		delete(exp.id, exph.ID)
 	}
+	runtime.GC()
 }

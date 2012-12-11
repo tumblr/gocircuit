@@ -1,7 +1,6 @@
 package types
 
 import (
-	"circuit/c/errors"
 	"go/ast"
 	"go/token"
 )
@@ -14,11 +13,7 @@ func (tt *TypeTable) AddPkg(fset *token.FileSet, pkgPath string, pkg *ast.Packag
 			PkgPath: pkgPath,
 			Spec:    spec,
 		}
-		if _, ok := tt.types[t.FullName()]; ok {
-			return errors.NewSource(fset, spec.Name.NamePos, "type %s already defined", t.FullName())
-		}
-		tt.types[t.FullName()] = t
-		return nil
+		return tt.addType(t)
 	})
 }
 
