@@ -24,7 +24,7 @@ type Type struct {
 func (t *Type) FullName() string {
 	return path.Join(t.PkgPath, t.Name)
 }
-
+/*
 type Type0 struct {
 	Kind reflect.Kind
 	X    string
@@ -120,3 +120,4 @@ func compileTypeExpr(expr ast.Expr) (type0 *Type0, err error)
 
 	return type0, nil
 }
+*/
