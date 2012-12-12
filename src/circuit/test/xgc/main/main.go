@@ -13,11 +13,26 @@ import (
 
 func main() {
 	ch := make(chan int)
+	spark(ch)
+
+	println("Waiting for finalizer call ...")
+	// Force the garbage collector to collect
+	go func() {
+		for i := 0; i < 1e9; i++ {
+			_ = make([]int, i)
+		}
+	}()
+	<-ch
+	println("Success")
+}
+
+func spark(ch chan int) {
 	d := &worker.Dummy{}
 	runtime.SetFinalizer(d, func(h *worker.Dummy) {
 		println("finalizing dummy")
 		close(ch)
 	})
+	defer runtime.GC()
 
 	// Test: 
 	//	Spawn a worker and pass an x-pointer to it; 
@@ -27,11 +42,5 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	d = nil // Make sure we are not holding the object
-	runtime.GC()
-
 	println(addr.String())
-	println("Waiting for finalizer call ...")
-	<-ch
-	println("Success")
 }
