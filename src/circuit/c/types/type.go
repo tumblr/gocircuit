@@ -24,11 +24,10 @@ type Type struct {
 func (t *Type) FullName() string {
 	return path.Join(t.PkgPath, t.Name)
 }
-/*
+
 type Type0 struct {
-	Kind reflect.Kind
-	X    string
-	Y    string
+	Kind     reflect.Kind
+	AliasFor string
 }
 
 func compileTypeSpec(spec *ast.TypeSpec) (type0 *Type0, err error) {
@@ -36,7 +35,7 @@ func compileTypeSpec(spec *ast.TypeSpec) (type0 *Type0, err error) {
 	compileTypeExpr(spec.Type)
 }
 
-func compileTypeExpr(expr ast.Expr) (type0 *Type0, err error)
+func compileTypeExpr(pkgPath string, expr ast.Expr) (type0 *Type0, err error)
 	type0 = &Type0{}
 	switch q := expr.(type) {
 
@@ -79,16 +78,19 @@ func compileTypeExpr(expr ast.Expr) (type0 *Type0, err error)
 			type0.Kind = reflect.String
 		default:
 			// Name of another type defined in this package
-			type0.Kind = reflect.Invalid
-			type0.X = q.Name
+			type0.AliasFor = path.Join(pkgPath, q.Name)
 		}
 		return type0, nil
 
 	case *ast.ParenExpr:
-		return compileTypeExpr(q)
+		return compileTypeExpr(pkgPath, q)
 
 	case *ast.SelectorExpr:
-		…
+		pkgAlias, ok := q.X.(*ast.Ident)
+		if !ok {
+			?
+		}
+		typeName := q.Sel.Name
 
 	case *ast.StarExpr:
 		// r.Elem will be filled in during a follow up sweep of all types
@@ -120,4 +122,3 @@ func compileTypeExpr(expr ast.Expr) (type0 *Type0, err error)
 
 	return type0, nil
 }
-*/
