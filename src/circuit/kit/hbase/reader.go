@@ -23,6 +23,10 @@ func OpenFile(name string) (*File, error) {
 	return &File{f: f, r: r}, nil
 }
 
+func (f *File) Close() error {
+	return f.f.Close()
+}
+
 // v should be a pointer to struct
 func (f *File) Read(v interface{}) error {
 	rec, err := f.r.Read()

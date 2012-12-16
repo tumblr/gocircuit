@@ -46,6 +46,16 @@ type Metric struct {
 
 var ErrDup = errors.New("duplicate point")
 
+func (m *Metric) Iterate(f func(Item)) {
+	f(m.Item)
+	if m.sub[0] != nil {
+		m.sub[0].Iterate(f)
+	}
+	if m.sub[1] != nil {
+		m.sub[1].Iterate(f)
+	}
+}
+
 // Copy returns a deep copy of the metric
 func (m *Metric) Copy() *Metric {
 	m_ := &Metric{

@@ -6,13 +6,20 @@ import (
 	"sort"
 )
 
-// FillBin represents a bin carying integer load
-type FillBin interface {
+// Bin represents a bin carying integral load
+type Bin interface {
 	Add()
-	Less(FillBin) bool
+	Less(Bin) bool
 }
 
-func NewFill(bin []FillBin) *Fill {
+// Fill represents an integral load distribution over a set of bins
+type Fill struct {
+	bin   []Bin
+	i     int
+	water Bin	// Bin holding the high water mark load
+}
+
+func NewFill(bin []Bin) *Fill {
 	if len(bin) == 0 {
 		return nil
 	}
@@ -22,12 +29,6 @@ func NewFill(bin []FillBin) *Fill {
 		i:     0,
 		water: bin[0],
 	}
-}
-
-type Fill struct {
-	bin   []FillBin
-	i     int
-	water FillBin
 }
 
 func (f *Fill) String() string {
@@ -40,7 +41,8 @@ func (f *Fill) String() string {
 	return string(w.Bytes())
 }
 
-func (f *Fill) Add() FillBin {
+// Add assigns a unit of work to a bin and returns that bin
+func (f *Fill) Add() Bin {
 	// Part I
 	if f.i == len(f.bin) {
 		f.i = 1
@@ -64,8 +66,8 @@ func (f *Fill) Add() FillBin {
 	return r
 }
 
-// sortBins sorts a slice of FillBins according to their order
-type sortBins []FillBin
+// sortBins sorts a slice of Bins according to their order
+type sortBins []Bin
 
 func (sb sortBins) Len() int {
 	return len(sb)
