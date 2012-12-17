@@ -9,24 +9,30 @@ import (
 	"strings"
 )
 
-type Src struct {
+type Source struct {
 	layout *Layout
+	jail   *Jail
 	pkg    map[string]*Pkg	// package path to package structure
 }
 
-func New(l *Layout) *Src {
-	return &Src{
-		layout: l,
-		pkg:    make(map[string]*Pkg),
+func New(l *Layout, writeDir string) (*Source, error) {
+	jail, err := NewJail(writeDir)
+	if err != nil {
+		return nil, err
 	}
+	return &Source{
+		layout: l,
+		jail:   jail,
+		pkg:    make(map[string]*Pkg),
+	}, nil
 }
 
-func (s *Src) Get(pkgPath string) *Pkg {
+func (s *Source) GetPkg(pkgPath string) *Pkg {
 	return s.pkg[pkgPath]
 }
 
 // parses parses package pkg
-func (s *Src) Parse(pkgPath string, includeGoRoot bool, mode parser.Mode) (pkgSrc *Pkg, err error) {
+func (s *Source) ParsePkg(pkgPath string, includeGoRoot bool, mode parser.Mode) (pkgSrc *Pkg, err error) {
 	pkgPath = path.Clean(pkgPath)
 	
 	// Find source root for pkgPath

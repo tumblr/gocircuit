@@ -4,6 +4,7 @@ import (
 	"go/ast"
 	"go/token"
 	"path"
+	"strings"
 )
 
 // Pkg captures a parsed Go source package
@@ -52,6 +53,9 @@ func (p *Pkg) Name() string {
 }
 
 func (p *Pkg) AddFile(pkgName, fileName string) *ast.File {
+	if strings.Index(fileName, "/") >= 0 {
+		panic("not a filename")
+	}
 
 	// Make package ast if not there
 	pkg, ok := p.PkgAST[pkgName]
@@ -66,15 +70,16 @@ func (p *Pkg) AddFile(pkgName, fileName string) *ast.File {
 	}
 
 	// If file already exists, return it
-	f, ok := pkg.Files[fileName]
+	filePath := path.Join(p.PkgPath, fileName)
+	f, ok := pkg.Files[filePath]
 	if !ok {
-		ff := p.FileSet.AddFile(path.Join(p.PkgPath, fileName), p.FileSet.Base(), 1)
+		ff := p.FileSet.AddFile(filePath, p.FileSet.Base(), 1)
 		pos := ff.Pos(0)
 		f = &ast.File{
 			Package:   pos,
 			Name:      &ast.Ident{Name: pkgName},
 		}
-		pkg.Files[fileName] = f
+		pkg.Files[filePath] = f
 	}
 
 	return f

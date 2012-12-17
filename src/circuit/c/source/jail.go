@@ -24,7 +24,7 @@ func (j *Jail) mkdirs() error {
 	return nil
 }
 
-// PkgPath returns the absolute path of package pkg within the jail
+// AbsPkgPath returns the absolute local path of package pkg within the jail
 func (j *Jail) AbsPkgPath(pkgPath string) string {
 	return path.Join(j.root, "src", pkgPath)
 }
@@ -36,4 +36,16 @@ func (j *Jail) MakePkgDir(pkgPaths ...string) error {
 		}
 	}
 	return nil
+}
+
+func (j *Jail) CreateSourceFile(pkgPath, fileName string) (*os.File, error) {
+	absPath := j.AbsPkgPath(pkgPath)
+	if err := os.MkdirAll(absPath, 0770); err != nil {
+		return nil, err
+	}
+	f, err := os.Create(path.Join(absPath, fileName))
+	if err != nil {
+		return nil, err
+	}
+	return f, nil
 }
