@@ -1,0 +1,89 @@
+package dep
+
+import (
+	"go/ast"
+	"circuit/c/util"
+)
+
+// Parser parses a package path on demand
+type Parser interface {
+	Parse(pkgPath string) (map[string]*ast.Package, error)
+}
+
+// Table maintains the dependent packages for a list of incrementally added
+// target packages
+type Table struct {
+	parser Parser
+	pkgs   map[string]*Pkg	// Package path to package dependency structure
+	follow []string
+}
+
+// Pkg summarizes all package paths imported by this package
+type Pkg struct {
+	Imports  []string	// List of package paths needed for this package
+}
+
+// New creates an empty dependency table
+func New(parser Parser) *Table {
+	return &Table{
+		parser: parser,
+		pkgs:   make(map[string]*Pkg),
+		follow: nil,
+	}
+}
+
+// Add adds pkgPath to the list of target packages
+func (dt *Table) Add(pkgPath string) error {
+	dt.follow = append(dt.follow, pkgPath)
+	return dt.loop()
+}
+
+func (dt *Table) loop() error {
+	for len(dt.follow) > 0 {
+		pop := dt.follow[0]
+		dt.follow = dt.follow[1:]
+
+		// Check if package already processed
+		if _, present := dt.pkgs[pop]; present {
+			continue
+		}
+
+		// Parse package source
+		pkgs, err := dt.parser.Parse(pop)
+		if err != nil {
+			return err
+		}
+
+		// Process all import specs in all source files
+		imps := make(map[string]struct{})
+		for _, pkg := range pkgs {
+			pimps := util.DeterminePkgImports(pkg)
+			for i, _ := range pimps {
+				if i != "C" {
+					imps[i] = struct{}{}
+				}
+			}
+		}
+
+		// Make pkg structure and enqueue new imports
+		dpkg := &Pkg{}
+		for pkg, _ := range imps {
+			dpkg.Imports = append(dpkg.Imports, pkg)
+			dt.follow = append(dt.follow, pkg)
+		}
+
+		// Save pkg structure
+		dt.pkgs[pop] = dpkg
+	}
+	return nil
+}
+
+// All returns a list of all package paths required for the compilation of
+// packages added via Add.
+func (dt *Table) All() []string {
+	var all []string
+	for pkg, _ := range dt.pkgs {
+		all = append(all, pkg)
+	}
+	return all
+}

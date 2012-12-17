@@ -1,4 +1,4 @@
-package c
+package util
 
 import (
 	"fmt"
