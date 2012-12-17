@@ -1,4 +1,4 @@
-package c
+package source
 
 import (
 	"os"
@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// Layout describes a Go compilation environment
+// Layout describes the user's Go compilation environment
 type Layout struct {
 	goRoot        string    // GOROOT directory
 	goPaths       GoPaths   // All GOPATH paths

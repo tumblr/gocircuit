@@ -1,83 +1,81 @@
-package c
+package source
 
 import (
 	"go/ast"
 	"go/token"
-	"go/parser"
-	"os"
 	"path"
-	"strings"
 )
 
-// PkgSrc captures a parsed Go source package
-type PkgSrc struct {
-	FileSet *token.FileSet           // File names are relative to SrcDir
-	SrcDir  string                   // SrcDir/PkgPath = absolute local path to package directory
-	PkgPath string                   // Package import path
-	Pkgs    map[string]*ast.Package  // Package name to package AST
-	MainPkg *ast.Package             // Package named after the containing source directory, or main
+// Pkg captures a parsed Go source package
+type Pkg struct {
+	FileSet  *token.FileSet           // File names are relative to SrcDir
+	SrcDir   string                   // SrcDir/PkgPath = absolute local path to package directory
+	PkgPath  string                   // Package import path
+	PkgAST   map[string]*ast.Package  // Package name to package AST
+	FileAST  map[string]*ast.File
 }
 
-func (p *PkgSrc) Name() string {
+func (p *Pkg) link() {
+	p.FileAST = make(map[string]*ast.File)
+	for _, pkgAST := range p.PkgAST {
+		for n, f := range pkgAST.Files {
+			if _, ok := p.FileAST[n]; ok {
+				panic("file in two packages")
+			}
+			p.FileAST[n] = f
+		}
+	}
+}
+
+func (p *Pkg) LibPkg() *ast.Package {
+	name := p.Name()
+	for pkgName, pkg := range p.PkgAST {
+		if pkgName == name {
+			return pkg
+		}
+	}
+	return nil
+}
+
+func (p *Pkg) MainPkg() *ast.Package {
+	for pkgName, pkg := range p.PkgAST {
+		if pkgName == "main" {
+			return pkg
+		}
+	}
+	return nil
+}
+
+func (p *Pkg) Name() string {
 	_, name := path.Split(p.PkgPath)
 	return name
 }
 
-// ParsePkg parses package pkg, using FileSet fset
-func (l *Layout) ParsePkg(pkgPath string, includeGoRoot bool, mode parser.Mode) (pkgSrc *PkgSrc, err error) {
-	
-	// Find source root for pkgPath
-	var srcDir string
-	if srcDir, err = l.FindPkg(pkgPath, includeGoRoot); err != nil {
-		return nil, err
-	}
+func (p *Pkg) AddFile(pkgName, fileName string) *ast.File {
 
-	// Save current working directory
-	var saveDir string
-	if saveDir, err = os.Getwd(); err != nil {
-		return nil, err
-	}
-
-	// Change current directory to root of sources
-	if err = os.Chdir(srcDir); err != nil {
-		return nil, err
-	}
-	defer func() {
-		err = os.Chdir(saveDir)
-	}()
-
-	// Make file set just for this package
-	fset := token.NewFileSet()
-
-	// Parse
-	var pkgs map[string]*ast.Package
-	if pkgs, err = parser.ParseDir(fset, pkgPath, filterGoNoTest, mode); err != nil {
-		return nil, err
-	}
-
-	// Find the exported package
-	var mainPkg *ast.Package
-	_, pkgDirName := path.Split(pkgPath)
-	for pkgName, pkg := range pkgs {
-		if pkgName == pkgDirName || pkgName == "main" {
-			mainPkg = pkg
-			break
+	// Make package ast if not there
+	pkg, ok := p.PkgAST[pkgName]
+	if !ok {
+		pkg = &ast.Package{
+			Name:    pkgName,
+			Scope:   nil,
+			Imports: nil,
+			Files:   make(map[string]*ast.File),
 		}
+		p.PkgAST[pkgName] = pkg
 	}
-	// TODO: Package source directories will often contain files with main or xxx_test package clauses.
-	// We ignore those, by guessing they are not part of the program.
-	// The correct way to ignore is to recognize the comment directive: // +build ignore
 
-	return &PkgSrc{
-		SrcDir:  srcDir,
-		FileSet: fset,
-		PkgPath: pkgPath,
-		Pkgs:    pkgs,
-		MainPkg: mainPkg,
-	}, nil
-}
+	// If file already exists, return it
+	f, ok := pkg.Files[fileName]
+	if !ok {
+		ff := p.FileSet.AddFile(path.Join(p.PkgPath, fileName), p.FileSet.Base(), 1)
+		pos := ff.Pos(0)
+		f = &ast.File{
+			Package:   pos,
+			Name:      &ast.Ident{Name: pkgName},
+		}
+		pkg.Files[fileName] = f
+	}
 
-func filterGoNoTest(fi os.FileInfo) bool {
-	n := fi.Name()
-	return len(n) > 0 && strings.HasSuffix(n, ".go") && n[0] != '_' && strings.Index(n, "_test.go") < 0
+	return f
 }

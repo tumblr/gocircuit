@@ -1,4 +1,4 @@
-package c
+package source
 
 import (
 	"circuit/c/errors"
