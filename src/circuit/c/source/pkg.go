@@ -28,6 +28,10 @@ func (p *Pkg) link() {
 	}
 }
 
+func (p *Pkg) GetPkg(name string) *ast.Package {
+	return p.PkgAST[name]
+}
+
 func (p *Pkg) LibPkg() *ast.Package {
 	name := p.Name()
 	for pkgName, pkg := range p.PkgAST {
@@ -52,24 +56,24 @@ func (p *Pkg) Name() string {
 	return name
 }
 
+func (p *Pkg) AddPkg(name string) *ast.Package {
+	pkg, ok := p.PkgAST[name]
+	if !ok {
+		pkg = &ast.Package{
+			Name:  name,
+			Files: make(map[string]*ast.File),
+		}
+		p.PkgAST[name] = pkg
+	}
+	return pkg
+}
+
 func (p *Pkg) AddFile(pkgName, fileName string) *ast.File {
 	if strings.Index(fileName, "/") >= 0 {
 		panic("not a filename")
 	}
+	pkg := p.AddPkg(pkgName)
 
-	// Make package ast if not there
-	pkg, ok := p.PkgAST[pkgName]
-	if !ok {
-		pkg = &ast.Package{
-			Name:    pkgName,
-			Scope:   nil,
-			Imports: nil,
-			Files:   make(map[string]*ast.File),
-		}
-		p.PkgAST[pkgName] = pkg
-	}
-
-	// If file already exists, return it
 	filePath := path.Join(p.PkgPath, fileName)
 	f, ok := pkg.Files[filePath]
 	if !ok {

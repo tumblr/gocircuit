@@ -10,7 +10,7 @@ type TypeTable struct {
 	pkgs  map[string]map[string]*Type  // Package path to type name to type structure
 }
 
-func NewTypeTable() *TypeTable {
+func New() *TypeTable {
 	return &TypeTable{
 		types: make(map[string]*Type),
 		pkgs:  make(map[string]map[string]*Type),

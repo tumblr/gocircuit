@@ -2,6 +2,7 @@ package c
 
 import (
 	"circuit/c/types"
+	"circuit/c/util"
 	"go/ast"
 )
 
@@ -20,38 +21,42 @@ import (
 // well as executables linked in. This addresses the situation when an entire
 // circuit app is implemented in a "main" package and the corresponding circuit
 // worker must be aware of the types declared in that "main" package.
-//
-func (b *Build) RegisterValues() error {
+
+// TransformRegisterValues …
+func (b *Build) TransformRegisterValues() error {
 
 	// For every package directory
-	for _, pkgSrc := range b.pkgs {
+	for _, pkg := range b.src.GetAll() {
 
 		// Create source file for registrations in this package
-		pkgName := pkgSrc.Name()
-		_, astFile := pkgSrc.AddFile(pkgName, pkgName + "_circuit.go") 
-		AddImport(astFile, "circuit/use/circuit")
+		pkgName := pkg.Name()
+		astFile := pkg.AddFile(pkgName, pkgName + "_circuit.go") 
+
+		util.AddImport(astFile, "circuit/use/circuit")
 
 		// For every package name defined in the package directory
-		for _, pkg := range pkgSrc.Pkgs {
+		for _, p := range pkg.PkgAST {
 
 			var typeNames []string
 			
 			// Compile interface types in package
-			if err := types.CompilePkg(pkgSrc.FileSet, pkg, func (spec *ast.TypeSpec) error {
-					typeNames = append(typeNames, spec.Name.Name)
-					return nil
-				}); err != nil {
+			if err := types.CompilePkg(pkg.FileSet, p, 
+					func (spec *ast.TypeSpec) error {
+						typeNames = append(typeNames, spec.Name.Name)
+						return nil
+					},
+				); err != nil {
 				return err
 			}
 
 			// Write interface registrations
-			registerPkgValues(astFile, typeNames)
+			transformRegisterPkgValues(astFile, typeNames)
 		}
 	}
 	return nil
 }
 
-func registerPkgValues(file *ast.File, typeNames []string) {
+func transformRegisterPkgValues(file *ast.File, typeNames []string) {
 
 	// Create init function declaration
 	fdecl := &ast.FuncDecl{

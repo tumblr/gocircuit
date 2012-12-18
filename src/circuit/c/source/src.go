@@ -27,12 +27,16 @@ func New(l *Layout, writeDir string) (*Source, error) {
 	}, nil
 }
 
+func (s *Source) GetAll() map[string]*Pkg {
+	return s.pkg
+}
+
 func (s *Source) GetPkg(pkgPath string) *Pkg {
 	return s.pkg[pkgPath]
 }
 
 // parses parses package pkg
-func (s *Source) ParsePkg(pkgPath string, includeGoRoot bool, mode parser.Mode) (pkgSrc *Pkg, err error) {
+func (s *Source) ParsePkg(pkgPath string, includeGoRoot bool, mode parser.Mode) (pkg *Pkg, err error) {
 	pkgPath = path.Clean(pkgPath)
 	
 	// Find source root for pkgPath
@@ -64,7 +68,7 @@ func (s *Source) ParsePkg(pkgPath string, includeGoRoot bool, mode parser.Mode) 
 		return nil, err
 	}
 
-	pkg := &Pkg{
+	pkg = &Pkg{
 		SrcDir:  srcDir,
 		FileSet: fset,
 		PkgPath: pkgPath,

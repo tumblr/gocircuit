@@ -10,9 +10,9 @@ type Parser interface {
 	Parse(pkgPath string) (map[string]*ast.Package, error)
 }
 
-// Table maintains the dependent packages for a list of incrementally added
+// Dep maintains the dependent packages for a list of incrementally added
 // target packages
-type Table struct {
+type Dep struct {
 	parser Parser
 	pkgs   map[string]*Pkg	// Package path to package dependency structure
 	follow []string
@@ -24,8 +24,8 @@ type Pkg struct {
 }
 
 // New creates an empty dependency table
-func New(parser Parser) *Table {
-	return &Table{
+func New(parser Parser) *Dep {
+	return &Dep{
 		parser: parser,
 		pkgs:   make(map[string]*Pkg),
 		follow: nil,
@@ -33,12 +33,12 @@ func New(parser Parser) *Table {
 }
 
 // Add adds pkgPath to the list of target packages
-func (dt *Table) Add(pkgPath string) error {
+func (dt *Dep) Add(pkgPath string) error {
 	dt.follow = append(dt.follow, pkgPath)
 	return dt.loop()
 }
 
-func (dt *Table) loop() error {
+func (dt *Dep) loop() error {
 	for len(dt.follow) > 0 {
 		pop := dt.follow[0]
 		dt.follow = dt.follow[1:]
@@ -80,7 +80,7 @@ func (dt *Table) loop() error {
 
 // All returns a list of all package paths required for the compilation of
 // packages added via Add.
-func (dt *Table) All() []string {
+func (dt *Dep) All() []string {
 	var all []string
 	for pkg, _ := range dt.pkgs {
 		all = append(all, pkg)

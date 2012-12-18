@@ -1,108 +1,101 @@
 package c
 
 import (
-	"circuit/c/errors"
+	"circuit/c/dep"
+	"circuit/c/source"
 	"circuit/c/types"
 	"go/ast"
 	"go/parser"
 )
 
 type Build struct {
-	layout    *Layout
-	jail      *Jail
-
-	pkgs      map[string]*PkgSrc  // pkgPath to parsed package source
-	depTable  *DepTable
-	typeTable *types.TypeTable
+	src   *source.Source
+	dep   *dep.Dep
+	types *types.TypeTable
 }
 
-func NewBuild(layout *Layout, jaildir string) (b *Build, err error) {
-
-	b = &Build{layout: layout}
-
-	// Create a new compilation jail
-	if b.jail, err = NewJail(jaildir); err != nil {
+func NewBuild(layout *source.Layout, writeDir string) (b *Build, err error) {
+	src, err := source.New(layout, writeDir)
+	if err != nil {
 		return nil, err
 	}
-
-	return b, nil
+	return &Build{src: src}, nil
 }
 
 func (b *Build) Build(pkgPaths ...string) error {
 
 	var err error
 
-	// Calculate package dependencies
-	b.pkgs = make(map[string]*PkgSrc)
-	if err = b.compileDep(pkgPaths...); err != nil {
+	// Calculate dependencies
+	if err = b.determineDep(pkgPaths...); err != nil {
 		return err
 	}
 
 	// Parse types
-	b.typeTable = types.NewTypeTable()
-	if err = b.parseTypes(); err != nil {
-		return err
-	}
+	// b.types = types.New()
 
 	// dbg
-	for _, typ := range b.typeTable.ListFullNames() {
+	for _, typ := range b.types.ListFullNames() {
 		println(typ)
 	}
 
-	if err = b.RegisterValues(); err != nil {
+	// Add code that registers all user structs with the circuit runtime type system
+	if err = b.TransformRegisterValues(); err != nil {
 		return err
 	}
 
-	// Flush rewritten source into jail
-	if err = b.flush(); err != nil {
+	// Flush rewritten source into output jail
+	if err = b.src.Flush(); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-// ParsePkg parses the requested package path and saves the resulting package
-// AST node into the pkgs field
-func (b *Build) ParsePkg(pkgPath string) (map[string]*ast.Package, error) {
-	pkgSrc, err := b.layout.ParsePkg(pkgPath, false, parser.ParseComments)
+type buildParser Build
+
+// Parse implements dep.Parser
+func (b *buildParser) Parse(pkgPath string) (map[string]*ast.Package, error) {
+	pkg, err := b.src.ParsePkg(pkgPath, false, parser.ParseComments)
 	if err != nil {
-		Log("- %s skipping", pkgPath)
+		Log("- %s skipping (%s)", pkgPath, err)
 		// This is intended for Go's packages itself, which we don't want to parse for now
-		return nil, nil
+		return nil, err
 	}
-	Log("+ %s", pkgPath)
+	Log("+ %s parsed", pkgPath)
 
-	// Save package AST into global map
-	if _, present := b.pkgs[pkgPath]; present {
-		return nil, errors.New("package %s already parsed", pkgPath)
-	}
-	b.pkgs[pkgPath] = pkgSrc
-
-	return pkgSrc.Pkgs, nil
+	return pkg.PkgAST, nil
 }
 
-// compileDep causes all packages that pkgs depend on to be parsed
-func (b *Build) compileDep(pkgPaths ...string) error {
+// determineDep causes all packages that pkgPaths depend on to be parsed
+func (b *Build) determineDep(pkgPaths ...string) error {
 	Log("Calculating dependencies ...")
 	Indent()
 	defer Unindent()
 
-	b.depTable = NewDepTable(b)
+	b.dep = dep.New((*buildParser)(b))
 	for _, pkgPath := range pkgPaths {
-		if err := b.depTable.Add(pkgPath); err != nil {
+		if err := b.dep.Add(pkgPath); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-// parseTypes finds all type declarations and registers them with a global map
-func (b *Build) parseTypes() error {
-	for pkgPath, pkgSrc := range b.pkgs {
-		if pkgSrc.MainPkg == nil {
+// buildTypes finds all type declarations and registers them with a global map
+func (b *Build) buildTypes() error {
+	Log("Linking types ...")
+	Indent()
+	defer Unindent()
+
+	for pkgPath, pkg := range b.src.GetAll() {
+		libPkg := pkg.LibPkg()
+		if libPkg == nil {
+			// XXX: This is probably a main pkg; we still need to
+			// link all its types in the worker binary
 			continue
 		}
-		if err := b.typeTable.AddPkg(pkgSrc.FileSet, pkgPath, pkgSrc.MainPkg); err != nil {
+		if err := b.types.AddPkg(pkg.FileSet, pkgPath, libPkg); err != nil {
 			return err
 		}
 	}

@@ -3,10 +3,11 @@ package c
 import (
 	"os"
 	"testing"
+	"circuit/c/source"
 )
 
 var (
-	testLayout = NewLayout(os.Getenv("GOROOT"), GoPaths{"./testdata"}, "")
+	testLayout = source.NewLayout(os.Getenv("GOROOT"), source.GoPaths{"./testdata"}, "")
 )
 
 func TestBuild(t *testing.T) {
