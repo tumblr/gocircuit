@@ -21,34 +21,35 @@ func NewGoPaths(gopathlist string) GoPaths {
 }
 
 // FindPkg looks for pkg in each gopath in order of appearance.
-// If found, it returns the first gopath/src that contains pkgPath.
+// If found, it returns srcDir such that srcDir/pkgPath is the absolute path of the package sources.
+// If not found, the returned error is still nil, while srcDir is an empty string.
 func (gopaths GoPaths) FindPkg(pkgPath string) (srcDir string, err error) {
 	for _, gp := range gopaths {
-		err = ExistPkg(path.Join(gp, "src", pkgPath))
-		if err == errors.ErrNotFound {
-			continue
-		}
+		exists, err := ExistPkg(path.Join(gp, "src", pkgPath))
 		if err != nil {
 			return "", err
 		}
+		if !exists {
+			continue
+		}
 		return path.Join(gp, "src"), nil
 	}
-	return "", errors.ErrNotFound
+	return "", nil
 }
 
-// ExistPkg returns no error if pkgAbs is a local directory
-func ExistPkg(pkgAbs string) error {
+// ExistPkg returns whether pkgAbs is an existing package directory on the local file system.
+func ExistPkg(pkgAbs string) (bool, error) {
 	fi, err := os.Stat(pkgAbs)
 	if os.IsNotExist(err) {
-		return errors.ErrNotFound
+		return false, nil
 	}
 	if err != nil {
-		return err
+		return false, err
 	}
 	if !fi.IsDir() {
-		return errors.ErrNotFound
+		return false, nil
 	}
-	return nil
+	return true, nil
 }
 
 func (gopaths GoPaths) FindWorkingPath(dir string) (string, error) {

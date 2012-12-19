@@ -11,7 +11,7 @@ var (
 )
 
 func TestBuild(t *testing.T) {
-	b, err := NewBuild(testLayout, "./tmp")
+	b, err := NewBuild(testLayout, "./_tmp")
 	if err != nil {
 		t.Fatalf("build (%s)", err)
 	}

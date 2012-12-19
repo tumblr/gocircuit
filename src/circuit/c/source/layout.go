@@ -35,16 +35,21 @@ func NewWorkingLayout() (*Layout, error) {
 	}, nil
 }
 
-// FindPkg returns the ...
-// If includeGoRoot is set, goroot is checked first.
-func (l *Layout) FindPkg(pkgPath string, includeGoRoot bool) (srcDir string, err error) {
-	if includeGoRoot {
-		if err = ExistPkg(path.Join(l.goRoot, "src", "pkg", pkgPath)); err != nil {
-			return "", err
-		}
-		return path.Join(l.goRoot, "src", "pkg"), nil
+// FindPkg checks whether there is a source directory for package path pkgPath
+// within this layout. If the returned error is nil, srcDir is such that
+// srcDir/pkgPath equals the absolute local path to the package directory.
+// inGoRoot indicates whether the latter path is within the Go source tree.
+func (l *Layout) FindPkg(pkgPath string) (srcDir string, inGoRoot bool, err error) {
+	if inGoRoot, err = ExistPkg(path.Join(l.goRoot, "src", "pkg", pkgPath)); err != nil {
+		return "", false, err
 	}
-	return l.goPaths.FindPkg(pkgPath)
+	if inGoRoot {
+		return path.Join(l.goRoot, "src", "pkg"), true, nil
+	}
+	if srcDir, err = l.goPaths.FindPkg(pkgPath); err != nil {
+		return "", false, err
+	}
+	return srcDir, false, nil
 }
 
 // FindWorkingPath returns the first gopath that parents the absolute directory dir.

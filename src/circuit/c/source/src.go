@@ -35,25 +35,34 @@ func (s *Source) GetPkg(pkgPath string) *Pkg {
 	return s.pkg[pkgPath]
 }
 
+// If pkgPath is an existing package path within the source layout, the string
+// srcDir is returned so that srcDir/pkgPath equals the absolute path to the
+// package directory. If found, inGoRoot indicates whether the package
+// directory resides inside the Go language source tree.
+func (s *Source) FindPkg(pkgPath string) (srcDir string, inGoRoot bool, err error) {
+	return s.layout.FindPkg(pkgPath)
+}
+
 // parses parses package pkg
-func (s *Source) ParsePkg(pkgPath string, includeGoRoot bool, mode parser.Mode) (pkg *Pkg, err error) {
+func (s *Source) ParsePkg(pkgPath string, mode parser.Mode) (pkg *Pkg, inGoRoot bool, err error) {
+
 	pkgPath = path.Clean(pkgPath)
 	
 	// Find source root for pkgPath
 	var srcDir string
-	if srcDir, err = s.layout.FindPkg(pkgPath, includeGoRoot); err != nil {
-		return nil, err
+	if srcDir, inGoRoot, err = s.layout.FindPkg(pkgPath); err != nil {
+		return nil, false, err
 	}
 
 	// Save current working directory
 	var saveDir string
 	if saveDir, err = os.Getwd(); err != nil {
-		return nil, err
+		return nil, false, err
 	}
 
 	// Change current directory to root of sources
 	if err = os.Chdir(srcDir); err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	defer func() {
 		err = os.Chdir(saveDir)
@@ -65,7 +74,7 @@ func (s *Source) ParsePkg(pkgPath string, includeGoRoot bool, mode parser.Mode) 
 	// Parse
 	var pkgs map[string]*ast.Package
 	if pkgs, err = parser.ParseDir(fset, pkgPath, filterGoNoTest, mode); err != nil {
-		return nil, err
+		return nil, false, err
 	}
 
 	pkg = &Pkg{
@@ -77,7 +86,7 @@ func (s *Source) ParsePkg(pkgPath string, includeGoRoot bool, mode parser.Mode) 
 	pkg.link()
 
 	s.pkg[pkgPath] = pkg
-	return pkg, nil
+	return pkg, inGoRoot, nil
 
 }
 

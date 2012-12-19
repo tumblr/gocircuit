@@ -32,7 +32,10 @@ func (b *Build) Build(pkgPaths ...string) error {
 	}
 
 	// Parse types
-	// b.types = types.New()
+	b.types = types.New()
+	if err = b.linkTypes(); err != nil {
+		return err
+	}
 
 	// dbg
 	for _, typ := range b.types.ListFullNames() {
@@ -54,9 +57,20 @@ func (b *Build) Build(pkgPaths ...string) error {
 
 type buildParser Build
 
-// Parse implements dep.Parser
+// Parse implements dep.Parser; It is invoked by the dependency calculator's
+// internal algorithm.
 func (b *buildParser) Parse(pkgPath string) (map[string]*ast.Package, error) {
-	pkg, err := b.src.ParsePkg(pkgPath, false, parser.ParseComments)
+	_, inGoRoot, err := b.src.FindPkg(pkgPath)
+	if err != nil {
+		return nil, err
+	}
+
+	// Go packages are not parsed and consecuently their dependencies are not followed
+	if inGoRoot {
+		return nil, nil
+	}
+
+	pkg, _, err := b.src.ParsePkg(pkgPath, parser.ParseComments)
 	if err != nil {
 		Log("- %s skipping (%s)", pkgPath, err)
 		// This is intended for Go's packages itself, which we don't want to parse for now
@@ -82,8 +96,8 @@ func (b *Build) determineDep(pkgPaths ...string) error {
 	return nil
 }
 
-// buildTypes finds all type declarations and registers them with a global map
-func (b *Build) buildTypes() error {
+// linkTypes finds all type declarations and registers them with a global map
+func (b *Build) linkTypes() error {
 	Log("Linking types ...")
 	Indent()
 	defer Unindent()
