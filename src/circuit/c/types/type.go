@@ -1,6 +1,8 @@
 package types
 
 import (
+	"circuit/c/errors"
+	"circuit/c/util"
 	"go/ast"
 	"go/token"
 	"path"
@@ -25,102 +27,113 @@ func (t *Type) FullName() string {
 	return path.Join(t.PkgPath, t.Name)
 }
 
-/*
-type Type0 struct {
-	Kind     reflect.Kind
-	AliasFor string
+// UnlinkedType represents a partially-compiled type.
+// If Kind equals:
+//	reflect.Invalid, the type is an alias for another type, whose name resides in Elem.
+//	reflect.Ptr, reflect.Slice, reflect.Array, the name of the element type resides in Elem.
+//	reflect.Map, the name of the key (value) type is stored in Key (Value).
+type UnlinkedType struct {
+	Kind  reflect.Kind
+	Elem  string	// Fully-qualified name of another type
+	Key   string	// "
+	Value string	// "
 }
 
-func compileTypeSpec(spec *ast.TypeSpec) (type0 *Type0, err error) {
+func compileTypeSpec(spec *ast.TypeSpec) (unlinked *Type0, err error) {
 	…
 	compileTypeExpr(spec.Type)
 }
 
-func compileTypeExpr(pkgPath string, expr ast.Expr) (type0 *Type0, err error)
-	type0 = &Type0{}
+func compileTypeExpr(pkgPath string, expr ast.Expr, fimp *util.FileImports) (unlinked *UnlinkedType, err error)
+	unilnked = &UnlinkedType{}
 	switch q := expr.(type) {
 
 	// Built-in types or references to other types in this package
 	case *ast.Ident:
 		switch q.Name {
 		case "bool":
-			type0.Kind = reflect.Bool
+			unlinked.Kind = reflect.Bool
 		case "int":
-			type0.Kind = reflect.Int
+			unlinked.Kind = reflect.Int
 		case "int8":
-			type0.Kind = reflect.Int8
+			unlinked.Kind = reflect.Int8
 		case "int16":
-			type0.Kind = reflect.Int16
+			unlinked.Kind = reflect.Int16
 		case "int32":
-			type0.Kind = reflect.Int32
+			unlinked.Kind = reflect.Int32
 		case "int64":
-			type0.Kind = reflect.Int64
+			unlinked.Kind = reflect.Int64
 		case "uint":
-			type0.Kind = reflect.Uint
+			unlinked.Kind = reflect.Uint
 		case "uint8":
-			type0.Kind = reflect.Uint8
+			unlinked.Kind = reflect.Uint8
 		case "uint16":
-			type0.Kind = reflect.Uint16
+			unlinked.Kind = reflect.Uint16
 		case "uint32":
-			type0.Kind = reflect.Uint32
+			unlinked.Kind = reflect.Uint32
 		case "uint64":
-			type0.Kind = reflect.Uint64
+			unlinked.Kind = reflect.Uint64
 		case "uintptr":
-			type0.Kind = reflect.Uintptr
+			unlinked.Kind = reflect.Uintptr
 		case "float32":
-			type0.Kind = reflect.Float32
+			unlinked.Kind = reflect.Float32
 		case "float64":
-			type0.Kind = reflect.Float64
+			unlinked.Kind = reflect.Float64
 		case "complex64":
-			type0.Kind = reflect.Complex64
+			unlinked.Kind = reflect.Complex64
 		case "complex128":
-			type0.Kind = reflect.Complex128
+			unlinked.Kind = reflect.Complex128
 		case "string":
-			type0.Kind = reflect.String
+			unlinked.Kind = reflect.String
 		default:
 			// Name of another type defined in this package
-			type0.AliasFor = path.Join(pkgPath, q.Name)
+			unlinked.AliasFor = path.Join(pkgPath, q.Name)
 		}
-		return type0, nil
+		return unlinked, nil
 
 	case *ast.ParenExpr:
-		return compileTypeExpr(pkgPath, q)
+		return compileTypeExpr(pkgPath, q, fimp)
 
 	case *ast.SelectorExpr:
 		pkgAlias, ok := q.X.(*ast.Ident)
 		if !ok {
-			?
+			panic("unrecognized selector")
 		}
 		typeName := q.Sel.Name
+		impPath, ok := fimp.Alias[pkgAlias]
+		if !ok {
+			return nil, errors.New("import alias unknown")
+		}
+		unlinked.AliasFor = path.Join(impPath, typeName)
+		return unlinked, nil
 
 	case *ast.StarExpr:
 		// r.Elem will be filled in during a follow up sweep of all types
-		type0.Kind = reflect.Ptr
+		unlinked.Kind = reflect.Ptr
 		?
 
 	case *ast.ArrayType:
 		XX // Slice or array kind?
-		type0.Kind = reflect.Array
+		unlinked.Kind = reflect.Array
 
 	case *ast.ChanType:
-		type0.Kind = reflect.Chan
+		unlinked.Kind = reflect.Chan
 
 	case *ast.FuncType:
-		type0.Kind = reflect.Func
+		unlinked.Kind = reflect.Func
 
 	case *ast.InterfaceType:
-		type0.Kind = reflect.Interface
+		unlinked.Kind = reflect.Interface
 
 	case *ast.MapType:
-		type0.Kind = reflect.Map
+		unlinked.Kind = reflect.Map
 
 	case *ast.StructType:
-		type0.Kind = reflect.Struct
+		unlinked.Kind = reflect.Struct
 
 	default:
 		return 0, "", errors.NewSource(fset, spec.Name.NamePos, "unexpected type definition")
 	}
 
-	return type0, nil
+	return unlinked, nil
 }
-*/

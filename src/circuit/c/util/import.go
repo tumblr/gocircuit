@@ -18,19 +18,26 @@ func DeterminePkgImports(pkg *ast.Package) map[string]struct{} {
 	return imprts
 }
 
+type FileImports struct {
+	Alias      map[string]string		// Import alias to package path
+	Dot        []string			// List of package paths imported with the dot alias
+	Underscore []string			// List of package paths imported with the underscore alias
+}
+
 // DetermineFileImports …
-func DetermineFileImports(file *ast.File) (alias map[string]string, dot, underscore []string) {
+func DetermineFileImports(file *ast.File) (fimp *FileImports) {
+	fimp = &FileImports{Alias: make(map[string]string)}
 	for _, impSpec := range file.Imports {
 		pkgAlias, pkgPath := parseImportSpec(impSpec)
 		switch pkgAlias {
 		case ".":
-			dot = append(dot, pkgPath)
+			fimp.Dot = append(fimp.Dot, pkgPath)
 		case "_":
-			underscore = append(underscore, pkgPath)
+			fimp.Underscore = append(fimp.Underscore, pkgPath)
 		case "":
 			panic("import with no alias")
 		default:
-			alias[pkgAlias] = pkgPath
+			fimp.Alias[pkgAlias] = pkgPath
 		}
 	}
 	return

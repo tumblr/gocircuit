@@ -1,4 +1,5 @@
 = register all public types that have public methods
+	restrict just to struct types (simplicity and safety)
 
 = register all public functions that return public types
 
