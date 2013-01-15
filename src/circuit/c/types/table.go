@@ -5,39 +5,42 @@ import (
 	"sort"
 )
 
-type TypeTable struct {
-	types map[string]*Type	           // Fully-qualified type name to type structure
-	pkgs  map[string]map[string]*Type  // Package path to type name to type structure
+type GlobalNames struct {
+	names map[string]*Named	       // Fully-qualified type name to type structure
+	pkgs  map[string]PackageNames  // Package path to type name to type structure
 }
 
-func New() *TypeTable {
-	return &TypeTable{
-		types: make(map[string]*Type),
-		pkgs:  make(map[string]map[string]*Type),
+type PackageNames map[string]*Named
+
+func MakeNames() *GlobalNames {
+	return &GlobalNames{
+		names: make(map[string]*Named),
+		pkgs:  make(map[string]PackageNames),
 	}
 }
 
-func (tt *TypeTable) ListFullNames() []string {
+func (tt *GlobalNames) ListFullNames() []string {
 	var pp []string
-	for pkgPath, _ := range tt.types {
-		pp = append(pp, pkgPath)
+	for name, _ := range tt.names {
+		pp = append(pp, name)
 	}
 	sort.Strings(pp)
 	return pp
 }
 
-func (tt *TypeTable) addType(t *Type) error {
+// add adds t to the structures for global and per-package lookups
+func (tt *GlobalNames) Add(t *Named) error {
 
 	// Add type to global type map
-	if _, ok := tt.types[t.FullName()]; ok {
+	if _, ok := tt.names[t.FullName()]; ok {
 		return errors.NewSource(t.FileSet, t.Spec.Name.NamePos, "type %s already defined", t.FullName())
 	}
-	tt.types[t.FullName()] = t
+	tt.names[t.FullName()] = t
 
 	// Add type to per-package structure
 	pkgMap, ok := tt.pkgs[t.PkgPath] 
 	if !ok {
-		pkgMap = make(map[string]*Type)
+		pkgMap = make(map[string]*Named)
 		tt.pkgs[t.PkgPath] = pkgMap
 	}
 	pkgMap[t.Name] = t
@@ -45,11 +48,7 @@ func (tt *TypeTable) addType(t *Type) error {
 	return nil
 }
 
-// PkgTypes returns a map from type name to type structure of all types declared in pkgPath
-func (tt *TypeTable) PkgTypes(pkgPath string) map[string]*Type {
-	pkgTypes, ok := tt.pkgs[pkgPath]
-	if !ok {
-		return nil
-	}
-	return pkgTypes
+// Pkg returns a map from type name to type structure of all names declared in pkgPath
+func (tt *GlobalNames) Pkg(pkgPath string) PackageNames {
+	return tt.pkgs[pkgPath]
 }

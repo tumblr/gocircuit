@@ -1,139 +1,200 @@
 package types
 
 import (
-	"circuit/c/errors"
-	"circuit/c/util"
 	"go/ast"
 	"go/token"
-	"path"
-	"reflect"
+	"math/big"
 )
 
-type Type struct {
+// Type is a type definition.
+type Type interface {
+	aType()
+}
 
-	// Sweep 1
+// Incomplete type specializations
+
+// Link is an unresolved type reference
+type Link struct {
+	PkgPath string
+	Name    string
+}
+
+func (*Link) aType() {}
+
+// TypeExpr stands in for an unparsed type expression
+type TypeExpr struct{
+	expr *ast.TypeExpr
+}
+
+type TypeSource struct {
 	FileSet *token.FileSet
 	Spec    *ast.TypeSpec
-	Name    string
 	PkgPath string
-
-	// Sweep 2
-	Kind    reflect.Kind      // Go kind
-	Elem    *Type             // Ptr, Interface, Array, Slice
-	Procs   []*Proc           // Methods
 }
 
-func (t *Type) FullName() string {
-	return path.Join(t.PkgPath, t.Name)
+// Type specializations
+
+type Array struct {
+	Len int64
+	Elt Type
 }
 
-// UnlinkedType represents a partially-compiled type.
-// If Kind equals:
-//	reflect.Invalid, the type is an alias for another type, whose name resides in Elem.
-//	reflect.Ptr, reflect.Slice, reflect.Array, the name of the element type resides in Elem.
-//	reflect.Map, the name of the key (value) type is stored in Key (Value).
-type UnlinkedType struct {
-	Kind  reflect.Kind
-	Elem  string	// Fully-qualified name of another type
-	Key   string	// "
-	Value string	// "
+// Basic is a type definition
+type Basic struct {
+	Kind BasicKind
+	Info BasicInfo
+	Size int64
+	Name string
 }
 
-func compileTypeSpec(spec *ast.TypeSpec) (unlinked *Type0, err error) {
-	…
-	compileTypeExpr(spec.Type)
+var Builtin = [...]*Basic{
+	Invalid:        {aType, Invalid,        0,                      0,  "invalid type"},
+
+	Bool:           {aType, Bool,           IsBoolean,              1,  "bool"},
+	Int:            {aType, Int,            IsInteger,              0,  "int"},
+	Int8:           {aType, Int8,           IsInteger,              1,  "int8"},
+	Int16:          {aType, Int16,          IsInteger,              2,  "int16"},
+	Int32:          {aType, Int32,          IsInteger,              4,  "int32"},
+	Int64:          {aType, Int64,          IsInteger,              8,  "int64"},
+	Uint:           {aType, Uint,           IsInteger | IsUnsigned, 0,  "uint"},
+	Uint8:          {aType, Uint8,          IsInteger | IsUnsigned, 1,  "uint8"},
+	Uint16:         {aType, Uint16,         IsInteger | IsUnsigned, 2,  "uint16"},
+	Uint32:         {aType, Uint32,         IsInteger | IsUnsigned, 4,  "uint32"},
+	Uint64:         {aType, Uint64,         IsInteger | IsUnsigned, 8,  "uint64"},
+	Uintptr:        {aType, Uintptr,        IsInteger | IsUnsigned, 0,  "uintptr"},
+	Float32:        {aType, Float32,        IsFloat,                4,  "float32"},
+	Float64:        {aType, Float64,        IsFloat,                8,  "float64"},
+	Complex64:      {aType, Complex64,      IsComplex,              8,  "complex64"},
+	Complex128:     {aType, Complex128,     IsComplex,              16, "complex128"},
+	String:         {aType, String,         IsString,               0,  "string"},
+	UnsafePointer:  {aType, UnsafePointer,  0,                      0,  "Pointer"},
+
+	UntypedBool:    {aType, UntypedBool,    IsBoolean | IsUntyped,  0,  "untyped boolean"},
+	UntypedInt:     {aType, UntypedInt,     IsInteger | IsUntyped,  0,  "untyped integer"},
+	UntypedRune:    {aType, UntypedRune,    IsInteger | IsUntyped,  0,  "untyped rune"},
+	UntypedFloat:   {aType, UntypedFloat,   IsFloat   | IsUntyped,  0,  "untyped float"},
+	UntypedComplex: {aType, UntypedComplex, IsComplex | IsUntyped,  0,  "untyped complex"},
+	UntypedString:  {aType, UntypedString,  IsString  | IsUntyped,  0,  "untyped string"},
+	UntypedNil:     {aType, UntypedNil,     IsUntyped,              0,  "untyped nil"},
 }
 
-func compileTypeExpr(pkgPath string, expr ast.Expr, fimp *util.FileImports) (unlinked *UnlinkedType, err error)
-	unilnked = &UnlinkedType{}
-	switch q := expr.(type) {
+// BasicInfo stores auxiliary information about a basic type
+type BasicInfo int
 
-	// Built-in types or references to other types in this package
-	case *ast.Ident:
-		switch q.Name {
-		case "bool":
-			unlinked.Kind = reflect.Bool
-		case "int":
-			unlinked.Kind = reflect.Int
-		case "int8":
-			unlinked.Kind = reflect.Int8
-		case "int16":
-			unlinked.Kind = reflect.Int16
-		case "int32":
-			unlinked.Kind = reflect.Int32
-		case "int64":
-			unlinked.Kind = reflect.Int64
-		case "uint":
-			unlinked.Kind = reflect.Uint
-		case "uint8":
-			unlinked.Kind = reflect.Uint8
-		case "uint16":
-			unlinked.Kind = reflect.Uint16
-		case "uint32":
-			unlinked.Kind = reflect.Uint32
-		case "uint64":
-			unlinked.Kind = reflect.Uint64
-		case "uintptr":
-			unlinked.Kind = reflect.Uintptr
-		case "float32":
-			unlinked.Kind = reflect.Float32
-		case "float64":
-			unlinked.Kind = reflect.Float64
-		case "complex64":
-			unlinked.Kind = reflect.Complex64
-		case "complex128":
-			unlinked.Kind = reflect.Complex128
-		case "string":
-			unlinked.Kind = reflect.String
-		default:
-			// Name of another type defined in this package
-			unlinked.AliasFor = path.Join(pkgPath, q.Name)
-		}
-		return unlinked, nil
+const (
+	IsBoolean BasicInfo = 1 << iota
+	IsInteger
+	IsUnsigned
+	IsFloat
+	IsComplex
+	IsString
+	IsUntyped
 
-	case *ast.ParenExpr:
-		return compileTypeExpr(pkgPath, q, fimp)
+	IsOrdered   = IsInteger | IsFloat | IsString
+	IsNumeric   = IsInteger | IsFloat | IsComplex
+	IsConstType = IsBoolean | IsNumeric | IsString
+)
 
-	case *ast.SelectorExpr:
-		pkgAlias, ok := q.X.(*ast.Ident)
-		if !ok {
-			panic("unrecognized selector")
-		}
-		typeName := q.Sel.Name
-		impPath, ok := fimp.Alias[pkgAlias]
-		if !ok {
-			return nil, errors.New("import alias unknown")
-		}
-		unlinked.AliasFor = path.Join(impPath, typeName)
-		return unlinked, nil
+// BasicKind distinguishes a primitive type
+type BasicKind int
 
-	case *ast.StarExpr:
-		// r.Elem will be filled in during a follow up sweep of all types
-		unlinked.Kind = reflect.Ptr
-		?
+const (
+	Invalid BasicKind = iota
 
-	case *ast.ArrayType:
-		XX // Slice or array kind?
-		unlinked.Kind = reflect.Array
+	// Predeclared types
+	Bool
+	Int
+	Int8
+	Int16
+	Int32
+	Int64
+	Uint
+	Uint8
+	Uint16
+	Uint32
+	Uint64
+	Uintptr
+	Float32
+	Float64
+	Complex64
+	Complex128
+	String
+	UnsafePointer
 
-	case *ast.ChanType:
-		unlinked.Kind = reflect.Chan
+	// Types for untyped values
+	UntypedBool
+	UntypedInt
+	UntypedRune
+	UntypedFloat
+	UntypedComplex
+	UntypedString
+	UntypedNil
 
-	case *ast.FuncType:
-		unlinked.Kind = reflect.Func
+	// Aliases
+	Byte = Uint8
+	Rune = Int32
+)
 
-	case *ast.InterfaceType:
-		unlinked.Kind = reflect.Interface
+type Chan struct {
+	Dir ast.ChanDir
+	Elt Type
+}
 
-	case *ast.MapType:
-		unlinked.Kind = reflect.Map
+type Field struct {
+	Name        string
+	Type        Type
+	Tag         string
+	IsAnonymous bool
+}
 
-	case *ast.StructType:
-		unlinked.Kind = reflect.Struct
+type Interface struct {
+	Methods []*Method
+}
 
-	default:
-		return 0, "", errors.NewSource(fset, spec.Name.NamePos, "unexpected type definition")
-	}
+type Map struct {
+	Key, Value Type
+}
 
-	return unlinked, nil
+type Method struct{
+	Name string
+	Type *Signature
+}
+
+type Named struct {
+	Name       string
+	PkgPath    string
+	Underlying Type
+}
+
+func (n *Named) FullName() string {
+	return n.PkgPath + "·" + n.Name
+}
+
+type Nil struct{}
+
+type Pointer struct {
+	Base Type
+}
+
+type Result struct {
+	Values []Type
+}
+
+type Signature struct {
+	Recv       Type
+	Params     []Type
+	Results    []Type
+	IsVariadic bool
+}
+
+type Slice struct {
+	Elt Type
+}
+
+type Struct struct {
+	Fields []*Field
+}
+
+type ComplexConstant struct {
+	Re, Im *big.Rat
 }

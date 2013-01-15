@@ -5,30 +5,34 @@ import (
 	"go/token"
 )
 
-func (tt *TypeTable) AddPkg(fset *token.FileSet, pkgPath string, pkg *ast.Package) error {
-	return CompilePkg(fset, pkg, func(spec *ast.TypeSpec) error {
-		t := &Type{
-			FileSet: fset,
-			Name:    spec.Name.Name,
-			PkgPath: pkgPath,
-			Spec:    spec,
+func CompilePkg(fset *token.FileSet, pkgPath string, pkg *ast.Package, globalNames *GlobalNames) error {
+	return VisitPkgTypeSpecs(fset, pkg, func(spec *ast.TypeSpec) error {
+		t, err := CompileTypeSpec(pkgPath, spec, fimp??)
+		if err != nil {
+			return err
 		}
-		return tt.addType(t)
+		switch q := t.(type) {
+		case *Named:
+			return globalNames.Add(q)
+		}
+		return nil
 	})
 }
 
 type TypeSpecFunc func(typeSpec *ast.TypeSpec) error
 
-func CompilePkg(fset *token.FileSet, pkg *ast.Package, typeSpecFunc TypeSpecFunc) error {
+// VisitPkgTypeSpecs calls typeSpecFunc for each TypeSpec in package pkg.
+func VisitPkgTypeSpecs(fset *token.FileSet, pkg *ast.Package, typeSpecFunc TypeSpecFunc) error {
 	for _, file := range pkg.Files {
-		if err := CompileFile(fset, file, typeSpecFunc); err != nil {
+		if err := VisitFileTypeSpecs(fset, file, typeSpecFunc); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func CompileFile(fset *token.FileSet, f *ast.File, typeSpecFunc TypeSpecFunc) error {
+// VisitFileTypeSpecs calls typeSpecFunc for each TypeSpec in file f.
+func VisitFileTypeSpecs(fset *token.FileSet, f *ast.File, typeSpecFunc TypeSpecFunc) error {
 	for _, decl := range f.Decls {
 		switch q := decl.(type) {
 		// GenDecl captures a single or multi-type declaration block, e.g.:

@@ -2,7 +2,7 @@ package types
 
 
 /*
-func (tt *TypeTable) linkType(…) … {
+func (tt *Table) linkType(…) … {
 	…
 	switch q := spec.Type.(type) {
 	// Built-in types or references to other types in this package

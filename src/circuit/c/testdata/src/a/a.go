@@ -2,6 +2,7 @@ package a
 
 import (
 	_ "strings"
+	"os"
 )
 
 type T1 (int)
@@ -28,4 +29,5 @@ type (
 	T4 []byte
 
 	T5 [3]byte
+	T6 *os.File
 )

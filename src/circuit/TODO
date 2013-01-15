@@ -1,3 +1,5 @@
+separate config file for a crossbuild host
+
 finish language rules doc
 CONFIG FRICTION:
 	circuit configs are user specific since they contain hardcoded absolute paths

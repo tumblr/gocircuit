@@ -1,9 +1,13 @@
+FUNC
+
 = register all public types that have public methods
 	restrict just to struct types (simplicity and safety)
 
 = register all public functions that return public types
 
-= public types
+TYPE
+
+= public types (IN PROGRESS)
 	that have >0 public methods
 	register as circuit value types
 	under all receiver type variations
@@ -21,6 +25,9 @@
 	compute dependency packages
 	parse types thru-out tree
 	rewrite
+
+
+
 
 argument, or return value, kind:
 	unsafe pointer
