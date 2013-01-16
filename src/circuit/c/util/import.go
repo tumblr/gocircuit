@@ -6,8 +6,8 @@ import (
 	"strconv"
 )
 
-// DeterminePkgImports returns a map of all package paths, directly imported by pkg
-func DeterminePkgImports(pkg *ast.Package) map[string]struct{} {
+// CompilePkgImports returns a map of all package paths, directly imported by pkg
+func CompilePkgImports(pkg *ast.Package) map[string]struct{} {
 	imprts := make(map[string]struct{}) 
 	for _, file := range pkg.Files {
 		for _, impSpec := range file.Imports {
@@ -24,8 +24,8 @@ type FileImports struct {
 	Underscore []string			// List of package paths imported with the underscore alias
 }
 
-// DetermineFileImports …
-func DetermineFileImports(file *ast.File) (fimp *FileImports) {
+// CompileFileImports …
+func CompileFileImports(file *ast.File) (fimp *FileImports) {
 	fimp = &FileImports{Alias: make(map[string]string)}
 	for _, impSpec := range file.Imports {
 		pkgAlias, pkgPath := parseImportSpec(impSpec)

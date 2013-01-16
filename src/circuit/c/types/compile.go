@@ -5,17 +5,19 @@ import (
 	"circuit/c/util"
 	"go/ast"
 	"go/token"
-	"path"
-	"reflect"
 )
 
 // pkgPath is the package path where the type expression expr resides.
 // fimp is the import structure of the source file containing expr.
-func CompileTypeSpec(pkgPath string, spec *ast.TypeSpec, fimp *util.FileImports) (typ Type, err error) {
-	return compileTypeExpr(pkgPath, spec.Type, fimp)
+func CompileTypeSpec(fset *token.FileSet, pkgPath string, fimp *util.FileImports, spec *ast.TypeSpec) (typ Type, err error) {
+	typ, err = compileTypeExpr(pkgPath, fimp, spec.Type)
+	if err != nil {
+		return nil, errors.NewSource(fset, spec.Name.NamePos, err.Error())
+	}
+	return typ, nil
 }
 
-func compileTypeExpr(pkgPath string, expr ast.Expr, fimp *util.FileImports) (typ Type, err error)
+func compileTypeExpr(pkgPath string, fimp *util.FileImports, expr ast.Expr) (typ Type, err error) {
 
 	switch q := expr.(type) {
 
@@ -58,12 +60,12 @@ func compileTypeExpr(pkgPath string, expr ast.Expr, fimp *util.FileImports) (typ
 			typ = Builtin[String]
 		default:
 			// Name of another type defined in this package
-			typ = &Link{pkgPath, q.Name}
+			typ = &Link{PkgPath: pkgPath, Name: q.Name}
 		}
 		return typ, nil
 
 	case *ast.ParenExpr:
-		return compileTypeExpr(pkgPath, q, fimp)
+		return compileTypeExpr(pkgPath, fimp, q)
 
 	case *ast.SelectorExpr:
 		pkgAlias, ok := q.X.(*ast.Ident)
@@ -71,34 +73,34 @@ func compileTypeExpr(pkgPath string, expr ast.Expr, fimp *util.FileImports) (typ
 			panic("package alias is not an identifier")
 		}
 		typeName := q.Sel.Name
-		impPath, ok := fimp.Alias[pkgAlias]
+		impPath, ok := fimp.Alias[pkgAlias.Name]
 		if !ok {
 			return nil, errors.New("no import with given alias")
 		}
-		return &Link{impPath, typeName}, nil
+		return &Link{PkgPath: impPath, Name: typeName}, nil
 
 	case *ast.StarExpr:
-		base, err := compileTypeExpr(pkgPath, q.X, fimp)
+		base, err := compileTypeExpr(pkgPath, fimp, q.X)
 		if err != nil {
 			return nil, err
 		}
 		return &Pointer{Base: base}, nil
 
 	case *ast.ArrayType:
-		elt, err := compileTypeExpr(pkgPath, q.Elt, fimp)
+		elt, err := compileTypeExpr(pkgPath, fimp, q.Elt)
 		if err != nil {
 			return nil, err
 		}
 		if q.Len == nil {
 			return &Slice{Elt: elt}, nil
 		}
-		if _, ok := q.Len.(*ast.Ellipses); ok {
+		if _, ok := q.Len.(*ast.Ellipsis); ok {
 			return &Array{Len: -1/*XXX*/, Elt: elt}, nil
 		}
 		return nil, errors.New("unknown array length")
 
 	case *ast.ChanType:
-		value, err := compileTypeExpr(pkgPath, q.Value, fimp)
+		value, err := compileTypeExpr(pkgPath, fimp, q.Value)
 		if err != nil {
 			return nil, err
 		}
@@ -113,20 +115,20 @@ func compileTypeExpr(pkgPath string, expr ast.Expr, fimp *util.FileImports) (typ
 		return &Interface{}, nil
 
 	case *ast.MapType:
-		key, err := compileTypeExpr(pkgPath, q.Key, fimp)
+		key, err := compileTypeExpr(pkgPath, fimp, q.Key)
 		if err != nil {
 			return nil, err
 		}
-		value, err := compileTypeExpr(pkgPath, q.Value, fimp)
+		value, err := compileTypeExpr(pkgPath, fimp, q.Value)
 		if err != nil {
 			return nil, err
 		}
-		return &MapType{Key: key, Value: value}, nil
+		return &Map{Key: key, Value: value}, nil
 
 	case *ast.StructType:
 		// TODO: Compile struct details
 		return &Struct{}, nil
 	}
 
-	return nil, errors.NewSource(fset, spec.Name.NamePos, "unexpected type definition")
+	return nil, errors.New("unexpected type definition")
 }

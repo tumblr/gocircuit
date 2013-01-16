@@ -33,7 +33,7 @@ func (tt *GlobalNames) Add(t *Named) error {
 
 	// Add type to global type map
 	if _, ok := tt.names[t.FullName()]; ok {
-		return errors.NewSource(t.FileSet, t.Spec.Name.NamePos, "type %s already defined", t.FullName())
+		return errors.New("type %s already defined", t.FullName())
 	}
 	tt.names[t.FullName()] = t
 

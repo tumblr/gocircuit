@@ -11,20 +11,22 @@ type Type interface {
 	aType()
 }
 
+// All concrete types embed implementsType which
+// ensures that all types implement the Type interface.
+type implementsType struct{}
+
+func (*implementsType) aType() {}
+
 // Incomplete type specializations
 
 // Link is an unresolved type reference
 type Link struct {
+	implementsType
 	PkgPath string
 	Name    string
 }
 
 func (*Link) aType() {}
-
-// TypeExpr stands in for an unparsed type expression
-type TypeExpr struct{
-	expr *ast.TypeExpr
-}
 
 type TypeSource struct {
 	FileSet *token.FileSet
@@ -35,17 +37,21 @@ type TypeSource struct {
 // Type specializations
 
 type Array struct {
+	implementsType
 	Len int64
 	Elt Type
 }
 
 // Basic is a type definition
 type Basic struct {
+	implementsType
 	Kind BasicKind
 	Info BasicInfo
 	Size int64
 	Name string
 }
+
+var aType implementsType
 
 var Builtin = [...]*Basic{
 	Invalid:        {aType, Invalid,        0,                      0,  "invalid type"},
@@ -136,11 +142,13 @@ const (
 )
 
 type Chan struct {
+	implementsType
 	Dir ast.ChanDir
 	Elt Type
 }
 
 type Field struct {
+	implementsType
 	Name        string
 	Type        Type
 	Tag         string
@@ -148,10 +156,12 @@ type Field struct {
 }
 
 type Interface struct {
+	implementsType
 	Methods []*Method
 }
 
 type Map struct {
+	implementsType
 	Key, Value Type
 }
 
@@ -161,6 +171,7 @@ type Method struct{
 }
 
 type Named struct {
+	implementsType
 	Name       string
 	PkgPath    string
 	Underlying Type
@@ -170,9 +181,12 @@ func (n *Named) FullName() string {
 	return n.PkgPath + "·" + n.Name
 }
 
-type Nil struct{}
+type Nil struct{
+	implementsType
+}
 
 type Pointer struct {
+	implementsType
 	Base Type
 }
 
@@ -181,6 +195,7 @@ type Result struct {
 }
 
 type Signature struct {
+	implementsType
 	Recv       Type
 	Params     []Type
 	Results    []Type
@@ -188,13 +203,16 @@ type Signature struct {
 }
 
 type Slice struct {
+	implementsType
 	Elt Type
 }
 
 type Struct struct {
+	implementsType
 	Fields []*Field
 }
 
 type ComplexConstant struct {
+	implementsType
 	Re, Im *big.Rat
 }
