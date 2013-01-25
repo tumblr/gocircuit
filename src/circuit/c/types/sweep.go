@@ -7,6 +7,8 @@ import (
 )
 
 func CompilePkg(fset *token.FileSet, pkgPath string, pkg *ast.Package, globalNames *GlobalNames) error {
+	println("pkg", pkgPath)
+	defer println("done pkg", pkgPath)
 	return VisitPkgTypeSpecs(fset, pkg, func(fimp *util.FileImports, spec *ast.TypeSpec) error {
 		t, err := CompileTypeSpec(fset, pkgPath, fimp, spec)
 		if err != nil {
@@ -22,7 +24,8 @@ func CompilePkg(fset *token.FileSet, pkgPath string, pkg *ast.Package, globalNam
 
 // VisitPkgTypeSpecs calls typeSpecFunc for each TypeSpec in package pkg.
 func VisitPkgTypeSpecs(fset *token.FileSet, pkg *ast.Package, typeSpecFunc func(fimp *util.FileImports, typeSpec *ast.TypeSpec) error) error {
-	for _, file := range pkg.Files {
+	for x, file := range pkg.Files {
+		println(x)
 		fimp := util.CompileFileImports(file)
 		if err := visitFileTypeSpecs(fset, file, 
 			func(typeSpec *ast.TypeSpec) error { 

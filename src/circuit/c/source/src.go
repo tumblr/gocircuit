@@ -27,7 +27,8 @@ func New(l *Layout, writeDir string) (*Source, error) {
 	}, nil
 }
 
-func (s *Source) GetAll() map[string]*Pkg {
+// GetPkgMap returns a map from package paths to package structures
+func (s *Source) GetPkgMap() map[string]*Pkg {
 	return s.pkg
 }
 

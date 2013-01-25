@@ -26,7 +26,7 @@ import (
 func (b *Build) TransformRegisterValues() error {
 
 	// For every package directory
-	for _, pkg := range b.src.GetAll() {
+	for _, pkg := range b.src.GetPkgMap() {
 
 		// Create source file for registrations in this package
 		pkgName := pkg.Name()
@@ -35,13 +35,13 @@ func (b *Build) TransformRegisterValues() error {
 		util.AddImport(astFile, "circuit/use/circuit")
 
 		// For every package name defined in the package directory
-		for _, p := range pkg.PkgAST {
+		for _/*pkgSubName*/, pkgAST := range pkg.PkgAST {
 
 			var typeNames []string
 			
 			// Compile interface types in package
-			if err := types.CompilePkg(pkg.FileSet, p, 
-					func (spec *ast.TypeSpec) error {
+			if err := types.VisitPkgTypeSpecs(pkg.FileSet, pkgAST, 
+					func (fimp *util.FileImports, spec *ast.TypeSpec) error {
 						typeNames = append(typeNames, spec.Name.Name)
 						return nil
 					},

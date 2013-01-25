@@ -11,7 +11,7 @@ import (
 type Build struct {
 	src   *source.Source
 	dep   *dep.Dep
-	types *types.TypeTable
+	types *types.GlobalNames
 }
 
 func NewBuild(layout *source.Layout, writeDir string) (b *Build, err error) {
@@ -32,8 +32,8 @@ func (b *Build) Build(pkgPaths ...string) error {
 	}
 
 	// Parse types
-	b.types = types.New()
-	if err = b.linkTypes(); err != nil {
+	b.types = types.MakeNames()
+	if err = b.compileTypes(); err != nil {
 		return err
 	}
 
@@ -96,20 +96,20 @@ func (b *Build) determineDep(pkgPaths ...string) error {
 	return nil
 }
 
-// linkTypes finds all type declarations and registers them with a global map
-func (b *Build) linkTypes() error {
-	Log("Linking types ...")
+// compileTypes finds all type declarations and registers them with a global map
+func (b *Build) compileTypes() error {
+	Log("Compiling types ...")
 	Indent()
 	defer Unindent()
 
-	for pkgPath, pkg := range b.src.GetAll() {
+	for pkgPath, pkg := range b.src.GetPkgMap() {
 		libPkg := pkg.LibPkg()
 		if libPkg == nil {
 			// XXX: This is probably a main pkg; we still need to
 			// link all its types in the worker binary
 			continue
 		}
-		if err := b.types.AddPkg(pkg.FileSet, pkgPath, libPkg); err != nil {
+		if err := types.CompilePkg(pkg.FileSet, pkgPath, libPkg, b.types); err != nil {
 			return err
 		}
 	}

@@ -57,7 +57,7 @@ func (dt *Dep) loop() error {
 		// Process all import specs in all source files
 		imps := make(map[string]struct{})
 		for _, pkg := range pkgs {
-			pimps := util.DeterminePkgImports(pkg)
+			pimps := util.CompilePkgImports(pkg)
 			for i, _ := range pimps {
 				if i != "C" {
 					imps[i] = struct{}{}
