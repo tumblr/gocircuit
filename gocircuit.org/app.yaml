@@ -1,20 +1,17 @@
 # mkapp
-# ~/pub/go_appengine/dev_appserver.py --high_replication tmp
-# ~/pub/go_appengine/appcfg.py update tmp
+# ~/google_appengine/dev_appserver.py --high_replication tmp
+# ~/google_appengine/appcfg.py update tmp
 
-application: gocircuit-org-app
+application: gocircuit
 runtime: go
-version: test
+version: 1
 api_version: go1
 
 handlers:
-- url: /\.appfs.*
-  script: _go_app
-  secure: always
-- url: /admin(/.*)?
-  script: _go_app
-  login: admin
+- url: /
+  static_files: static/index.html
+  upload: /static/index.html
 
-# MUST BE LAST
-- url: /.*
-  script: _go_app
+- url: /(.*)
+  static_files: static/\1
+  upload: /static/(.*)
