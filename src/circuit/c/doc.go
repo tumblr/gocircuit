@@ -1,2 +1,2 @@
-// Package c implements the Go Circuit compiler
+// (EXPERIMENTAL) Package c implements the Go Circuit compiler
 package c
