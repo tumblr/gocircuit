@@ -1,5 +1,4 @@
-// 4crossbuild builds the circuit on a remote host (usually with a different OS
-// and/or architecture) and ships the result locally.
+// 4build automates the process of building ...
 package main
 
 import (
