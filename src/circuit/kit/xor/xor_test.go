@@ -11,13 +11,13 @@ const K = 16
 func TestXOR(t *testing.T) {
 	m := &Metric{}
 	for i := 0; i < K; i++ {
-		m.Add(ID(i))
+		m.Add(Key(i))
 	}
 	for piv := 0; piv < K; piv++ {
-		nearest := m.Nearest(ID(piv), K/2)
-		fmt.Println(ID(piv).ShortString(4))
+		nearest := m.Nearest(Key(piv), K/2)
+		fmt.Println(Key(piv).ShortString(4))
 		for _, n := range nearest {
-			fmt.Println(" ", n.ID().ShortString(4))
+			fmt.Println(" ", n.Key().ShortString(4))
 		}
 	}
 }
@@ -26,9 +26,9 @@ const stressN = 1000000
 
 func TestStress(t *testing.T) {
 	m := &Metric{}
-	var h []ID
+	var h []Key
 	for i := 0; i < stressN; i++ {
-		id := ID(rand.Int63())
+		id := Key(rand.Int63())
 		h = append(h, id)
 		if _, err := m.Add(id); err != nil {
 			t.Errorf("add (%s)", err)

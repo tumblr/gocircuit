@@ -30,8 +30,8 @@ type shard struct {
 }
 
 // ID implements xor.Metric.Point
-func (s *shard) ID() xor.ID {
-	return xor.ID(s.Key)
+func (s *shard) ID() xor.Key {
+	return xor.Key(s.Key)
 }
 
 // dfile is the filename of the node in Durable FS where the service keeps its
@@ -74,7 +74,7 @@ func (cli *Client) Add(updateTime time.Time, key sumr.Key, value float64) (resul
 	}()
 
 	cli.lk.Lock()
-	server := cli.metric.Nearest(xor.ID(key), 1)[0].(*ctl.WorkerCheckpoint).Server
+	server := cli.metric.Nearest(xor.Key(key), 1)[0].(*ctl.WorkerCheckpoint).Server
 	cli.lk.Unlock()
 
 	retrn := server.Call("Add", updateTime, key, value)
@@ -119,7 +119,7 @@ func (cli *Client) Sum(key sumr.Key) (result float64) {
 	}()
 
 	cli.lk.Lock()
-	server := cli.metric.Nearest(xor.ID(key), 1)[0].(*ctl.WorkerCheckpoint).Server
+	server := cli.metric.Nearest(xor.Key(key), 1)[0].(*ctl.WorkerCheckpoint).Server
 	cli.lk.Unlock()
 
 	retrn := server.Call("Sum", key)

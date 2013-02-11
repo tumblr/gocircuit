@@ -63,6 +63,6 @@ func ReadCheckpoint(dfile string) (*Checkpoint, error) {
 }
 
 // Implements xor.Item
-func (s *WorkerCheckpoint) ID() xor.ID {
-	return xor.ID(s.Key)
+func (s *WorkerCheckpoint) ID() xor.Key {
+	return xor.Key(s.Key)
 }

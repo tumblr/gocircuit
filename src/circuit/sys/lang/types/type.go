@@ -62,7 +62,7 @@ type TypeChar struct {
 	Proc  map[string]*funcChar
 }
 
-// makeType makes a new structure for the receiver's value type
+// makeType makes a new type structure for the receiver's value type
 func makeType(receiver interface{}) *TypeChar {
 	t := reflect.TypeOf(receiver)
 	k := &TypeChar{

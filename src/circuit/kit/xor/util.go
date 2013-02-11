@@ -2,16 +2,16 @@ package xor
 
 import "math/rand"
 
-// ChooseMinK tries to insert K random IDs ...
-func (m *Metric) ChooseMinK(k int) ID {
+// ChooseMinK tries to insert K random Keys ...
+func (m *Metric) ChooseMinK(k int) Key {
 	if m == nil {
-		return ID(rand.Int63())
+		return Key(rand.Int63())
 	}
-	var min_id ID
+	var min_id Key
 	var min_d int = 1000
 	for k > 0 {
 		// Note: The last bit is not really randomized here
-		id := ID(rand.Int63())
+		id := Key(rand.Int63())
 		d, err := m.Add(id)
 		if err != nil {
 			continue
