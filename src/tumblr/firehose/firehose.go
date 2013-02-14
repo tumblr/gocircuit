@@ -4,12 +4,14 @@ package firehose
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/textproto"
 	"net/url"
+	"os"
 	"strings"
 )
 
@@ -77,7 +79,11 @@ func (conn *Conn) ReadInterface(v interface{}) error {
 	if err != nil {
 		return err
 	}
-	return json.Unmarshal([]byte(line), v)
+	if err = json.Unmarshal([]byte(line), v); err != nil {
+		fmt.Fprintf(os.Stderr, "firehose line [[[%s]]] error: %s\n", line, err)
+		return err
+	}
+	return nil
 }
 
 // Read reads the next Firehose event and returns the results parsed into an Event structure

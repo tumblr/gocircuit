@@ -44,6 +44,8 @@ func (rc *RedialConn) redial(onlyIfNil bool) {
 	}
 }
 
+// Read reads and parses the next event from the firehose.
+// If an error occurs, Read pauses and reconnects.
 func (rc *RedialConn) Read() *Event {
 	rc.Lock()
 	defer rc.Unlock()
@@ -53,6 +55,7 @@ func (rc *RedialConn) Read() *Event {
 	rc.redial(true)
 	for {
 		if ev, err = rc.conn.Read(); err != nil {
+			println("firehose read error:", err.Error())
 			rc.redial(false)
 			continue
 		}
