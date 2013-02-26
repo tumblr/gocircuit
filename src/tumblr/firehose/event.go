@@ -2,6 +2,7 @@ package firehose
 
 import (
 	"errors"
+	"fmt"
 	"net/url"
 	"time"
 )
@@ -77,6 +78,7 @@ const (
 	DeletePost
 	Likes
 	Unlikes
+	FirehoseCheckpoint
 )
 
 // Post types
@@ -158,6 +160,8 @@ func (a Activity) String() string {
 		return "Likes"
 	case Unlikes:
 		return "Unlikes"
+	case FirehoseCheckpoint:
+		return "FirehoseCheckpoint"
 	}
 	return "Unknown"
 }
@@ -174,14 +178,25 @@ func ParseActivity(activity string) (Activity, error) {
 		return Likes, nil
 	case "Unlikes":
 		return Unlikes, nil
+	case "FirehoseCheckpoint":
+		return FirehoseCheckpoint, nil
 	}
 	return 0, ErrParse
 }
 
 func ParseEvent(m map[string]interface{}) (ev *Event, err error) {
+	defer func() {
+		if err != nil {
+			fmt.Printf("RAW:%#v\n", m)
+		}
+	}()
+
 	ev = &Event{}
 	if ev.Activity, err = ParseActivity(getString(m, "activity")); err != nil {
 		return nil, err
+	}
+	if ev.Activity == FirehoseCheckpoint {
+		return ev, nil
 	}
 	ev.Private = getBool(m, "isPrivate")
 	ev.PrivateData = getMap(m, "privateJson")
