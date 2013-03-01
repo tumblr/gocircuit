@@ -9,6 +9,16 @@ import (
 func init() {
 	http.HandleFunc("/_pprof", serveRuntimeProfile)
 	http.HandleFunc("/_g", serveGoroutineProfile)
+	http.HandleFunc("/_s", serveStackProfile)
+}
+
+func serveStackProfile(w http.ResponseWriter, r *http.Request) {
+	prof := pprof.Lookup("goroutine")
+	if prof == nil {
+		http.Error(w, "unknown profile name", 400)
+		return
+	}
+	prof.WriteTo(w, 2)
 }
 
 func serveGoroutineProfile(w http.ResponseWriter, r *http.Request) {
