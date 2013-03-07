@@ -27,19 +27,22 @@ func (rc *RedialConn) Stat() (time.Time, int32, int32) {
 	return rc.reLast, rc.reSuccess, rc.reErr
 }
 
-func (rc *RedialConn) redial(onlyIfNil bool) {
-	if !onlyIfNil {
-		rc.conn = nil
+func (rc *RedialConn) redial() {
+	if rc.conn != nil {
+		rc.conn.Close()
 	}
+	rc.conn = nil
+
 	var err error
 	for rc.conn == nil {
 		rc.reLast = time.Now()
+		print("R")
 		if rc.conn, err = Dial(rc.req); err == nil {
 			rc.reSuccess++
 			break
 		}
 		rc.reErr++
-		println("Redial error:", err.Error())
+		println("firehose redial:", err.Error())
 		time.Sleep(time.Second)
 	}
 }
@@ -52,11 +55,16 @@ func (rc *RedialConn) Read() *Event {
 
 	var err error
 	var ev *Event
-	rc.redial(true)
+	if rc.conn == nil {
+		rc.redial()
+	}
 	for {
 		if ev, err = rc.conn.Read(); err != nil {
-			println("firehose read error:", err.Error())
-			rc.redial(false)
+			//println("firehose read error:", err.Error())
+			print("?")
+			if !IsSyntaxError(err) {
+				rc.redial()
+			}
 			continue
 		}
 		return ev
@@ -67,10 +75,14 @@ func (rc *RedialConn) Read() *Event {
 func (rc *RedialConn) ReadInterface(v interface{}) {
 	rc.Lock()
 	defer rc.Unlock()
-	rc.redial(true)
+	if rc.conn == nil {
+		rc.redial()
+	}
 	for {
 		if err := rc.conn.ReadInterface(v); err != nil {
-			rc.redial(false)
+			if !IsSyntaxError(err) {
+				rc.redial()
+			}
 			continue
 		}
 		return
@@ -83,10 +95,14 @@ func (rc *RedialConn) ReadRaw() string {
 	defer rc.Unlock()
 	var err error
 	var raw string
-	rc.redial(true)
+	if rc.conn == nil {
+		rc.redial()
+	}
 	for {
 		if raw, err = rc.conn.ReadRaw(); err != nil {
-			rc.redial(false)
+			if !IsSyntaxError(err) {
+				rc.redial()
+			}
 			continue
 		}
 		return raw

@@ -80,7 +80,7 @@ func (conn *Conn) ReadInterface(v interface{}) error {
 		return err
 	}
 	if err = json.Unmarshal([]byte(line), v); err != nil {
-		fmt.Fprintf(os.Stderr, "firehose line [[[%s]]] error: %s\n", line, err)
+		fmt.Fprintf(os.Stderr, "firehose non-json response:\n= %s\n", line)
 		return err
 	}
 	return nil

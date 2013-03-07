@@ -2,7 +2,6 @@ package firehose
 
 import (
 	"errors"
-	"fmt"
 	"net/url"
 	"time"
 )
@@ -146,6 +145,14 @@ var (
 	ErrType    = errors.New("wrong type")
 )
 
+func IsSyntaxError(err error) bool {
+	switch err {
+	case ErrParse, ErrMissing, ErrType:
+		return true
+	}
+	return false
+}
+
 type Activity byte
 
 func (a Activity) String() string {
@@ -185,11 +192,13 @@ func ParseActivity(activity string) (Activity, error) {
 }
 
 func ParseEvent(m map[string]interface{}) (ev *Event, err error) {
+	/*
 	defer func() {
 		if err != nil {
 			fmt.Printf("RAW:%#v\n", m)
 		}
 	}()
+	*/
 
 	ev = &Event{}
 	if ev.Activity, err = ParseActivity(getString(m, "activity")); err != nil {
