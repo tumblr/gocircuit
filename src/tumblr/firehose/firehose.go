@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"time"
 )
 
 // Example HTTP request to the Firehose:
@@ -109,11 +110,11 @@ func (conn *Conn) Close() error {
 type transport struct {}
 
 func (t *transport) RoundTrip(req *http.Request) (resp *http.Response, err error) {
-	conn, err := net.Dial("tcp", canonicalAddr(req.URL))
+	conn, err := net.DialTimeout("tcp", canonicalAddr(req.URL), 2 * time.Second)
 	if err != nil {
 		return nil, err
 	}
-	cc := httputil.NewClientConn(conn, nil)
+	cc := httputil.NewClientConn(newTimeoutConn(conn, 3 * time.Second), nil)
 	resp, err = cc.Do(req)
 	if err != nil {
 		return nil, err
@@ -145,3 +146,25 @@ func canonicalAddr(url *url.URL) string {
 // Given a string of the form "host", "host:port", or "[ipv6::address]:port",
 // return true if the string includes a port.
 func hasPort(s string) bool { return strings.LastIndex(s, ":") > strings.LastIndex(s, "]") }
+
+type timeoutConn struct {
+	net.Conn
+	timeout time.Duration
+}
+
+func newTimeoutConn(conn net.Conn, timeout time.Duration) net.Conn {
+	return &timeoutConn{
+		Conn:    conn,
+		timeout: timeout,
+	}
+}
+
+func (t *timeoutConn) Read(b []byte) (n int, err error) {
+	t.Conn.SetReadDeadline(time.Now().Add(t.timeout))
+	return t.Conn.Read(b)
+}
+
+func (t *timeoutConn) Write(b []byte) (n int, err error) {
+	t.Conn.SetWriteDeadline(time.Now().Add(t.timeout))
+	return t.Conn.Write(b)
+}
