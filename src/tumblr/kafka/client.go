@@ -31,7 +31,7 @@ type ProduceArg struct {
 	Messages  [][]byte
 }
 
-// ??
+// Convert the produce request argument into a set of messages with a topic and partition annotation attached
 func (x *ProduceArg) TopicPartitionMessages() *TopicPartitionMessages {
 	r := &TopicPartitionMessages{
 		TopicPartition: TopicPartition{
@@ -84,7 +84,7 @@ type FetchArg struct {
 	MaxSize int32	// Maximum size of returned result
 }
 
-// ??
+// TopicPartitionOffset converts a fetch request into a topic/partition/offset tuple
 func (x *FetchArg) TopicPartitionOffset() *TopicPartitionOffset {
 	return &TopicPartitionOffset{
 		TopicPartition: TopicPartition{
@@ -99,7 +99,7 @@ func (x *FetchArg) TopicPartitionOffset() *TopicPartitionOffset {
 // FetchReturn holds a user-facing representation of the result of a fetch request
 type FetchReturn struct {
 	Err      KafkaError	// Err records any error conditions
-	Messages [][]byte	// ??
+	Messages [][]byte
 }
 
 // Fetch sends a fetch request to the Kafka server and returns the response
@@ -178,7 +178,8 @@ type OffsetsArg struct {
 	MaxOffsets int32
 }
 
-// ??
+// OffsetsRequest returns a representation of the a offsets request into a
+// lower-level networking request type
 func (x *OffsetsArg) OffsetsRequest() *OffsetsRequest {
 	return &OffsetsRequest{
 		TopicPartition: TopicPartition{

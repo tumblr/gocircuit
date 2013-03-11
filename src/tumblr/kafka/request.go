@@ -54,7 +54,7 @@ type RequestHeader struct {
 	_N            int16
 }
 
-// TopicPartition is wraps a topic and partition pair
+// TopicPartition identifies a topic and a partition pair
 type TopicPartition struct {
 	// Topic is the Kafka request topic
 	Topic         string
