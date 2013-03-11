@@ -1,4 +1,4 @@
-// Package opentsdb provides facilities for connecting and writing to an OpenTSDB server
+// Package opentsdb provides low-level facilities for interacting with an OpenTSDB server
 package opentsdb
 
 import (
@@ -35,9 +35,8 @@ type Tag struct {
 	Value string
 }
 
-var (
-	ErrArg = errors.New("invalid argument")
-)
+// ErrArg represent errors in parsing
+var ErrArg = errors.New("invalid argument")
 
 // sanitizeIdentifier trims whitespaces.
 // It returns an error if id has whitespaces in its body.
@@ -52,6 +51,7 @@ func sanitizeIdentifier(id string) (string, error) {
 	return id, nil
 }
 
+// Normalize returns a normalized version of its argument.
 func Normalize(s string) string {
 	ascii := []byte(s)
 	for i, a := range ascii {

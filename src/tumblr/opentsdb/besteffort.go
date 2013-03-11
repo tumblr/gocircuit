@@ -6,14 +6,18 @@ import (
 	"time"
 )
 
+// BestEffortConn is a connection to an OpenTSDB server that fails gracefully
+// and continues operation when the OpenTSDB service is unresponsive.
 type BestEffortConn struct {
 	sync.Mutex
 	conn *Conn
 	hostport string
 }
 
+// ErrRedialing indicates an error necessitating a redial.
 var ErrRedialing = errors.New("redialing")
 
+// BetEffortDial opens a new connection to OpenTSDB with graceful failure built-in.
 func BestEffortDial(hostport string) (*BestEffortConn, error) {
 	be := &BestEffortConn{
 		hostport: hostport,
@@ -23,6 +27,7 @@ func BestEffortDial(hostport string) (*BestEffortConn, error) {
 	return be, nil
 }
 
+// Put sends a new sample to udnerlying OpenTSDB server.
 func (c *BestEffortConn) Put(metric string, value interface{}, tags ...Tag) error {
 	c.Lock()
 	defer c.Unlock()
@@ -64,6 +69,7 @@ func (c *BestEffortConn) redial() {
 	}
 }
 
+//  Close closes this connection to the Kafka broker
 func (c *BestEffortConn) Close() error {
 	c.Lock()
 	defer c.Unlock()
