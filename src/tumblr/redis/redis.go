@@ -1,3 +1,4 @@
+// Package redis provides a low-level client to a Redis server.
 package redis
 
 import (
@@ -5,11 +6,9 @@ import (
 	"strconv"
 )
 
-var (
-	ErrNotInt64 = errors.New("type did not assert against int64")
-)
+var ErrNotInt64 = errors.New("type did not assert against int64")
 
-// increment a redis key by 1
+// Incr increments a Redis key by one.
 func (r *Conn) Incr(key string) (int64, error) {
 	id := r.Next()
 	r.StartRequest(id)
@@ -23,7 +22,7 @@ func (r *Conn) Incr(key string) (int64, error) {
 	return r.readResponseInt64(id)
 }
 
-// decrement a redis key by 1
+// Decr decrement a Redis key by one.
 func (r *Conn) Decr(key string) (int64, error) {
 	id := r.Next()
 
@@ -38,6 +37,7 @@ func (r *Conn) Decr(key string) (int64, error) {
 	return r.readResponseInt64(id)
 }
 
+// SetInt sets the value of a Redis key.
 func (r *Conn) SetInt(key string, value int64) error {
 	id := r.Next()
 
@@ -52,18 +52,13 @@ func (r *Conn) SetInt(key string, value int64) error {
 	return r.readResponse(id)
 }
 
+// KeyIntValue represents a key/value pair with a string key and a 64-bit integral value.
 type KeyIntValue struct {
 	Key   string
 	Value int64
 }
 
-/*
-func (r *Conn) SetIntBulk(pairs ...KeyInt64Value) error {
-	?
-}
-*/
-
-// get the value of a redis key as an
+// GetInt gets the value of a Redis key as a 64-bit signed integer.
 func (r *Conn) GetInt(key string) (int64, error) {
 	id := r.Next()
 

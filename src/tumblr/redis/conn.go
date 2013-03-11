@@ -11,6 +11,7 @@ import (
 	"net/textproto"
 )
 
+// Conn is a connection to a Redis server.
 type Conn struct {
 	conn net.Conn
 	r    *bufio.Reader
@@ -28,13 +29,22 @@ var (
 	ErrSize   = errors.New("size out of bounds")
 )
 
-// The different kinds of Redis responses are captured in respective Go types
+// Status represents a STATUS response from a Redis server.
 type Status string
+
+// Error represents an ERROR response from a Redis server.
 type Error string
+
+// Integer represents an integral-value response from a Redis server.
 type Integer int
+
+// Bulk represents a BULK response from a Redis server.
 type Bulk string
+
+// MultiBulk represents a MULTIBULK response from a Redis server.
 type MultiBulk []Bulk
 
+// Dial attempts to establish a new connection to the Redis server at addr.
 func Dial(addr string) (conn *Conn, err error) {
 	c, err := net.DialTimeout("tcp", addr, time.Second*5)
 	if err != nil {
@@ -43,10 +53,12 @@ func Dial(addr string) (conn *Conn, err error) {
 	return &Conn{conn: c, r: bufio.NewReader(c)}, nil
 }
 
+// Close closes the connection to the Redis server.
 func (c *Conn) Close() error {
 	return c.conn.Close()
 }
 
+// WriteMultiBulk sends a MULTIBULK request to the server.
 func (c *Conn) WriteMultiBulk(args ...string) error {
 	var w bytes.Buffer
 	w.WriteString("*")
@@ -63,6 +75,7 @@ func (c *Conn) WriteMultiBulk(args ...string) error {
 	return err
 }
 
+// ReadResponse reads and parses a server response.
 func (c *Conn) ReadResponse() (resp interface{}, err error) {
 	ch, err := c.r.ReadByte()
 	if err != nil {
@@ -111,6 +124,7 @@ func (c *Conn) ReadResponse() (resp interface{}, err error) {
 	return nil, ErrFormat
 }
 
+// ReadMultiBulk reads a MULTIBULK response from the Redis server.
 func (c *Conn) ReadMultiBulk() (multibulk MultiBulk, err error) {
 	// Read first line
 	line, isPrefix, err := c.r.ReadLine()
@@ -142,6 +156,7 @@ func (c *Conn) ReadMultiBulk() (multibulk MultiBulk, err error) {
 	return multibulk, nil
 }
 
+// ReadBulk reads a BULK response from a Redis server.
 func (c *Conn) ReadBulk() (bulk Bulk, err error) {
 	// Read first line containing argument size
 	line, isPrefix, err := c.r.ReadLine()
@@ -174,6 +189,7 @@ func (c *Conn) ReadBulk() (bulk Bulk, err error) {
 	return Bulk(arg[:arglen]), nil
 }
 
+// ReadOK confirms the next response from the Redis server is an OK.
 func (c *Conn) ReadOK() error {
 	resp, err := c.ReadResponse()
 	if err != nil {
@@ -186,6 +202,7 @@ func (c *Conn) ReadOK() error {
 	return nil
 }
 
+// ResponseString returns a textual representation of the response resp.
 func ResponseString(resp interface{}) string {
 	if resp == nil {
 		return "nil"
