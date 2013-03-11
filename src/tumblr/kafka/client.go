@@ -1,0 +1,223 @@
+package kafka
+
+import (
+	"net"
+	"net/textproto"
+	"sync"
+)
+
+// ClientConn is a connection to a Kafka broker
+type ClientConn struct {
+	textproto.Pipeline
+	sync.Mutex
+	net.Conn
+}
+
+// Dial connects to the broker with the given host/port
+func Dial(broker string) (c *ClientConn, err error) {
+	conn, err := net.Dial("tcp", broker)
+	if err != nil {
+		return nil, err
+	}
+	return &ClientConn{
+		Conn: conn,
+	}, nil
+}
+
+type ProduceArg struct {
+	Topic     string
+	Partition 
+	Messages  [][]byte
+}
+
+func (x *ProduceArg) TopicPartitionMessages() *TopicPartitionMessages {
+	r := &TopicPartitionMessages{
+		TopicPartition: TopicPartition{
+			Topic:     x.Topic,
+			Partition: x.Partition,
+		},
+	}
+	for _, payload := range x.Messages {
+		r.Messages = append(r.Messages, &Message{
+			Compression: NoCompression,
+			Payload:     payload,
+		})
+	}
+	return r
+}
+
+// Produce sends a produce request to the Kafka broker
+func (c *ClientConn) Produce(args ...*ProduceArg) error {
+	if len(args) < 1 {
+		return ErrArg
+	}
+	var err error
+	id := c.Pipeline.Next()
+
+	req := &ProduceRequest{}
+	for _, a := range args {
+		req.Args = append(req.Args, a.TopicPartitionMessages())
+	}
+
+	// Send request
+	c.Pipeline.StartRequest(id)
+	c.Lock()
+	err = req.Write(c.Conn)
+	c.Unlock()
+	c.Pipeline.EndRequest(id)
+	c.Pipeline.StartResponse(id)
+	c.Pipeline.EndResponse(id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type FetchArg struct {
+	Topic   string
+	Partition
+	Offset
+	MaxSize int32
+}
+
+func (x *FetchArg) TopicPartitionOffset() *TopicPartitionOffset {
+	return &TopicPartitionOffset{
+		TopicPartition: TopicPartition{
+			Topic:     x.Topic,
+			Partition: x.Partition,
+		},
+		Offset:  x.Offset,
+		MaxSize: x.MaxSize,
+	}
+}
+
+type FetchReturn struct {
+	Err      KafkaError
+	Messages [][]byte
+}
+
+// Fetch sends a fetch request to the Kafka server and returns the response
+func (c *ClientConn) Fetch(args ...*FetchArg) (returns []FetchReturn, err error) {
+	if len(args) < 1 {
+		return nil, ErrArg
+	}
+	id := c.Pipeline.Next()
+
+	req := &FetchRequest{}
+	for _, a := range args {
+		req.Args = append(req.Args, a.TopicPartitionOffset())
+	}
+
+	// Send request
+	c.Pipeline.StartRequest(id)
+	c.Lock()
+	err = req.Write(c.Conn)
+	c.Unlock()
+	c.Pipeline.EndRequest(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Receive response
+	var resp *FetchResponse
+	var multiresp *MultiFetchResponse
+	c.Pipeline.StartResponse(id)
+	c.Lock()
+	if len(args) > 1 {
+		multiresp = &MultiFetchResponse{}
+		err = multiresp.Read(c.Conn)
+	} else {
+		resp = &FetchResponse{}
+		_, err = resp.Read(c.Conn)
+	}
+	c.Unlock()
+	c.Pipeline.EndResponse(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Package return values
+	var resps []*FetchResponse
+	if len(args) > 1 {
+		if multiresp.Err != nil {
+			return nil, multiresp.Err
+		}
+		// Number of responses does not match number of requests
+		if len(multiresp.FetchResponses) != len(args) {
+			return nil, ErrWire
+		}
+		resps = multiresp.FetchResponses
+	} else {
+		resps = []*FetchResponse{resp}
+	}
+	returns = make([]FetchReturn, len(args))
+	for i, r := range resps {
+		returns[i].Err = r.Err
+		for _, m := range r.Messages {
+			if m.Compression != NoCompression {
+				return nil, ErrCompression
+			}
+			returns[i].Messages = append(returns[i].Messages, m.Payload)
+		}
+	}
+
+	return returns, nil
+}
+
+type OffsetsArg struct {
+	Topic      string
+	Partition 
+	Time       int64
+	MaxOffsets int32
+}
+
+func (x *OffsetsArg) OffsetsRequest() *OffsetsRequest {
+	return &OffsetsRequest{
+		TopicPartition: TopicPartition{
+			Topic:     x.Topic,
+			Partition: x.Partition,
+		},
+		Time:       x.Time,
+		MaxOffsets: x.MaxOffsets,
+	}
+}
+
+// Offsets sends an offsets request to the Kafka server and returns the response
+func (c *ClientConn) Offsets(arg *OffsetsArg) (offsets []Offset, err error) {
+	id := c.Pipeline.Next()
+	req := arg.OffsetsRequest()
+
+	// Send request
+	c.Pipeline.StartRequest(id)
+	c.Lock()
+	err = req.Write(c.Conn)
+	c.Unlock()
+	c.Pipeline.EndRequest(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Receive response
+	resp := &OffsetsResponse{}
+	c.Pipeline.StartResponse(id)
+	c.Lock()
+	err = resp.Read(c.Conn)
+	c.Unlock()
+	c.Pipeline.EndResponse(id)
+	if err != nil {
+		return nil, err
+	}
+	
+	offsets = resp.Offsets
+
+	return offsets, nil
+}
+
+// Close closes the connection to the Kafka broker
+func (c *ClientConn) Close() error {
+	c.Lock()
+	defer c.Unlock()
+
+	return c.Conn.Close()
+}
