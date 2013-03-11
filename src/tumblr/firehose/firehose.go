@@ -1,4 +1,4 @@
-// Package firehose implements a connection to the Tumblr Firehose
+// Package firehose implements a clients for the Tumblr Firehose/Firegeyser streaming API.
 package firehose
 
 import (
@@ -16,24 +16,29 @@ import (
 	"time"
 )
 
-// Example HTTP request to the Firehose:
+// The Firehose protocol is HTTP-based. It begins with a client request,
+// holding the user credentials, which looks like this:
 //
 //	GET /?applicationId=1&offset=oldest&clientId=87 HTTP/1.1
 //	Authorization: Basic Ym1hdGhlbnk6Zm9vYmFyYmF6YnV6
 //	User-Agent: curl/7.21.4 (universal-apple-darwin11.0) libcurl/7.21.4 OpenSSL/0.9.8r zlib/1.2.5
 //	Host: localhost:8000
 //	Accept: */*
+//
+// In response, the Firehose either returns an HTTP error response header, or
+// begins an infinite stream of JSON-encoded events, one per line
 
+// Request represents the user credentials included in the initial client request to the Tumblr Firehose service.
 type Request struct {
-	HostPort       string
-	Username       string
-	Password       string
-	ApplicationID  string
-	ClientID       string
-	Offset         string
+	HostPort      string // Host and port of the Tumblr Firehose endpoint, e.g. firehose.datacenter.com
+	Username      string // Username of the client
+	Password      string // Password of the client
+	ApplicationID string // Application ID (of possibly many held by this user) to be utilized
+	ClientID      string // Client ID of an independent session pertaining to the specific application stream
+	Offset        string // Offset into the stream of events, where streaming should being; current options are "oldest" and "newest"
 }
 
-func MakeRequest(freq *Request) *http.Request {
+func makeHTTPRequest(freq *Request) *http.Request {
 	req, err := http.NewRequest("GET", "/", nil)
 	if err != nil {
 		panic("make firehose request")
@@ -53,18 +58,19 @@ func MakeRequest(freq *Request) *http.Request {
 	return req
 }
 
-// Conn is a connection to the Tumblr Firehose with a given application, offset and client parameters
+// Conn is a connection to the Tumblr Firehose.
 type Conn struct {
 	resp *http.Response
 	r    *textproto.Reader
 }
 
-// Dial connects to the firehose and returns a connection object capable of reading Firehose events iteratively
+// Dial connects to the Tumblr Firehose, using the credentials in freq, and
+// returns a connection object capable of reading Firehose events iteratively.
 func Dial(freq *Request) (*Conn, error) {
 	client := &http.Client{
 		Transport: &transport{},
 	}
-	resp, err := client.Do(MakeRequest(freq))
+	resp, err := client.Do(makeHTTPRequest(freq))
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +80,9 @@ func Dial(freq *Request) (*Conn, error) {
 	}, nil
 }
 
-// Read reads the next Firehose event into the supplied value
+// ReadInterface reads the next Firehose event into the supplied value.
+// It attempts to parse the next incoming JSON event into the user supplied
+// value v, without trying to check for correct event semantics.
 func (conn *Conn) ReadInterface(v interface{}) error {
 	line, err := conn.r.ReadLine()
 	if err != nil {
@@ -87,16 +95,17 @@ func (conn *Conn) ReadInterface(v interface{}) error {
 	return nil
 }
 
-// Read reads the next Firehose event and returns the results parsed into an Event structure
+// Read reads, parses and processes the next event from connection, and returns
+// the parsed event information.
 func (conn *Conn) Read() (*Event, error) {
 	m := make(map[string]interface{})
 	if err := conn.ReadInterface(&m); err != nil {
 		return nil, err
 	}
-	return ParseEvent(m)
+	return parseEvent(m)
 }
 
-// Read reads the next Firehose event in raw, non-decoded string form
+// ReadRaw reads the next line from the connection and returnes it unprocessed.
 func (conn *Conn) ReadRaw() (string, error) {
 	return conn.r.ReadLine()
 }
@@ -107,19 +116,19 @@ func (conn *Conn) Close() error {
 }
 
 // transport is a special http.RoundTripper designed for the streaming nature of the Firehose
-type transport struct {}
+type transport struct{}
 
 func (t *transport) RoundTrip(req *http.Request) (resp *http.Response, err error) {
-	conn, err := net.DialTimeout("tcp", canonicalAddr(req.URL), 2 * time.Second)
+	conn, err := net.DialTimeout("tcp", canonicalAddr(req.URL), 2*time.Second)
 	if err != nil {
 		return nil, err
 	}
-	cc := httputil.NewClientConn(newTimeoutConn(conn, 3 * time.Second), nil)
+	cc := httputil.NewClientConn(newTimeoutConn(conn, 3*time.Second), nil)
 	resp, err = cc.Do(req)
 	if err != nil {
 		return nil, err
 	}
-	resp.Body = &disconnectOnBodyClose{ resp.Body, cc }
+	resp.Body = &disconnectOnBodyClose{resp.Body, cc}
 	return resp, nil
 }
 

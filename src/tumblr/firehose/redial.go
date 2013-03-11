@@ -1,4 +1,3 @@
-// Package firehose implements a connection to the Tumblr Firehose
 package firehose
 
 import (
@@ -6,6 +5,9 @@ import (
 	"time"
 )
 
+// RedialConn is a wrapper of Conn, whose read methods never return an error.
+// Instead, read attempts automatically perform reconnects in an intelligent
+// manner so as to quietly overcome common networking issues.
 type RedialConn struct {
 	sync.Mutex
 	req       *Request
@@ -15,13 +17,19 @@ type RedialConn struct {
 	reErr     int32
 }
 
+// Redial establishes a new connection to the Tumblr Firehose that supports
+// automatic and silent reconnects.
 func Redial(req *Request) *RedialConn {
 	rc := &RedialConn{req: req}
 	//rc.conn, _ = Dial(rc.req)
 	return rc
 }
 
-func (rc *RedialConn) Stat() (time.Time, int32, int32) {
+// Stat returns basic statistics about past re/connection attempts.
+// last is the timestamp of the last re/connect attempt. 
+// nok is the number of times a re/connect was successful.
+// nerr is the number of times a re/connect failed.
+func (rc *RedialConn) Stat() (last time.Time, nok, nerr int32) {
 	rc.Lock()
 	defer rc.Unlock()
 	return rc.reLast, rc.reSuccess, rc.reErr
@@ -48,7 +56,8 @@ func (rc *RedialConn) redial() {
 }
 
 // Read reads and parses the next event from the firehose.
-// If an error occurs, Read pauses and reconnects.
+// If an underlying network error occurs, Read blocks to pause and reconnect,
+// and so on until successful.
 func (rc *RedialConn) Read() *Event {
 	rc.Lock()
 	defer rc.Unlock()
@@ -72,6 +81,11 @@ func (rc *RedialConn) Read() *Event {
 	panic("u")
 }
 
+// ReadInterface reads the next Firehose event into the supplied value.
+// It attempts to parse the next incoming event into the user supplied
+// value v without trying to check for correct event semantics.
+// If an underlying network error occurs, Read blocks to pause and reconnect,
+// and so on until successful.
 func (rc *RedialConn) ReadInterface(v interface{}) {
 	rc.Lock()
 	defer rc.Unlock()
@@ -90,6 +104,9 @@ func (rc *RedialConn) ReadInterface(v interface{}) {
 	panic("u")
 }
 
+// ReadRaw reads the next line from the connection and returnes it unprocessed.
+// If an underlying network error occurs, Read blocks to pause and reconnect,
+// and so on until successful.
 func (rc *RedialConn) ReadRaw() string {
 	rc.Lock()
 	defer rc.Unlock()
@@ -110,6 +127,7 @@ func (rc *RedialConn) ReadRaw() string {
 	panic("u")
 }
 
+// Close closes the connection to the Tumblr Firehose.
 func (rc *RedialConn) Close() error {
 	rc.Lock()
 	defer rc.Unlock()

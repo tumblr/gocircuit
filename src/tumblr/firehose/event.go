@@ -9,39 +9,55 @@ import (
 // The firehose event format implemented here is documented in:
 //	https://github.com/tumblr/parmesan/wiki/Parmesan-API
 
+// Event is a parsed representation of a Firehose event
 type Event struct {
+
+	// Activity describes the type of event (post create, liked, etc.)
 	Activity    Activity
+
+	// Private equals true of this is a private event
 	Private     bool
+
+	// PrivateData contains the contents of private structures included with the event
 	PrivateData map[string]interface{}
+
+	// Timestamp records the time the event occurred 
 	Timestamp   time.Time
+
+	// If the event Activity is CratePost, UpdatePost or DeletePost, Post holds event-specific information
 	Post *Post
+
+	// If the event Activity is Like or Unlike, Like holds event-specific information
 	Like *Like
 }
 
+// Post keeps event information pertaining to CreatePost, UpdatePost and DeletePost events
 type Post struct {
-	ID           int64
-	BlogID       int64
-	BlogName     string
-	PostURL      string
-	BlogURL      string
-	Type         PostType
-	Tags         []string
-	Title        string
-	Body         string
-	Caption      string
+	ID           int64	// ID equals the post ID
+	BlogID       int64	// BlogID equals the tumblelog ID of the owner
+	BlogName     string	// BlogName is a textual representation of the tumblelog's identity
+	PostURL      string	// PostURL is the public URL where the post can be viewed
+	BlogURL      string	// BlogURL is the public URL of the main page of the owning tumblelog
+	Type         PostType	// Type determines if the post is text, photo, video, audio, etc.
+	Tags         []string	// Tags lists any user-supplied tags that apply to this post
+	Title        string	// Title is the title of the post
+	Body         string	// Body contains the post's HTML body
+	Caption      string	// Caption is the caption of the post, when it applies (audio, video, etc.)
 	SourceURL    string
 	SourceTitle  string
-	Quote        string
-	LinkURL      string	// Link URL, if post is a link
+	Quote        string	// For quote posts, Quote holds the contents of the quote
+	LinkURL      string	// LinkURL equals the link of this post, if post is of type link
 	Description  string
-	Photos       []Photo
+	Photos       []Photo	// For photoset posts, Photos contains further photoset-specific details
 }
 
+// Photo represents a single photo inside a photoset
 type Photo struct {
-	Caption  string
-	Alt      []AltPhoto
+	Caption  string		// Caption is the caption of the this photo
+	Alt      []AltPhoto	// Alt is slice of variations on the format of this photo
 }
 
+// BigestAlt returns a pointer to the largest format altenrative for this photo
 func (ph *Photo) BiggestAlt() *AltPhoto {
 	var alt *AltPhoto
 	var width int
@@ -54,25 +70,27 @@ func (ph *Photo) BiggestAlt() *AltPhoto {
 	return alt
 }
 
+// AltPhoto represents a specific rendition of a photo in way of scaling
 type AltPhoto struct {
-	Width  int
-	Height int
-	URL    string
+	Width  int	// Width is the photo width in pixels
+	Height int	// Height is the photo height in pixels
+	URL    string	// URL is the URL where the photo can be accessed
 }
 
+// Like holds details specific to like and unlike events
 type Like struct {
-	DestPostID    int64
-	DestBlogID    int64
-	SourceBlogID  int64
-	RootPostID    int64
-	RootBlogID    int64
+	DestPostID    int64	// DestPostID is the post ID of the post that is being liked
+	DestBlogID    int64	// DestBlogID is the tumblelog ID of the tumblelog owning the post that is being liked
+	SourceBlogID  int64	// SourceBlogID is the primary tumblelog ID of the user liking the post
+	RootPostID    int64	// RootPostID is the post ID of the original post, if the liked post is a reblog
+	RootBlogID    int64	// RootBlogID is the tumblelog ID of the tumblelog owning the original post, if the liked post is a reblog
 	ParentPostID  int64
 	ParentBlogID  int64
 }
 
-// Events
+// The activity constants list the currently supported event activity types.
 const (
-	CreatePost = iota
+	CreatePost Activity = iota
 	UpdatePost
 	DeletePost
 	Likes
@@ -80,10 +98,10 @@ const (
 	FirehoseCheckpoint
 )
 
-// Post types
+// Post constants enumerate all supported tumblelog post types.
 type PostType byte
 const (
-	PostUnknown = PostType(iota)
+	PostUnknown PostType = iota
 	PostText
 	PostQuote
 	PostLink
@@ -94,6 +112,7 @@ const (
 	PostChat
 )
 
+// String returns a textual representation of the post type
 func (pt PostType) String() string {
 	switch pt {
 	case PostText:
@@ -138,13 +157,14 @@ func parsePostType(t string) PostType {
 	return PostUnknown
 }
 
-// Errors
+// Errors returned by the parser of incoming events from the Tumblr Firehose
 var (
 	ErrParse   = errors.New("unrecognized semantics")
 	ErrMissing = errors.New("missing field")
 	ErrType    = errors.New("wrong type")
 )
 
+// IsSyntaxError returns true if err represents an event parsing error
 func IsSyntaxError(err error) bool {
 	switch err {
 	case ErrParse, ErrMissing, ErrType:
@@ -153,8 +173,10 @@ func IsSyntaxError(err error) bool {
 	return false
 }
 
+// Activity represents the type of user activity that an event holds
 type Activity byte
 
+// String returns a textual representation of the activity type
 func (a Activity) String() string {
 	switch a {
 	case CreatePost:
@@ -173,6 +195,7 @@ func (a Activity) String() string {
 	return "Unknown"
 }
 
+// ParseActivity converts a textual representation of an activity type to a compact representation of type Activity
 func ParseActivity(activity string) (Activity, error) {
 	switch activity {
 	case "CreatePost":
@@ -191,7 +214,7 @@ func ParseActivity(activity string) (Activity, error) {
 	return 0, ErrParse
 }
 
-func ParseEvent(m map[string]interface{}) (ev *Event, err error) {
+func parseEvent(m map[string]interface{}) (ev *Event, err error) {
 	/*
 	defer func() {
 		if err != nil {
