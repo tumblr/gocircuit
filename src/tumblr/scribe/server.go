@@ -9,11 +9,13 @@ import (
 	"tumblr/net/scribe/thrift/fb303"
 )
 
+// Handler is a type that can handle incoming message log requests and errors
 type Handler interface {
 	Log(...Message) error
 	Error(error)
 }
 
+// Listen binds a Scribe protocol server to bind address and dispatches incoming requests to the handler.
 func Listen(bind string, handler Handler) error {
 
 	// Resolve bind address

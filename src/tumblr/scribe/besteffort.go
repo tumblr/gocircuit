@@ -6,12 +6,14 @@ import (
 	"time"
 )
 
+// BestEffortConn is a connection to a Scribe node that ignores common Scribe errors
 type BestEffortConn struct {
 	sync.Mutex
 	conn *Conn
 	hostport string
 }
 
+// BestEffortDial connects to a Scribe node and returns the resulting connection
 func BestEffortDial(hostport string) (*BestEffortConn, error) {
 	be := &BestEffortConn{
 		conn:     nil,
@@ -23,7 +25,8 @@ func BestEffortDial(hostport string) (*BestEffortConn, error) {
 
 var ErrRedialing = errors.New("redialing")
 
-func (bec *BestEffortConn) E(category, payload string) error {
+// Write sends a single message write request to the Scribe node.
+func (bec *BestEffortConn) Write(category, payload string) error {
 	bec.Lock()
 	defer bec.Unlock()
 	if bec.conn == nil {
@@ -39,7 +42,8 @@ func (bec *BestEffortConn) E(category, payload string) error {
 	return err
 }
 
-func (bec *BestEffortConn) Emit(msgs ...Message) error {
+// WriteMany sends a batch of multiple message write requests to the scribe node.
+func (bec *BestEffortConn) WriteMany(msgs ...Message) error {
 	bec.Lock()
 	defer bec.Unlock()
 
@@ -82,6 +86,7 @@ func (bec *BestEffortConn) redial() {
 	}
 }
 
+// Close closes the connection to the Scribe node.
 func (bec *BestEffortConn) Close() error {
 	bec.Lock()
 	defer bec.Unlock()

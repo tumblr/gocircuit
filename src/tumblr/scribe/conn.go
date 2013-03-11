@@ -8,12 +8,14 @@ import (
 	"tumblr/net/scribe/thrift/scribe"
 )
 
+// Conn is a connection to a Scribe node.
 type Conn struct {
 	sync.Mutex
 	transport thrift.TTransport
 	client    *scribe.ScribeClient
 }
 
+// Dial connects to a Scribe server with a given host and port endpoint.
 func Dial(hostport string) (*Conn, error) {
 	addr, err := net.ResolveTCPAddr("tcp", hostport)
 	if err != nil {
@@ -32,16 +34,20 @@ func Dial(hostport string) (*Conn, error) {
 	return conn, nil
 }
 
+// Message captures a single Scribe message with a given payload and a topic category
 type Message struct {
 	Category string
 	Payload  string
 }
 
-func (conn *Conn) E(category, payload string) error {
+
+// Write sends a single message write request to the Scribe node.
+func (conn *Conn) Write(category, payload string) error {
 	return conn.Emit(Message{category, payload})
 }
 
-func (conn *Conn) Emit(msgs ...Message) error {
+// WriteMany sends a batch of multiple message write requests to the scribe node.
+func (conn *Conn) WriteMany(msgs ...Message) error {
 	tlist := thrift.NewTList(thrift.TypeFromValue(scribe.NewLogEntry()), len(msgs))
 	for _, msg := range msgs {
 		tlog := scribe.NewLogEntry()
@@ -79,6 +85,7 @@ func resultCodeToError(resultCode scribe.ResultCode) error {
 	return ErrUnknown
 }
 
+// Close closes the connection to the Scribe node.
 func (conn *Conn) Close() error {
 	conn.Lock()
 	defer conn.Unlock()
