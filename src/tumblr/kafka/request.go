@@ -68,9 +68,9 @@ func (x *TopicPartition) Write(w io.Writer) error {
 	if len(x.Topic) > math.MaxInt16 {
 		panic("topic too long")
 	}
-	w.Write(Int16Bytes(int16(len(x.Topic))))
+	w.Write(int16Bytes(int16(len(x.Topic))))
 	w.Write([]byte(x.Topic))
-	_, err := w.Write(Int32Bytes(int32(x.Partition)))
+	_, err := w.Write(int32Bytes(int32(x.Partition)))
 	return err
 }
 
@@ -85,7 +85,7 @@ func (x *TopicPartition) Read(r io.Reader) error {
 	if _, err := r.Read(p[0:2]); err != nil {
 		return err
 	}
-	topicLen := BytesInt16(p[0:2])
+	topicLen := bytesInt16(p[0:2])
 	if topicLen < 0 {
 		return ErrWire
 	}
@@ -97,7 +97,7 @@ func (x *TopicPartition) Read(r io.Reader) error {
 	if _, err := r.Read(p[0:4]); err != nil {
 		return err
 	}
-	x.Partition = Partition(BytesInt32(p[0:4]))
+	x.Partition = Partition(bytesInt32(p[0:4]))
 	if !isValidPartition(x.Partition) {
 		return ErrWire
 	}
@@ -127,8 +127,8 @@ func (x *RequestHeader) Write(w io.Writer) error {
 		_nsize = 2
 	}
 	_length := x._NonHeaderLen + 2 /* type */ + _nsize
-	w.Write(Int32Bytes(_length))
-	if _, err := w.Write(Int16Bytes(int16(x._Type))); err != nil {
+	w.Write(int32Bytes(_length))
+	if _, err := w.Write(int16Bytes(int16(x._Type))); err != nil {
 		return err
 	}
 	if x._N < 1 {
@@ -138,7 +138,7 @@ func (x *RequestHeader) Write(w io.Writer) error {
 		if x._Type != RequestMultiProduce && x._Type != RequestMultiFetch {
 			return ErrArg
 		}
-		if _, err := w.Write(Int16Bytes(x._N)); err != nil {
+		if _, err := w.Write(int16Bytes(x._N)); err != nil {
 			return err
 		}
 	}
@@ -154,7 +154,7 @@ func (x *RequestHeader) Read(r io.Reader) error {
 	}
 
 	// Parse type
-	x._Type = RequestType(BytesInt16(p[4:6]))
+	x._Type = RequestType(bytesInt16(p[4:6]))
 	if !isValidRequestType(x._Type) {
 		return ErrWire
 	}
@@ -168,7 +168,7 @@ func (x *RequestHeader) Read(r io.Reader) error {
 	}
 
 	// Parse length
-	_length := BytesInt32(p[0:4])
+	_length := bytesInt32(p[0:4])
 	x._NonHeaderLen = _length - 2 /* type */ - _nsize
 	if x._NonHeaderLen < 0 {
 		return ErrWire
@@ -179,7 +179,7 @@ func (x *RequestHeader) Read(r io.Reader) error {
 		if _, err = r.Read(p[0:2]); err != nil {
 			return err
 		}
-		x._N = BytesInt16(p[0:2])
+		x._N = bytesInt16(p[0:2])
 		if x._N < 2 {
 			return ErrWire
 		}
@@ -207,6 +207,7 @@ type ProduceRequest struct {
 	Args []*TopicPartitionMessages
 }
 
+// TopicPartitionMessages hols a list of messages coming from a given topic/partition combination
 type TopicPartitionMessages struct {
 	TopicPartition
 	Messages []*Message
@@ -221,7 +222,7 @@ func (x *TopicPartitionMessages) Write(w io.Writer) error {
 	for _, m := range x.Messages {
 		msgLen += int32(m.WireLen())
 	}
-	w.Write(Int32Bytes(msgLen))
+	w.Write(int32Bytes(msgLen))
 	for _, m := range x.Messages {
 		if err := m.Write(w); err != nil {
 			return err
@@ -248,7 +249,7 @@ func (x *TopicPartitionMessages) Read(r io.Reader) error {
 	if _, err := r.Read(p[0:4]); err != nil {
 		return err
 	}
-	msgLen := BytesInt32(p[0:4])
+	msgLen := bytesInt32(p[0:4])
 	if msgLen < 0 {
 		return ErrWire
 	}
@@ -337,6 +338,7 @@ type FetchRequest struct {
 	Args []*TopicPartitionOffset
 }
 
+// TopicPartitionOffset couple a topic/partition selection with an offset within it
 type TopicPartitionOffset struct {
 	TopicPartition
 	Offset
@@ -348,10 +350,10 @@ func (x *TopicPartitionOffset) Write(w io.Writer) error {
 	if err := x.TopicPartition.Write(w); err != nil {
 		return err
 	}
-	if _, err := w.Write(Int64Bytes(int64(x.Offset))); err != nil {
+	if _, err := w.Write(int64Bytes(int64(x.Offset))); err != nil {
 		return err
 	}
-	if _, err := w.Write(Int32Bytes(x.MaxSize)); err != nil {
+	if _, err := w.Write(int32Bytes(x.MaxSize)); err != nil {
 		return err
 	}
 	return nil
@@ -372,14 +374,14 @@ func (x *TopicPartitionOffset) Read(r io.Reader) error {
 	if _, err := r.Read(p[0:8]); err != nil {
 		return err
 	}
-	x.Offset = Offset(BytesInt64(p[0:8]))
+	x.Offset = Offset(bytesInt64(p[0:8]))
 	if x.Offset < 0 {
 		return ErrWire
 	}
 	if _, err := r.Read(p[0:4]); err != nil {
 		return err
 	}
-	x.MaxSize = BytesInt32(p[0:4])
+	x.MaxSize = bytesInt32(p[0:4])
 	if x.MaxSize < 0 {
 		return ErrWire
 	}
@@ -474,10 +476,10 @@ func (x *OffsetsRequest) Write(w io.Writer) error {
 	if err := x.TopicPartition.Write(w); err != nil {
 		return err
 	}
-	if _, err := w.Write(Int64Bytes(x.Time)); err != nil {
+	if _, err := w.Write(int64Bytes(x.Time)); err != nil {
 		return err
 	}
-	if _, err := w.Write(Int32Bytes(x.MaxOffsets)); err != nil {
+	if _, err := w.Write(int32Bytes(x.MaxOffsets)); err != nil {
 		return err
 	}
 	return nil
@@ -510,11 +512,11 @@ func (x *OffsetsRequest) Read(header *RequestHeader, r io.Reader) error {
 	if _, err = r.Read(p[0:8]); err != nil {
 		return err
 	}
-	x.Time = BytesInt64(p[0:8])
+	x.Time = bytesInt64(p[0:8])
 	if _, err = r.Read(p[0:4]); err != nil {
 		return err
 	}
-	x.MaxOffsets = BytesInt32(p[0:4])
+	x.MaxOffsets = bytesInt32(p[0:4])
 	if x.MaxOffsets < 0 {
 		return ErrWire
 	}

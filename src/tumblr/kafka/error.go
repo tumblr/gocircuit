@@ -2,6 +2,7 @@ package kafka
 
 import "errors"
 
+// Error conditions that can occur in the Kafka client.
 var (
 	ErrIO           = errors.New("io or network")
 	ErrClosed       = errors.New("already closed")
@@ -13,8 +14,10 @@ var (
 	ErrNoBrokers    = errors.New("no brokers")
 )
 
+// KafkaError is a wrapper that unified errors emitted by the remote Kafka broker
 type KafkaError error
 
+// Known error conditions returned by the Kafka broker
 var (
 	KafkaErrUnknown          = KafkaError(errors.New("kafka: unknown error"))
 	KafkaErrNoError          = KafkaError(nil)
@@ -24,6 +27,7 @@ var (
 	KafkaErrInvalidFetchSize = KafkaError(errors.New("kafka: invalid fetch size"))
 )
 
+// KafkaErrorCode returns the integral protocol representation of the Kafka error corresponding to err.
 func KafkaErrorCode(err KafkaError) ErrorCode {
 	switch err {
 	case KafkaErrUnknown:
@@ -42,6 +46,7 @@ func KafkaErrorCode(err KafkaError) ErrorCode {
 	panic("unknown kafka error")
 }
 
+// KafkaCodeError returns the error object corresponding to the integral Kafka protocol error code.
 func KafkaCodeError(code ErrorCode) KafkaError {
 	switch code {
 	case ErrorCodeUnknown:
@@ -63,6 +68,7 @@ func KafkaCodeError(code ErrorCode) KafkaError {
 // ErrorCode represents a Kafka response error code
 type ErrorCode int16
 
+// List of known Kafka broker error codes
 const (
 	ErrorCodeUnknown ErrorCode = iota - 1
 	ErrorCodeNoError
@@ -76,6 +82,7 @@ func isValidErrorCode(e ErrorCode) bool {
 	return e >= ErrorCodeUnknown && e <= ErrorCodeInvalidFetchSize
 }
 
+// String returns a textual representation of the error code
 func (x ErrorCode) String() string {
 	switch x {
 	case ErrorCodeUnknown:

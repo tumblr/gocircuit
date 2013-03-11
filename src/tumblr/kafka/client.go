@@ -13,7 +13,7 @@ type ClientConn struct {
 	net.Conn
 }
 
-// Dial connects to the broker with the given host/port
+// Dial connects to the broker with the given host and port
 func Dial(broker string) (c *ClientConn, err error) {
 	conn, err := net.Dial("tcp", broker)
 	if err != nil {
@@ -24,12 +24,14 @@ func Dial(broker string) (c *ClientConn, err error) {
 	}, nil
 }
 
+// ProduceArg is a user-facing representation of a produce request to the Kafka broker
 type ProduceArg struct {
 	Topic     string
 	Partition 
 	Messages  [][]byte
 }
 
+// ??
 func (x *ProduceArg) TopicPartitionMessages() *TopicPartitionMessages {
 	r := &TopicPartitionMessages{
 		TopicPartition: TopicPartition{
@@ -74,13 +76,15 @@ func (c *ClientConn) Produce(args ...*ProduceArg) error {
 	return nil
 }
 
+// FetchArg is a user-facing representation of a fetch request to the Kafka broker
 type FetchArg struct {
-	Topic   string
-	Partition
-	Offset
-	MaxSize int32
+	Topic   string	// Topic to fetch
+	Partition	// Partition within the topic
+	Offset		// Offset within the partition
+	MaxSize int32	// Maximum size of returned result
 }
 
+// ??
 func (x *FetchArg) TopicPartitionOffset() *TopicPartitionOffset {
 	return &TopicPartitionOffset{
 		TopicPartition: TopicPartition{
@@ -92,9 +96,10 @@ func (x *FetchArg) TopicPartitionOffset() *TopicPartitionOffset {
 	}
 }
 
+// FetchReturn holds a user-facing representation of the result of a fetch request
 type FetchReturn struct {
-	Err      KafkaError
-	Messages [][]byte
+	Err      KafkaError	// Err records any error conditions
+	Messages [][]byte	// ??
 }
 
 // Fetch sends a fetch request to the Kafka server and returns the response
@@ -165,6 +170,7 @@ func (c *ClientConn) Fetch(args ...*FetchArg) (returns []FetchReturn, err error)
 	return returns, nil
 }
 
+// OffsetsArg is a user-facing representation of an offset request to the Kafka broker
 type OffsetsArg struct {
 	Topic      string
 	Partition 
@@ -172,6 +178,7 @@ type OffsetsArg struct {
 	MaxOffsets int32
 }
 
+// ??
 func (x *OffsetsArg) OffsetsRequest() *OffsetsRequest {
 	return &OffsetsRequest{
 		TopicPartition: TopicPartition{

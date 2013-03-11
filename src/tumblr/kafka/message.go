@@ -42,12 +42,12 @@ func (x *Message) Write(w io.Writer) error {
 		_magic = 1
 	}
 	var _length int32 = 1 /* magic */ + _magic /* compression */ + 4 /* checksum */ + int32(len(x.Payload))
-	w.Write(Int32Bytes(_length))
+	w.Write(int32Bytes(_length))
 	w.Write([]byte{ byte(_magic) })
 	if _magic == 1 {
 		w.Write([]byte{ byte(x.Compression) })
 	}
-	w.Write(Uint32Bytes(crc32.ChecksumIEEE(x.Payload)))
+	w.Write(uint32Bytes(crc32.ChecksumIEEE(x.Payload)))
 	_, err := w.Write(x.Payload)
 	return err
 }
@@ -61,7 +61,7 @@ func (x *Message) Read(r io.Reader) (nread int, err error) {
 	if err != nil {
 		return nread, err
 	}
-	_length := BytesInt32(p[0:4])
+	_length := bytesInt32(p[0:4])
 	n, err = r.Read(p[0:1])
 	nread += n
 	if err != nil {
@@ -85,7 +85,7 @@ func (x *Message) Read(r io.Reader) (nread int, err error) {
 	if err != nil {
 		return nread, err
 	}
-	_crc := BytesUint32(p[0:4])
+	_crc := bytesUint32(p[0:4])
 	_paylen := _length - 1 /* magic */ - _magic /* compression */ - 4 /* checksum */
 	if _paylen < 0 {
 		return nread, ErrWire

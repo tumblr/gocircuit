@@ -1,5 +1,5 @@
 /*
-Package kafka contains routines for interacting with a Kafka cluster.
+Package kafka implements a client for Apache Kafka.
 It is implemented after the following specifications:
 
   https://cwiki.apache.org/confluence/display/KAFKA/Wire+Format

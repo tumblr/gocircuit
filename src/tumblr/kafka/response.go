@@ -29,10 +29,10 @@ const (
 
 // Write encodes the ResponseHeader to the writer w in Kafka wire format
 func (x *ResponseHeader) Write(w io.Writer) error {
-	if _, err := w.Write(Int32Bytes(x._NonHeaderLen + responseHeaderFixedLen)); err != nil {
+	if _, err := w.Write(int32Bytes(x._NonHeaderLen + responseHeaderFixedLen)); err != nil {
 		return err
 	}
-	if _, err := w.Write(Int16Bytes(int16(KafkaErrorCode(x.Err)))); err != nil {
+	if _, err := w.Write(int16Bytes(int16(KafkaErrorCode(x.Err)))); err != nil {
 		return err
 	}
 	return nil
@@ -47,9 +47,9 @@ func (x *ResponseHeader) Read(r io.Reader) (nread int, err error) {
 	if err != nil {
 		return nread, err
 	}
-	_length := BytesInt32(p[0:4])
+	_length := bytesInt32(p[0:4])
 	x._NonHeaderLen = _length - responseHeaderFixedLen
-	errcode := ErrorCode(BytesInt16(p[4:6]))
+	errcode := ErrorCode(bytesInt16(p[4:6]))
 	if !isValidErrorCode(errcode) {
 		return nread, ErrWire
 	}
@@ -188,13 +188,13 @@ func (x *OffsetsResponse) Write(w io.Writer) error {
 	if err := x.ResponseHeader.Write(w); err != nil {
 		return err
 	}
-	if _, err := w.Write(Int32Bytes(int32(len(x.Offsets)))); err != nil {
+	if _, err := w.Write(int32Bytes(int32(len(x.Offsets)))); err != nil {
 		return err
 	}
 	for _, off := range x.Offsets {
 		// TODO: In proper idiom it would be better to implement
 		// read and write methods on the Offset type
-		if _, err := w.Write(Int64Bytes(int64(off))); err != nil {
+		if _, err := w.Write(int64Bytes(int64(off))); err != nil {
 			return err
 		}
 	}
@@ -221,14 +221,14 @@ func (x *OffsetsResponse) Read(r io.Reader) error {
 	if _, err := r.Read(q[0:4]); err != nil {
 		return err
 	}
-	offCount := BytesInt32(q[0:4])
+	offCount := bytesInt32(q[0:4])
 	var p [OffsetWireLen]byte
 	for offLen > 0 {
 		var off Offset
 		if _, err := r.Read(p[:]); err != nil {
 			return err
 		} else {
-			off = Offset(BytesInt64(p[:]))
+			off = Offset(bytesInt64(p[:]))
 			x.Offsets = append(x.Offsets, off)
 			offLen -= OffsetWireLen
 			offCount--

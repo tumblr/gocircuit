@@ -135,6 +135,7 @@ type BrokerView struct {
 	HostPort string
 }
 
+// String returns a textual representation of the broker view
 func (x *BrokerView) String() string {
 	return fmt.Sprintf("broker(%d, %s, %s)", x.BrokerID, x.Creator, x.HostPort)
 }
@@ -142,14 +143,17 @@ func (x *BrokerView) String() string {
 // BrokersView is a slice of BrokerView in ascending order of ID
 type BrokersView []*BrokerView
 
+// Len returns the length of the BrokerView slice
 func (t BrokersView) Len() int {
 	return len(t)
 }
 
+// Less compares the i-th and j-th elements of the BrokerView slice
 func (t BrokersView) Less(i, j int) bool {
 	return t[i].BrokerID < t[j].BrokerID
 }
 
+// Swap swaps the i-th and j-th elements of the BrokerView slice
 func (t BrokersView) Swap(i, j int) {
 	t[i], t[j] = t[j], t[i]
 }
