@@ -1,3 +1,4 @@
+// Package block implements the core database functionality of a sumr shard
 package block
 
 import (
@@ -10,6 +11,9 @@ import (
 	"circuit/kit/fs"
 )
 
+// Block encapsulates the database-related functionality of a sumr shard.
+// It keeps key-value pairs in memory until they expire and ensures
+// that incoming write requests are persisted at configurable intervals.
 type Block struct {
 	// Forget events older than forgetAfter
 	forgetAfter time.Duration
@@ -22,6 +26,7 @@ type Block struct {
 	disk  *Disk
 }
 
+// Stat holds simple usage statistics pertaining to a sumr shard
 type Stat struct {
 	NSketch      int64
 	NWrite       int64
@@ -29,10 +34,12 @@ type Stat struct {
 	NSketchInMem int64
 }
 
+// String returns a textual representation of this stats object
 func (s *Stat) String() string {
 	return fmt.Sprintf("nsketch=%d nwrite=%d nread=%d", s.NSketch, s.NWrite, s.NRead)
 }
 
+// NewBlock creates and initializes a new block data structure
 func NewBlock(disk fs.FS, forgetAfter time.Duration) (*Block, error) {
 	b := &Block{
 		forgetAfter: forgetAfter,
@@ -138,6 +145,7 @@ func (b *Block) Add(updateTime time.Time, key sumr.Key, value float64) float64 {
 	return sketch.Sum
 }
 
+// Sum returns the value under key
 func (b *Block) Sum(key sumr.Key) float64 {
 	b.lk.Lock()
 	defer b.lk.Unlock()

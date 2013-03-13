@@ -10,6 +10,13 @@ import (
 	"circuit/kit/fs"
 )
 
+// Disk implements a specialized file system abstraction that is used by the write-ahead logging mechanism.
+// The file system consists of a set of files that internally implement write-ahead logging.
+// One file is identified as the "master". It always exists because if not, the
+// disk system would automatically create it on the underlying file system.
+// Additionally, the disk can create shadow files and give them out to the user.
+// The main function of the disk is the promote operation, which swaps a given
+// shadow file in place of the master in an atomic manner.
 type Disk struct {
 	disk   fs.FS
 	lk     sync.Mutex
@@ -82,6 +89,8 @@ func (d *Disk) Master() File {
 	return diskFile{d.master}
 }
 
+// CreateShadow creates an empty "shadow" file. 
+// Eventually a shadow file can be promoted as a master atomically.
 func (d *Disk) CreateShadow() (File, error) {
 	sf, err := Create(d.disk, "shadow." + time.Now().Format(fileStamp) + 
 		"." + strconv.Itoa(int(rand.Int31())))
@@ -111,6 +120,7 @@ func (d *Disk) Promote(shadowFile File) error {
 	return nil
 }
 
+// Unmount closes the underlying file system
 func (d *Disk) Unmount() error {
 	d.lk.Lock()
 	defer d.lk.Unlock()
