@@ -9,6 +9,8 @@ import (
 	"circuit/kit/fs"
 )
 
+// File is an interface to file-like device. 
+// We use is to be able to swap *os.File for a file with a generic write-ahead log
 type File interface {
 	Name() string
 	Size() int64
@@ -29,6 +31,7 @@ type file struct {
 var ErrEndOfLog = errors.New("end of log")
 var ErrTooBig   = errors.New("too big")
 
+// Open opens the file name within the file system fs
 func Open(fs fs.FS, name string) (File, error) {
 	f, err := fs.OpenFile(name, os.O_RDWR, 0600) // perm = u+rw
 	if err != nil {
@@ -40,6 +43,7 @@ func Open(fs fs.FS, name string) (File, error) {
 	return &file{name: name, file: f}, nil
 }
 
+// Create creates the file name within the file system fs
 func Create(fs fs.FS, name string) (File, error) {
 	f, err := fs.Create(name)
 	if err != nil {
@@ -48,10 +52,12 @@ func Create(fs fs.FS, name string) (File, error) {
 	return &file{name: name, file: f}, nil
 }
 
+// Name returns the name of this file
 func (f *file) Name() string {
 	return f.name
 }
 
+// Size returns the size of this file
 func (f *file) Size() int64 {
 	return f.offset
 }
