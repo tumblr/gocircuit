@@ -8,12 +8,17 @@ import (
 	"circuit/app/sumr/block"
 	"circuit/kit/sched/limiter"
 	"circuit/kit/fs/diskfs"
+	"circuit/use/circuit"
 )
 
 // Server is the cross-type for the sumr shard API
 type Server struct {
 	block      *block.Block
 	lmtr       *limiter.Limiter
+}
+
+func init() {
+	circuit.RegisterValue(&Server{})
 }
 
 // New creates a new server instance backed by a local directory in diskPath.
