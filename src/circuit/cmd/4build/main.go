@@ -1,4 +1,4 @@
-// 4build automates the process of building ...
+// 4build automates the process of building a circuit application locally
 package main
 
 import (

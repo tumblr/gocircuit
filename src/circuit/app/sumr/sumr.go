@@ -1,4 +1,4 @@
-// Package sumr implements a circuit application for a distributed, persistent key-value store
+// Package sumr implements a distributed persistent key-value store
 package sumr
 
 import "fmt"

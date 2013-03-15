@@ -1,2 +1,2 @@
-// (EXPERIMENTAL) Package c implements the Go Circuit compiler
+// Package c implements a circuit compiler (EXPERIMENTAL)
 package c

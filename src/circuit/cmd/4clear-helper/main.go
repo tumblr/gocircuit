@@ -1,3 +1,4 @@
+// 4clear-helper is used internally by 4clear
 package main
 
 import (

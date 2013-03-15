@@ -1,2 +1,2 @@
-// Command-line utilities for building and administering circuit applications
+// Package cmd implements command-line utilities for building and maintaining circuit applications
 package doc
