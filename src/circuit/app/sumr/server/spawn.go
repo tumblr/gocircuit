@@ -10,6 +10,7 @@ import (
 	"circuit/app/sumr"
 	"circuit/kit/sched/limiter"
 	"circuit/use/circuit"
+	"circuit/use/durablefs"
 	"log"
 	"sync"
 	"tumblr/struct/xor"
@@ -17,9 +18,22 @@ import (
 
 // Spawn launches a sumr database cluster as specified by config.
 //
-func Spawn(config *Config) *Checkpoint {
+func Spawn(durableFile string, config *Config) *Checkpoint {
 	s := &Checkpoint{Config: config}
 	s.Workers = boot(config.Anchor, config.Workers)
+
+	// Save the checkpoint in a durable file
+	file, err := durablefs.CreateFile(durableFile)
+	if err != nil {
+		panic(err)
+	}
+	if err = file.Write(s); err != nil {
+		panic(err)
+	}
+	if err = file.Close(); err != nil {
+		panic(err)
+	}
+
 	return s
 }
 

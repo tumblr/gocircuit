@@ -9,6 +9,7 @@ import (
 
 var link = join.SetThenGet{Name: "durable file system"}
 
+// Bind is used internally to bind an implementation of this package to the public methods of this package
 func Bind(v fs) {
 	link.Set(v)
 }
@@ -17,18 +18,22 @@ func get() fs {
 	return link.Get().(fs)
 }
 
+// Open opens the file name
 func OpenFile(name string) (File, error) {
 	return get().OpenFile(name)
 }
 
+// Create creates a file called name
 func CreateFile(name string) (File, error) {
 	return get().CreateFile(name)
 }
 
+// Remove deletes the file name
 func Remove(name string) error {
 	return get().Remove(name)
 }
 
+// OpenDir opens the directory name
 func OpenDir(name string) Dir {
 	return get().OpenDir(name)
 }
@@ -52,17 +57,37 @@ type fs interface {
 	OpenDir(string) Dir
 }
 
+// Dir is an interface to a directory in the durable file system
 type Dir interface {
+
+	// Path returns the absolute directory path
 	Path() string
+
+	// Children returns a map of directory children names
 	Children() (children map[string]struct{})
+
+	// Change blocks until a change in the contents of this directory is detected and 
+	// returns a map of children names
 	Change() (children map[string]struct{})
+
+	// Expire behaves like Change except, if the expiration interval is
+	// reached, it returns before a change is observed in the directory
 	Expire(expire time.Duration) (children map[string]struct{})
+
+	// Close closes this directory
 	Close()
 }
 
+// File is an interface to a file in the durable file system
 type File interface {
+
+	// Read reads the contents of this file and returns it in the form of a slice of interfaces
 	Read() ([]interface{}, error)
+
+	// Write writes a list of interfaces to this file
 	Write(...interface{}) error
+
+	// Close closes this file
 	Close() error
 }
 

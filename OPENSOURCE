@@ -1,3 +1,4 @@
 document cross-build environment requirements
 verify cross-build works with new modifications
 license
+fonts on typekit, delegate to default ones
