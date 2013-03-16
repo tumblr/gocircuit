@@ -5,18 +5,18 @@ import (
 	"testing"
 )
 
-type friend struct {
-	Follower uint64
-	Followee uint64
-	Time     int64
+type record struct {
+	Field1 uint64
+	Field2 uint64
+	Field3 int64
 }
 
 func TestReader(t *testing.T) {
-	r, err := OpenFile("testdata/friends")
+	r, err := OpenFile("testdata/records")
 	if err != nil {
 		t.Fatalf("open (%s)", err)
 	}
-	var v friend
+	var v record
 	for {
 		err = r.Read(&v)
 		if err == io.EOF {
