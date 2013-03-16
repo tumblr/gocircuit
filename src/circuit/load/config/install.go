@@ -1,5 +1,3 @@
-// Package install is responsible for reading the install system's configuration
-// from a file named by the CIR_INSTALL environment variable
 package config
 
 import (

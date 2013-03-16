@@ -2,8 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// A Left-Leaning Red-Black (LLRB) implementation of 2-3 balanced binary search trees
-
+// Package llrb provides a left-leaning red-black implementation of 2-3 balanced binary search trees
 package llrb
 
 // Tree is a Left-Leaning Red-Black (LLRB) implementation of 2-3 trees, based on:

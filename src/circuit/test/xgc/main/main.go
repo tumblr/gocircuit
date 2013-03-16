@@ -1,3 +1,4 @@
+// Package main is the main executable for starting the circuit application
 package main
 
 import (

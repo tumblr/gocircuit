@@ -1,3 +1,4 @@
+// Package zipfs exposes a ZIP archive file as a read-only file system
 package zipfs
 
 import (

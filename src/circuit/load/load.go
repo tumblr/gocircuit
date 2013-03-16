@@ -1,3 +1,4 @@
+// Package load has the side effect of linking the circuit runtime into the importing application
 package load
 
 import (

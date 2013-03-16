@@ -1,3 +1,4 @@
+// Package trace has the side effect of installing HTTP endpoints that report tracing information
 package trace
 
 import (

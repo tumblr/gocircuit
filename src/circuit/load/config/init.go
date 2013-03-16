@@ -1,3 +1,4 @@
+// Package config provides access the circuit configuration of this worker process
 package config
 
 import (

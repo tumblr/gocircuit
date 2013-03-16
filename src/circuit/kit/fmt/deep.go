@@ -1,3 +1,4 @@
+// Package fmt contains string formatting utilities
 package fmt
 
 import (

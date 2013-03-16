@@ -1,3 +1,4 @@
+// Package worker defines the worker function for this application
 package worker
 
 import (

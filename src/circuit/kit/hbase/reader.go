@@ -1,3 +1,4 @@
+// Package hbase implements a reader for HBASE-format files
 package hbase
 
 import (

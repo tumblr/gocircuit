@@ -1,3 +1,4 @@
+// Package limiter schedules job execution while maintaining an upper limit on concurrency
 package limiter
 
 import (

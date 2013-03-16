@@ -1,5 +1,3 @@
-// Package build is responsible for reading the build system's configuration
-// from a file named by the CIR_BUILD environment variable
 package config
 
 import (

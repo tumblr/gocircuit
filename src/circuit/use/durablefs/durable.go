@@ -1,3 +1,4 @@
+// Package durablefs exposes the programming interface to a global file system for storing cross-values
 package durablefs
 
 import (
