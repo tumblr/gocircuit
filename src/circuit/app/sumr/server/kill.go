@@ -3,31 +3,32 @@ package server
 import (
 	"circuit/use/circuit"
 	"circuit/use/durablefs"
-	"circuit/use/n"
+	"circuit/use/worker"
 	"log"
 )
 
-func Remove(dfile string) error {
-	return durablefs.Remove(dfile)
+func remove(durableFile string) error {
+	return durablefs.Remove(durableFile)
 }
 
-func Kill(dfile string) error {
-	chk, err := ReadCheckpoint(dfile)
+// Kill reads a sumr service checkpoint from the durableFile in the durable file system and kills the entire service
+func Kill(durableFile string) error {
+	chk, err := readCheckpoint(durableFile)
 	if err != nil {
 		return circuit.NewError("Problem reading checkpoint (%s)", err)
 	}
-	if err = KillCheckpoint(chk); err != nil {
+	if err = killCheckpoint(chk); err != nil {
 		return circuit.NewError("Problems killing shards (%s)", err)
 	}
-	return Remove(dfile)
+	return remove(durableFile)
 }
 
-func KillCheckpoint(chk *Checkpoint) error {
+func killCheckpoint(chk *checkpoint) error {
 	var err error
-	for i, worker := range chk.Workers {
+	for i, wrkr := range chk.Workers {
 		println("s", i)
-		if e := n.Kill(worker.Runtime); err != nil {
-			log.Printf("Problem killing server %s (%s)", worker.Runtime, e)
+		if e := worker.Kill(wrkr.Addr); err != nil {
+			log.Printf("Problem killing server %s (%s)", wrkr.Addr, e)
 			err = e
 		}
 	}

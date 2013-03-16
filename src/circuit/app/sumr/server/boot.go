@@ -1,4 +1,10 @@
-package ctl
+package server
+
+// In its lifetime (across failures and restarts), a service is only booted
+// once.  Reviving service shards in response to external events is done via
+// the various control functions. The services' current persistent state is
+// stored in the durable file system under the name dfile. Future maintenance to the
+// service is possible due to this durable state.
 
 import (
 	"circuit/app/sumr"
@@ -10,31 +16,25 @@ import (
 	"tumblr/struct/xor"
 )
 
-// Boot launches a SUMR instance as specified in c.
-// In its lifetime (across failures and restarts), a service is only booted
-// once.  Reviving service shards in response to external events is done via
-// the various control functions. The services' current persistent state is
-// stored in the durable FS under the name dfile. Future maintenance to the
-// service is possible due to this durable state.
+// Spawn launches a sumr database cluster as specified by config.
 //
-func Boot(c *Config) *Checkpoint {
-	s := &Checkpoint{Config: c}
-	s.Workers = boot(c.Anchor, c.Workers)
-	return s
+func Spawn(config *Config) {
+	s := &checkpoint{Config: config}
+	s.Workers = boot(config.Anchor, config.Workers)
 }
 
-// Boot starts a SUMR shard server on each host specified in cluster, and returns
+// Boot starts a sumr shard server on each host specified in cluster, and returns
 // a list of shards and respective keys and a corresponding list of runtime processes.
 //
-func boot(anchor string, shard []*WorkerConfig) []*WorkerCheckpoint {
+func boot(anchor string, shard []*WorkerConfig) []*workerCheckpoint {
 	var (
 		lk     sync.Mutex
 		lmtr   limiter.Limiter
-		shv    []*WorkerCheckpoint
+		shv    []*workerCheckpoint
 		metric xor.Metric // Used to allocate initial keys in a balanced fashion
 	)
 	lmtr.Init(20)
-	shv = make([]*WorkerCheckpoint, len(shard))
+	shv = make([]*workerCheckpoint, len(shard))
 	for i_, sh_ := range shard {
 		i, sh := i_, sh_
 		xkey := metric.ChooseMinK(5)
@@ -47,7 +47,7 @@ func boot(anchor string, shard []*WorkerConfig) []*WorkerCheckpoint {
 				}
 				lk.Lock()
 				defer lk.Unlock()
-				shv[i] = &WorkerCheckpoint{
+				shv[i] = &workerCheckpoint{
 					Key:     sumr.Key(xkey),
 					Runtime: addr,
 					Server:  x,
