@@ -1,6 +1,4 @@
-// 4install ships and installs a built circuit from the local shipping
-// directory to a group of hosts specified on standard input in the form of one
-// hostname (no port number) per line
+// 4install installs locally-available circuit binaries to a cluster of hosts supplied to standard input, one host per line
 package main
 
 import (

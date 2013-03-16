@@ -1,3 +1,4 @@
+// 4ls lists the contents of the anchor file system
 package main
 
 import (

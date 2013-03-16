@@ -1,3 +1,6 @@
+// Package zookeeper is a client for Apache Zookeeper, it is a copy of gozk
+package zookeeper
+
 // gozk - ZooKeeper support for the Go language
 //
 //   https://wiki.ubuntu.com/gozk
@@ -6,7 +9,6 @@
 //
 // Written by Gustavo Niemeyer <gustavo.niemeyer@canonical.com>
 //
-package zookeeper
 
 /*
 #include <zookeeper.h>

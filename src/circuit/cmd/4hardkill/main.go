@@ -1,3 +1,4 @@
+// 4hardkill kills worker processes on a given host using out-of-band UNIX-level facilities
 package main
 
 import (

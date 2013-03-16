@@ -1,3 +1,4 @@
+// 4kill locates a circuit worker through the anchor file system and kills it
 package main
 
 import (

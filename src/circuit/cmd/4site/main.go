@@ -1,4 +1,4 @@
-// 4site is static web server, used to serve the documentation in /doc
+// 4site is a static web server used to serve the documentation in /doc
 package main
 
 import (

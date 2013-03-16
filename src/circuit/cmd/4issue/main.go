@@ -1,3 +1,4 @@
+// 4issue is a command-line interface to the sample issue notification system
 package main
 
 import (

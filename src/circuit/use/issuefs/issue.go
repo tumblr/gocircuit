@@ -1,3 +1,4 @@
+// Package issuefs exposes the programming interface for a sample issue tracking and notification system
 package issuefs
 
 import (

@@ -1,3 +1,4 @@
+// 4stk locates a worker through the anchor file system and prints its current stack trace
 package main
 
 import (

@@ -1,3 +1,4 @@
+// 4stat locates a worker through the anchor file system and prints the result of its stats reporting endpoint
 package main
 
 import (

@@ -1,3 +1,4 @@
+// 4jailtail redirects the output of running 'tail -f' on a file inside a worker's local file system jail
 package main
 
 import (

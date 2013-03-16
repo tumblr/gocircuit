@@ -1,3 +1,4 @@
+// Package debug implements debugging utilities
 package debug
 
 import (

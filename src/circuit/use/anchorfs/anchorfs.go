@@ -1,3 +1,4 @@
+// Package anchorfs exposes the programming interface for accessing the anchor file system
 package anchorfs
 
 import (

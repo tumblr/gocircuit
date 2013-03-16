@@ -1,3 +1,4 @@
+// Package waterfill implements an algorithm for greedy even job assignment
 package waterfill
 
 import (

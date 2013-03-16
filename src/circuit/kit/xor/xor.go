@@ -1,4 +1,4 @@
-// Package xor implements a nearest-neighbor (NN) data structure for the XOR-metric
+// Package xor implements a nearest-neighbor data structure for the XOR-metric
 package xor
 
 import (
