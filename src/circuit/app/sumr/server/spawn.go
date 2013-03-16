@@ -17,9 +17,10 @@ import (
 
 // Spawn launches a sumr database cluster as specified by config.
 //
-func Spawn(config *Config) {
+func Spawn(config *Config) *Checkpoint {
 	s := &Checkpoint{Config: config}
 	s.Workers = boot(config.Anchor, config.Workers)
+	return s
 }
 
 // Boot starts a sumr shard server on each host specified in cluster, and returns

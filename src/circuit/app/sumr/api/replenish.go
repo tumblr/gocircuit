@@ -68,7 +68,7 @@ func replenishWorker(durableFile string, c *Config, i int) (replenished bool, er
 	return true, nil
 }
 
-// start is a workerfFunction for starting an API worker
+// start is a worker function for starting an API worker
 type start struct{}
 
 func (start) start(durableFile string, port int, readOnly bool) (circuit.XPerm, error) {
