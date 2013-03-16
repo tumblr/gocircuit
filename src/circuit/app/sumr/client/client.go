@@ -1,3 +1,4 @@
+// Package client implements a circuit client for the sumr database
 package client
 
 import (
@@ -6,7 +7,7 @@ import (
 	"sync"
 	"time"
 	"circuit/app/sumr"
-	"circuit/app/sumr/server/ctl"
+	"circuit/app/sumr/server"
 	"circuit/use/circuit"
 	"circuit/kit/sched/limiter"
 	"tumblr/struct/xor"
@@ -14,7 +15,7 @@ import (
 
 // TODO: Enforce read only
 
-// Client ..
+// Client is a circuit client for the sumr database
 type Client struct {
 	dfile      string
 	readOnly   bool
@@ -34,14 +35,14 @@ func (s *shard) ID() xor.Key {
 	return xor.Key(s.Key)
 }
 
-// dfile is the filename of the node in Durable FS where the service keeps its
+// durableFile is the filename of the node in Durable FS where the service keeps its
 // checkpoint structure.
-func New(dfile string, readOnly bool) (*Client, error) {
-	cli := &Client{dfile: dfile, readOnly: readOnly}
+func New(durableFile string, readOnly bool) (*Client, error) {
+	cli := &Client{dfile: durableFile, readOnly: readOnly}
 	cli.lmtr.Init(50)
 
 	var err error
-	if cli.checkpoint, err = ctl.ReadCheckpoint(dfile); err != nil {
+	if cli.checkpoint, err = ctl.ReadCheckpoint(durableFile); err != nil {
 		return nil, err
 	}
 
@@ -58,6 +59,9 @@ func (cli *Client) addServer(x *ctl.WorkerCheckpoint) {
 	cli.metric.Add(&shard{x.Key, x.Server})
 }
 
+// Add sends an ADD request to the database to add value to key; if key does not exist, it is created with the given value.
+// updateTime is the application-level timestamp of this request.
+// Add returns the value of the key after the update.
 func (cli *Client) Add(updateTime time.Time, key sumr.Key, value float64) (result float64) {
 
 	// Per-client rate-limiting
@@ -81,13 +85,14 @@ func (cli *Client) Add(updateTime time.Time, key sumr.Key, value float64) (resul
 	return retrn[0].(float64)
 }
 
-// AddRequest captures the input parameters for a Sumr ADD request
+// AddRequest captures the input parameters for a sumr ADD request
 type AddRequest struct {
 	UpdateTime time.Time
 	Key        sumr.Key
 	Value      float64
 }
 
+// AddBatch sends a batch of ADD requests to the sumr database
 func (cli *Client) AddBatch(batch []AddRequest) []float64 {
 	var lk sync.Mutex
 	r := make([]float64, len(batch))
@@ -106,6 +111,7 @@ func (cli *Client) AddBatch(batch []AddRequest) []float64 {
 	return r
 }
 
+// Sum sends a SUM request to the sumr database and returns the value underlying key, or zero otherwise
 func (cli *Client) Sum(key sumr.Key) (result float64) {
 	cli.lmtr.Open()
 	defer cli.lmtr.Close()
@@ -126,11 +132,12 @@ func (cli *Client) Sum(key sumr.Key) (result float64) {
 	return retrn[0].(float64)
 }
 
-// SumRequest captures the input parameters for a Sumr ADD request
+// SumRequest captures the input parameters for a sumr ADD request
 type SumRequest struct {
 	Key        sumr.Key
 }
 
+// SumBatch sends a batch of SUM requests to the sumr database
 func (cli *Client) SumBatch(batch []SumRequest) []float64 {
 	var lk sync.Mutex
 	r := make([]float64, len(batch))
