@@ -109,12 +109,12 @@ type stringAddr struct {
 	Addr string
 }
 
-func (sa stringAddr) String() string {
-	return sa.Addr
+func (sa stringAddr) Host() string {
+	panic("address has no host")
 }
 
-func (sa stringAddr) Host() circuit.Host {
-	panic("not implemented")
+func (sa stringAddr) String() string {
+	return sa.Addr
 }
 
 func (sa stringAddr) RuntimeID() circuit.RuntimeID {

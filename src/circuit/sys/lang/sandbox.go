@@ -51,8 +51,8 @@ type addr struct {
 	l   *listener
 }
 
-func (a *addr) Host() circuit.Host {
-	panic("n/i")
+func (a *addr) Host() string {
+	panic("no physical underlying host")
 }
 
 func (a *addr) RuntimeID() circuit.RuntimeID {

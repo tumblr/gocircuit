@@ -56,7 +56,7 @@ func setBoot(v interface{}) {
 // killed as soon as fn completes.
 // Unless an error occurs, err equals nil, addr is the address of the newly
 // spawened worker and retrn holds the values returned by fn.
-func Spawn(host Host, anchor []string, fn Func, in ...interface{}) (retrn []interface{}, addr Addr, err error) {
+func Spawn(host string, anchor []string, fn Func, in ...interface{}) (retrn []interface{}, addr Addr, err error) {
 	return get().Spawn(host, anchor, fn, in...)
 }
 

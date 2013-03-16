@@ -1,3 +1,4 @@
+// Package join provides a mechanism for linking an implementation package to a declaration package
 package join
 
 import (

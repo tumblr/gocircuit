@@ -3,8 +3,12 @@ package circuit
 // Addr is a unique representation of the identity of a remote runtime.
 // The implementing type must be registered with gob.
 type Addr interface {
+	// String returns a textual representation of the address
 	String() string
-	Host() Host
+
+	// Host returns a textual representation of the hostname of the machine
+	// that is running the worker identified by this address
+	Host() string
 
 	// RuntimeID is tentatively part of the transport address so that, if
 	// needed, we can verify the identity of the runtime we are talking to. 
@@ -64,15 +68,4 @@ type Dialer interface {
 type Transport interface {
 	Dialer
 	Listener
-}
-
-// Host represents a host that can spawn circuit runtimes.
-// Its specific implementation is up to the user.
-// A Host must be gob encodable.
-type Host interface {
-	String() string
-}
-
-type hostParser interface {
-	Parse(s string) Host
 }

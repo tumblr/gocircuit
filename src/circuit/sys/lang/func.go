@@ -98,7 +98,7 @@ func (r *Runtime) serveGo(req *goMsg, conn circuit.Conn) {
 	conn.Close()
 }
 
-func (r *Runtime) Spawn(host circuit.Host, anchor []string, fn circuit.Func, in ...interface{}) (retrn []interface{}, addr circuit.Addr, err error) {
+func (r *Runtime) Spawn(host string, anchor []string, fn circuit.Func, in ...interface{}) (retrn []interface{}, addr circuit.Addr, err error) {
 
 	// Catch all errors
 	defer func() {
@@ -108,16 +108,12 @@ func (r *Runtime) Spawn(host circuit.Host, anchor []string, fn circuit.Func, in 
 		}
 	}()
 
-	var proc n.Process
-	proc, err = n.Spawn(host, anchor...)
+	addr, err = n.Spawn(host, anchor...)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	addr = proc.Addr()
-	retrn = r.remoteGo(addr, fn, in...)
-
-	return
+	return r.remoteGo(addr, fn, in...), addr, nil
 }
 
 func (r *Runtime) remoteGo(addr circuit.Addr, ufn circuit.Func, in ...interface{}) []interface{} {

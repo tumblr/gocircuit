@@ -7,7 +7,7 @@ type runtime interface {
 	Kill(Addr) error
 
 	// Spawn mechanism
-	Spawn(Host, []string, Func, ...interface{}) ([]interface{}, Addr, error)
+	Spawn(string, []string, Func, ...interface{}) ([]interface{}, Addr, error)
 	Daemonize(func())
 
 	// Cross-services

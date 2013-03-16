@@ -1,63 +1,37 @@
 package n
 
 import (
-	"encoding/gob"
-	"io"
 	"circuit/kit/join"
 	"circuit/use/circuit"
 )
 
-// Host
-type Host struct {
-	Host string
-}
-func init() {
-	gob.Register(&Host{})
-}
-
-func ParseHost(host string) circuit.Host {
-	return &Host{host}
-}
-
-func (h Host) String() string {
-	return h.Host
-}
-
-// Process
-type Process interface {
-	Console
-	Addr() circuit.Addr
-	Kill() error
-}
-
-type Console interface {
-	Stdin()  io.WriteCloser
-	Stdout() io.ReadCloser
-	Stderr() io.ReadCloser
-}
-
-// Process is a usually remote OS process of a circuit runtime.
-
-func Spawn(host circuit.Host, anchors ...string) (Process, error) {
+// Spawn starts a new worker process on host and registers it under the given
+// anchors directories in the anchor file system. On success, Spawn returns 
+// the address of the new work. Spawn is a low-level function. The spawned
+// worker will wait idle for further interaction. It is the caller's responsibility
+// to manage the lifespan of the newworker.
+func Spawn(host string, anchors ...string) (circuit.Addr, error) {
 	return get().Spawn(host, anchors...)
 }
 
+// Kill kills the circuit worker with the given addr
 func Kill(addr circuit.Addr) error {
 	return get().Kill(addr)
 }
 
-type Commander interface {
-	Spawn(circuit.Host, ...string) (Process, error)
+type commander interface {
+	Spawn(string, ...string) (circuit.Addr, error)
 	Kill(circuit.Addr) error
 }
 
 // Binding mechanism
 var link = join.SetThenGet{Name: "commander system"}
 
-func Bind(v Commander) {
-	link.Set(v)
+// Bind is used internally to bind an implementation of this package to the public methods of this package
+func Bind(v interface{}) {
+	link.Set(v.(commander))
 }
 
-func get() Commander {
-	return link.Get().(Commander)
+func get() commander {
+	return link.Get().(commander)
 }

@@ -23,12 +23,12 @@ func (nc nopCloser) Close() error {
 
 type stringAddr string
 
-func (a stringAddr) RuntimeID() circuit.RuntimeID {
-	return 0
+func (a stringAddr) Host() string {
+	panic("not network host underlying")
 }
 
-func (a stringAddr) Host() circuit.Host {
-	panic("not implemented")
+func (a stringAddr) RuntimeID() circuit.RuntimeID {
+	return 0
 }
 
 func (a stringAddr) String() string {

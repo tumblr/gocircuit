@@ -10,7 +10,6 @@ import (
 	"circuit/kit/posix"
 	"circuit/sys/transport"
 	"circuit/use/circuit"
-	"circuit/use/n"
 	"circuit/load/config"
 )
 
@@ -28,10 +27,9 @@ func New(libpath, binary, jaildir string) *Config {
 	}
 }
 
-func (c *Config) Spawn(host circuit.Host, anchors ...string) (n.Process, error) {
+func (c *Config) Spawn(host string, anchors ...string) (circuit.Addr, error) {
 
-	h := host.(*n.Host).Host
-	cmd := exec.Command("ssh", h, "sh")
+	cmd := exec.Command("ssh", host, "sh")
 
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
@@ -73,8 +71,8 @@ func (c *Config) Spawn(host circuit.Host, anchors ...string) (n.Process, error) 
 		Spark: &config.SparkConfig{
 			ID:       id,
 			BindAddr: "",
-			Host:     h,
-			Anchor:   append(anchors, fmt.Sprintf("/host/%s", host.String())),
+			Host:     host,
+			Anchor:   append(anchors, fmt.Sprintf("/host/%s")),
 		},
 		Zookeeper: config.Config.Zookeeper,
 		Install:   config.Config.Install,
@@ -113,22 +111,12 @@ func (c *Config) Spawn(host circuit.Host, anchors ...string) (n.Process, error) 
 		return nil, err
 	}
 
-	addr, err := transport.NewAddr(id, pid, fmt.Sprintf("%s:%d", h, port))
+	addr, err := transport.NewAddr(id, pid, fmt.Sprintf("%s:%d", host, port))
 	if err != nil {
 		return nil, err
 	}
-	//println("n.Spawn -> pid=", pid, "addr=", addr.(*transport.Addr).String())
 
-	return &Process{
-		addr:   addr.(*transport.Addr),
-		/*
-		console: Console{
-			stdin:  stdin,
-			stdout: stdout,
-			stderr: stderr,
-		},
-		*/
-	}, nil
+	return addr.(*transport.Addr), nil
 }
 
 func (c *Config) Kill(remote circuit.Addr) error {

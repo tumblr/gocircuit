@@ -5,7 +5,6 @@ import (
 	"net"
 	"sync"
 	"circuit/use/circuit"
-	"circuit/use/n"
 )
 
 // Addr maintains a single unique instance for each addr.
@@ -28,8 +27,8 @@ func NewAddr(id circuit.RuntimeID, pid int, hostport string) (circuit.Addr, erro
 	return &Addr{ID: id, PID: pid, Addr: a}, nil
 }
 
-func (a *Addr) Host() circuit.Host {
-	return n.ParseHost(a.Addr.IP.String())
+func (a *Addr) Host() string {
+	return a.Addr.IP.String()
 }
 
 func (a *Addr) String() string {

@@ -5,7 +5,6 @@ import (
 	_ "circuit/load"
 	"circuit/test/xgc/worker"
 	"circuit/use/circuit"
-	"circuit/use/n"
 	"runtime"
 	_ "circuit/kit/debug/ctrlc"
 )
@@ -39,7 +38,7 @@ func spark(ch chan int) {
 	//	Spawn a worker and pass an x-pointer to it; 
 	//	Worker proceeds to die right away;
 	//	Check that finalizer of local dummy called when local runtime notices remote is dead
-	_, addr, err := circuit.Spawn(n.ParseHost("localhost"), []string{"/xgc"}, worker.Start{}, circuit.Ref(d))
+	_, addr, err := circuit.Spawn("localhost", []string{"/xgc"}, worker.Start{}, circuit.Ref(d))
 	if err != nil {
 		panic(err)
 	}
