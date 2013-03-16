@@ -2,19 +2,19 @@
 package server
 
 import (
-	"os"
-	"time"
 	"circuit/app/sumr"
 	"circuit/app/sumr/block"
-	"circuit/kit/sched/limiter"
 	"circuit/kit/fs/diskfs"
+	"circuit/kit/sched/limiter"
 	"circuit/use/circuit"
+	"os"
+	"time"
 )
 
 // Server is the cross-type for the sumr shard API
 type Server struct {
-	block      *block.Block
-	lmtr       *limiter.Limiter
+	block *block.Block
+	lmtr  *limiter.Limiter
 }
 
 func init() {

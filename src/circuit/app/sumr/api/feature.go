@@ -1,17 +1,18 @@
 package api
 
 import (
-	"hash/fnv"
+	"circuit/app/sumr"
 	"encoding/json"
+	"hash/fnv"
 	"math"
 	"time"
-	"circuit/app/sumr"
 )
 
-// A Feature is an expressive form of a counter key, which hashes down to the latter
-type Feature map[string]string
+// Feature is a dictionary, string-to-string map, which can hash its contents down to a sumr key
+type feature map[string]string
 
-func (f Feature) Key() sumr.Key {
+// Key returns the sumr key corresponding to this feature
+func (f feature) Key() sumr.Key {
 	buf := []byte(f.String())
 	hash := fnv.New64a()
 	hash.Write(buf)
@@ -23,7 +24,8 @@ func (f Feature) Key() sumr.Key {
 	return sumr.Key(k)
 }
 
-func (f Feature) String() string {
+// String returns the textual JSON representation of this feature
+func (f feature) String() string {
 	buf, err := json.Marshal(f)
 	if err != nil {
 		panic("feature marshal")
@@ -31,8 +33,8 @@ func (f Feature) String() string {
 	return string(buf)
 }
 
-func MakeFeatureMap(b map[string]interface{}) (Feature, error) {
-	f := make(Feature)
+func makeFeatureMap(b map[string]interface{}) (feature, error) {
+	f := make(feature)
 	for k, v := range b {
 		s, ok := v.(string)
 		if !ok {
@@ -43,35 +45,35 @@ func MakeFeatureMap(b map[string]interface{}) (Feature, error) {
 	return f, nil
 }
 
-// Change combines a feature together with an event of a given value and time
-type Change struct {
+// Change combines a feature, a timestamp and change value
+type change struct {
 	Time    time.Time
-	Feature Feature
+	feature feature
 	Value   float64
 }
 
-// Key returns the hash key corresponding to the change's feature
-func (s *Change) Key() sumr.Key {
-	return s.Feature.Key()
+// Key returns the hash key corresponding to the feature of this change
+func (s *change) Key() sumr.Key {
+	return s.feature.Key()
 }
 
-// ReadChange parses a change from its JSON representation, like so:
-// 
+// readChange parses a change from its JSON representation, like so:
+//
 //	{
 //		"t": 12345678,
 //		"f": { "fkey": "fvalue", ... },
 //		"v": 1.234
 //	}
 //
-func ReadChange(dec *json.Decoder) (*Change, error) {
+func readChange(dec *json.Decoder) (*change, error) {
 	b := make(map[string]interface{})
 	if err := dec.Decode(&b); err != nil {
 		return nil, err
 	}
-	return MakeChangeMap(b)
+	return makeChangeMap(b)
 }
 
-func MakeChangeMap(b map[string]interface{}) (*Change, error) {
+func makeChangeMap(b map[string]interface{}) (*change, error) {
 	// Read time
 	time_, ok := b["t"]
 	if !ok {
@@ -105,11 +107,11 @@ func MakeChangeMap(b map[string]interface{}) (*Change, error) {
 	if !ok {
 		return nil, ErrNoFeature
 	}
-	f, err := MakeFeatureMap(feature)
+	f, err := makeFeatureMap(feature)
 	if err != nil {
 		return nil, err
 	}
 
 	// Done
-	return &Change{Time: t, Feature: f, Value: value}, nil
+	return &change{Time: t, feature: f, Value: value}, nil
 }

@@ -1,16 +1,16 @@
 package ctl
 
 import (
-	"log"
-	"sync"
 	"circuit/app/sumr"
 	"circuit/app/sumr/server"
-	"circuit/use/circuit"
 	"circuit/kit/sched/limiter"
+	"circuit/use/circuit"
+	"log"
+	"sync"
 	"tumblr/struct/xor"
 )
 
-// Boot launches a SUMR instance as specified in c. 
+// Boot launches a SUMR instance as specified in c.
 // In its lifetime (across failures and restarts), a service is only booted
 // once.  Reviving service shards in response to external events is done via
 // the various control functions. The services' current persistent state is
@@ -40,7 +40,7 @@ func boot(anchor string, shard []*WorkerConfig) []*WorkerCheckpoint {
 		xkey := metric.ChooseMinK(5)
 		lmtr.Go(
 			func() {
-				x, addr, err := bootShard(anchor, sh) 
+				x, addr, err := bootShard(anchor, sh)
 				if err != nil {
 					log.Printf("sumr shard boot on %s error (%s)", sh.Host, err)
 					return
@@ -62,7 +62,7 @@ func boot(anchor string, shard []*WorkerConfig) []*WorkerCheckpoint {
 
 func bootShard(anchor string, sh *WorkerConfig) (x circuit.XPerm, addr circuit.Addr, err error) {
 
-	retrn, addr, err := circuit.Spawn(sh.Host, []string{anchor}, server.Main{}, sh.DiskPath, sh.Forget)
+	retrn, addr, err := circuit.Spawn(sh.Host, []string{anchor}, server.main{}, sh.DiskPath, sh.Forget)
 	if retrn[1] != nil {
 		err = retrn[1].(error)
 		return nil, nil, err

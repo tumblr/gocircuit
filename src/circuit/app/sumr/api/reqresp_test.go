@@ -9,7 +9,7 @@ import (
 func TestReadBatch(t *testing.T) {
 	const src = `{"f":{"a":"b"},"v":1}{"f":{"c":"d"}, "v":-1}`
 	r := bytes.NewBufferString(src)
-	req, err := ReadAddRequestBatch(Now(), r)
+	req, err := readAddRequestBatch(Now(), r)
 	if err != nil {
 		t.Errorf("read batch (%s)", err)
 	}

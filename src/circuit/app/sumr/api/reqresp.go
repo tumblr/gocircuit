@@ -1,18 +1,18 @@
 package api
 
 import (
+	"circuit/app/sumr"
 	"encoding/json"
 	"io"
-	"circuit/app/sumr"
 )
 
 // Response is the common response object
-type Response struct {
-	Sum float64  `json:"sum"`
+type response struct {
+	Sum float64 `json:"sum"`
 }
 
 // ReadRequestBatchFunc reads a request batch
-type ReadRequestBatchFunc func(io.Reader) ([]interface{}, error)
+type readRequestBatchFunc func(io.Reader) ([]interface{}, error)
 
 // Request to add a new change to a feature vector
 // On the wire, it looks like so
@@ -22,31 +22,31 @@ type ReadRequestBatchFunc func(io.Reader) ([]interface{}, error)
 //		"v": 1.234
 //	}
 //
-type AddRequest struct {
-	Change *Change
+type addRequest struct {
+	change *change
 }
 
-func (r *AddRequest) Key() sumr.Key {
-	return r.Change.Key()
+func (r *addRequest) Key() sumr.Key {
+	return r.change.Key()
 }
 
-func (r *AddRequest) Value() float64 {
-	return r.Change.Value
+func (r *addRequest) Value() float64 {
+	return r.change.Value
 }
 
-func ReadAddRequest(dec *json.Decoder) (interface{}, error) {
-	change, err := ReadChange(dec)
+func readAddRequest(dec *json.Decoder) (interface{}, error) {
+	change, err := readChange(dec)
 	if err != nil {
 		return nil, err
 	}
-	return &AddRequest{Change: change}, nil
+	return &addRequest{change: change}, nil
 }
 
-func ReadAddRequestBatch(r io.Reader) ([]interface{}, error) {
+func readAddRequestBatch(r io.Reader) ([]interface{}, error) {
 	dec := json.NewDecoder(r)
 	var bch []interface{}
 	for {
-		r, err := ReadAddRequest(dec)
+		r, err := readAddRequest(dec)
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -65,27 +65,27 @@ func ReadAddRequestBatch(r io.Reader) ([]interface{}, error) {
 //		"f": { "fkey": "fvalue", ... },
 //	}
 //
-type SumRequest struct {
-	Feature Feature
+type sumRequest struct {
+	feature feature
 }
 
-func (r *SumRequest) Key() sumr.Key {
-	return r.Feature.Key()
+func (r *sumRequest) Key() sumr.Key {
+	return r.feature.Key()
 }
 
-func ReadSumRequest(dec *json.Decoder) (interface{}, error) {
+func readSumRequest(dec *json.Decoder) (interface{}, error) {
 	b := make(map[string]interface{})
 	if err := dec.Decode(&b); err != nil {
 		return nil, err
 	}
-	return MakeSumRequestMap(b)
+	return makeSumRequestMap(b)
 }
 
-func ReadSumRequestBatch(r io.Reader) ([]interface{}, error) {
+func readSumRequestBatch(r io.Reader) ([]interface{}, error) {
 	dec := json.NewDecoder(r)
 	var bch []interface{}
 	for {
-		r, err := ReadSumRequest(dec)
+		r, err := readSumRequest(dec)
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -97,7 +97,7 @@ func ReadSumRequestBatch(r io.Reader) ([]interface{}, error) {
 	return bch, nil
 }
 
-func MakeSumRequestMap(b map[string]interface{}) (*SumRequest, error) {
+func makeSumRequestMap(b map[string]interface{}) (*sumRequest, error) {
 	// Read feature
 	feature_, ok := b["f"]
 	if !ok {
@@ -107,11 +107,11 @@ func MakeSumRequestMap(b map[string]interface{}) (*SumRequest, error) {
 	if !ok {
 		return nil, ErrNoFeature
 	}
-	f, err := MakeFeatureMap(feature)
+	f, err := makeFeatureMap(feature)
 	if err != nil {
 		return nil, err
 	}
 
 	// Done
-	return &SumRequest{Feature: f}, nil
+	return &sumRequest{feature: f}, nil
 }

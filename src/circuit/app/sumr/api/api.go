@@ -1,9 +1,10 @@
+// Package API implements aa REST HTTP API proxy for a sumr database
 package api
 
 import (
-	"circuit/use/circuit"
-	"circuit/kit/sched/limiter"
 	"circuit/app/sumr/client"
+	"circuit/kit/sched/limiter"
+	"circuit/use/circuit"
 )
 
 var (
@@ -17,29 +18,39 @@ var (
 	ErrTime      = circuit.NewError("time format")
 )
 
+// API implements a RESTful HTTP API server that accepts JSON requests and
+// translates them to in-circuit requests to the sumr database cluster.
+// It can be viewed as a proxy between an external HTTP-capable technology, and
+// the circuit-backed sumr datastore.
+// As an added convenience the HTTP API canonically and transparently hashes
+// JSON values to sumr 64-bit keys. This allows upstream users, e.g. a PHP web app,
+// to embed semantic information in the keys.
 type API struct {
-	server    *httpServer
-	client    *client.Client
-	lmtr      limiter.Limiter
+	server *httpServer
+	client *client.Client
+	lmtr   limiter.Limiter
 }
 
 func init() {
 	circuit.RegisterValue(&API{}) // Register as circuit value
 }
 
-func New(dfile string, port int, readOnly bool) (api *API, err error) {
+// New creates a new API that listens on local port.
+// The durable file durableFile points to a deployed sumr database cluster.
+// If readOnly is set, API requests resulting in change will not be accepted.
+func New(durableFile string, port int, readOnly bool) (api *API, err error) {
 	api = &API{}
-	api.client, err = client.New(dfile, readOnly)
+	api.client, err = client.New(durableFile, readOnly)
 	if err != nil {
 		return nil, err
 	}
 	api.lmtr.Init(200)
 	api.server, err = startServer(
 		port,
-		func(req []interface{}) []interface{} { 
+		func(req []interface{}) []interface{} {
 			return api.respondAdd(req)
 		},
-		func(req []interface{}) []interface{} { 
+		func(req []interface{}) []interface{} {
 			return api.respondSum(req)
 		},
 	)
@@ -47,22 +58,22 @@ func New(dfile string, port int, readOnly bool) (api *API, err error) {
 }
 
 // Given slice of AddRequests, fire a batch query to client and fetch responses as slice of Response
-// respondAdd will panic if the underlying SUMR client panics.
+// respondAdd will panic if the underlying sumr client panics.
 func (api *API) respondAdd(req []interface{}) []interface{} {
 	api.lmtr.Open()
 	defer api.lmtr.Close()
 
-	q := make([]client.AddRequest, len(req))
+	q := make([]client.addRequest, len(req))
 	for i, a_ := range req {
-		a := a_.(*AddRequest)
-		q[i].UpdateTime = a.Change.Time
+		a := a_.(*addRequest)
+		q[i].UpdateTime = a.change.Time
 		q[i].Key = a.Key()
-		q[i].Value = a.Change.Value
+		q[i].Value = a.change.Value
 	}
 	r := api.client.AddBatch(q)
 	s := make([]interface{}, len(req))
 	for i, _ := range s {
-		s[i] = &Response{Sum: r[i]}
+		s[i] = &response{Sum: r[i]}
 	}
 	return s
 }
@@ -71,15 +82,15 @@ func (api *API) respondSum(req []interface{}) []interface{} {
 	api.lmtr.Open()
 	defer api.lmtr.Close()
 
-	q := make([]client.SumRequest, len(req))
+	q := make([]client.sumRequest, len(req))
 	for i, a_ := range req {
-		a := a_.(*SumRequest)
+		a := a_.(*sumRequest)
 		q[i].Key = a.Key()
 	}
 	r := api.client.SumBatch(q)
 	s := make([]interface{}, len(req))
 	for i, _ := range s {
-		s[i] = &Response{Sum: r[i]}
+		s[i] = &response{Sum: r[i]}
 	}
 	return s
 }

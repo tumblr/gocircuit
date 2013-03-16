@@ -1,21 +1,21 @@
 package server
 
 import (
-	"time"
 	"circuit/use/circuit"
+	"time"
 )
 
 // Main wraps the worker function that starts a sumr shard server
-type Main struct{}
+type main struct{}
 
 func init() {
-	circuit.RegisterFunc(Main{})
+	circuit.RegisterFunc(main{})
 }
 
 // Main starts a sumr shard server
 // diskpath is a directory path on the local file system, where the function is executed,
 // where the shard will persist its data.
-func (Main) Main(diskpath string, forgetafter time.Duration) (circuit.XPerm, error) {
+func (main) main(diskpath string, forgetafter time.Duration) (circuit.XPerm, error) {
 	srv, err := New(diskpath, forgetafter)
 	if err != nil {
 		return nil, err

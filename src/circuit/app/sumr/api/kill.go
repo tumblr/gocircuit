@@ -1,14 +1,15 @@
-package ctl
+package api
 
 import (
-	"log"
-	"strconv"
 	"circuit/use/anchorfs"
 	"circuit/use/n"
+	"log"
+	"strconv"
 )
 
-func Kill(c *Config) error {
-	dir, e := anchorfs.OpenDir(c.Anchor)
+// Kill kills any live workers belonging to an API started with config
+func Kill(config *Config) error {
+	dir, e := anchorfs.OpenDir(config.Anchor)
 	if e != nil {
 		return e
 	}

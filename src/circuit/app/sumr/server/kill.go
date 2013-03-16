@@ -1,10 +1,10 @@
-package ctl
+package server
 
 import (
-	"log"
 	"circuit/use/circuit"
 	"circuit/use/durablefs"
 	"circuit/use/n"
+	"log"
 )
 
 func Remove(dfile string) error {

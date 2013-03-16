@@ -14,18 +14,18 @@ type httpServer struct {
 	server http.Server
 }
 
-type RespondFunc func(req []interface{}) []interface{}
+type respondFunc func(req []interface{}) []interface{}
 
-func startServer(port int, respondAdd, respondSum RespondFunc) (*httpServer, error) {
-	listener, err := net.Listen("tcp", ":" + strconv.Itoa(port))
+func startServer(port int, respondAdd, respondSum respondFunc) (*httpServer, error) {
+	listener, err := net.Listen("tcp", ":"+strconv.Itoa(port))
 	if err != nil {
 		return nil, err
 	}
 
 	x := &httpServer{
 		server: http.Server{
-			ReadTimeout:    10*time.Second,
-			WriteTimeout:   10*time.Second,
+			ReadTimeout:    10 * time.Second,
+			WriteTimeout:   10 * time.Second,
 			MaxHeaderBytes: 20e3,
 		},
 	}
@@ -33,11 +33,11 @@ func startServer(port int, respondAdd, respondSum RespondFunc) (*httpServer, err
 	serveMux := http.NewServeMux()
 	x.server.Handler = serveMux
 
-	serveMux.Handle("/v0/add", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { 
-		handler(ReadAddRequestBatch, w, r, respondAdd)
+	serveMux.Handle("/v0/add", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		handler(readAddRequestBatch, w, r, respondAdd)
 	}))
-	serveMux.Handle("/v0/sum", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { 
-		handler(ReadSumRequestBatch, w, r, respondSum)
+	serveMux.Handle("/v0/sum", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		handler(readSumRequestBatch, w, r, respondSum)
 	}))
 
 	go x.server.Serve(listener)
@@ -48,7 +48,7 @@ func startServer(port int, respondAdd, respondSum RespondFunc) (*httpServer, err
 // handler decodes an API batch request, []*???Request, from the body of an HTTP request, using the read function.
 // It executes the request against the database using the respond function.
 // Finally, it encodes the response to w.
-func handler(read ReadRequestBatchFunc, w http.ResponseWriter, r *http.Request, respond RespondFunc) {
+func handler(read readRequestBatchFunc, w http.ResponseWriter, r *http.Request, respond respondFunc) {
 	if r.Body == nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("emtpy body"))
@@ -70,7 +70,7 @@ func handler(read ReadRequestBatchFunc, w http.ResponseWriter, r *http.Request, 
 		w.Write([]byte("read request: " + err.Error()))
 		return
 	}
-	resp, err := RespondWithoutPanic(respond, req)
+	resp, err := respondWithoutPanic(respond, req)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("response: " + err.Error()))
@@ -91,7 +91,7 @@ func handler(read ReadRequestBatchFunc, w http.ResponseWriter, r *http.Request, 
 	w.Write(bb.Bytes())
 }
 
-func RespondWithoutPanic(f RespondFunc, a []interface{}) (r []interface{}, err error) {
+func respondWithoutPanic(f respondFunc, a []interface{}) (r []interface{}, err error) {
 	defer func() {
 		if p := recover(); p != nil {
 			r, err = nil, ErrBackend
