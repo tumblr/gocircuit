@@ -6,11 +6,11 @@ import (
 	"time"
 	"circuit/use/circuit"
 	"circuit/sys/lang/types"
-	"circuit/use/n"
+	"circuit/use/worker"
 )
 
 func (r *Runtime) Kill(addr circuit.Addr) error {
-	return n.Kill(addr)
+	return worker.Kill(addr)
 }
 
 // Daemonize can only be invoked inside a serveGo.
@@ -108,7 +108,7 @@ func (r *Runtime) Spawn(host string, anchor []string, fn circuit.Func, in ...int
 		}
 	}()
 
-	addr, err = n.Spawn(host, anchor...)
+	addr, err = worker.Spawn(host, anchor...)
 	if err != nil {
 		return nil, nil, err
 	}

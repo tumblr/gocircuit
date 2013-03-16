@@ -1,4 +1,5 @@
-package n
+// Package worker implements low-level routines for spawning and killing a worker process
+package worker
 
 import (
 	"circuit/kit/join"

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"circuit/use/anchorfs"
 	"circuit/use/circuit"
-	"circuit/use/n"
+	"circuit/use/worker"
 	_ "circuit/load"
 )
 
@@ -35,7 +35,7 @@ func main() {
 			log.Printf("Problem opening (%s)", err)
 			os.Exit(1)
 		}
-		if err = n.Kill(f.Owner()); err != nil {
+		if err = worker.Kill(f.Owner()); err != nil {
 			log.Printf("Problem killing (%s)", err)
 			os.Exit(1)
 		}
@@ -74,7 +74,7 @@ func killdir(dir string, recurse bool) error {
 		return err
 	}
 	for _, f := range files {
-		if err = n.Kill(f.Owner()); err != nil {
+		if err = worker.Kill(f.Owner()); err != nil {
 			log.Printf("Problem killing %s (%s)", f.Owner(), err)
 			return err
 		} else {

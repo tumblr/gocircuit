@@ -13,7 +13,7 @@ import (
 	"circuit/kit/lockfile"
 	
 	"circuit/sys/lang"
-	sn "circuit/sys/n"
+	workerBackend "circuit/sys/worker"
 	"circuit/sys/transport"
 	"circuit/sys/zanchorfs"
 	"circuit/sys/zdurablefs"
@@ -23,7 +23,7 @@ import (
 	"circuit/use/durablefs"
 	"circuit/use/issuefs"
 	"circuit/use/circuit"
-	un "circuit/use/n"
+	"circuit/use/worker"
 	
 	"circuit/load/config" // Side-effect of reading in configurations
 )
@@ -39,16 +39,16 @@ func init() {
 	case config.Worker:
 		start(true, config.Config.Zookeeper, config.Config.Install, config.Config.Spark)
 	case config.Daemonizer:
-		sn.Daemonize(config.Config)
+		workerBackend.Daemonize(config.Config)
 	default:
 		println("Circuit role unrecognized:", config.Role)
 		os.Exit(1)
 	}
 }
 
-func start(worker bool, z *config.ZookeeperConfig, i *config.InstallConfig, s *config.SparkConfig) {
+func start(isWorker bool, z *config.ZookeeperConfig, i *config.InstallConfig, s *config.SparkConfig) {
 	// If this is a worker, create a lock file in its working directory
-	if worker {
+	if isWorker {
 		if _, err := lockfile.Create("lock"); err != nil {
 			fmt.Fprintf(os.Stderr, "Worker cannot obtain lock (%s)\n", err)
 			os.Exit(1)
@@ -68,7 +68,7 @@ func start(worker bool, z *config.ZookeeperConfig, i *config.InstallConfig, s *c
 	issuefs.Bind(zissuefs.New(iconn, z.IssueDir()))
 
 	// Initialize the networking module
-	un.Bind(sn.New(i.LibPath, path.Join(i.BinDir(), i.Binary), i.JailDir()))
+	worker.Bind(workerBackend.New(i.LibPath, path.Join(i.BinDir(), i.Binary), i.JailDir()))
 
 	// Initialize transport module
 	t := transport.New(s.ID, s.BindAddr, s.Host)
@@ -85,7 +85,7 @@ func start(worker bool, z *config.ZookeeperConfig, i *config.InstallConfig, s *c
 		}
 	}
 
-	if worker {
+	if isWorker {
 		// A worker sends back its PID and runtime port to its invoker (the daemonizer)
 		backpipe := os.NewFile(3, "backpipe")
 		if _, err := backpipe.WriteString(strconv.Itoa(os.Getpid()) + "\n"); err != nil {
