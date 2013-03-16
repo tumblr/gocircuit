@@ -10,7 +10,7 @@ import (
 	"circuit/app/sumr/server"
 	"circuit/use/circuit"
 	"circuit/kit/sched/limiter"
-	"tumblr/struct/xor"
+	"circuit/kit/xor"
 )
 
 // TODO: Enforce read only
@@ -19,20 +19,19 @@ import (
 type Client struct {
 	dfile      string
 	readOnly   bool
-	checkpoint *ctl.Checkpoint
+	checkpoint *server.Checkpoint
 	lmtr       limiter.Limiter	// Global client rate limiter
 	lk         sync.Mutex
 	metric     xor.Metric		// Items in the metric are shard
 }
 
 type shard struct {
-	Key    sumr.Key
-	Server circuit.XPerm
+	ShardKey sumr.Key
+	Server   circuit.XPerm
 }
 
-// ID implements xor.Metric.Point
-func (s *shard) ID() xor.Key {
-	return xor.Key(s.Key)
+func (s *shard) Key() xor.Key {
+	return xor.Key(s.ShardKey)
 }
 
 // durableFile is the filename of the node in Durable FS where the service keeps its
@@ -42,7 +41,7 @@ func New(durableFile string, readOnly bool) (*Client, error) {
 	cli.lmtr.Init(50)
 
 	var err error
-	if cli.checkpoint, err = ctl.ReadCheckpoint(durableFile); err != nil {
+	if cli.checkpoint, err = server.ReadCheckpoint(durableFile); err != nil {
 		return nil, err
 	}
 
@@ -53,10 +52,10 @@ func New(durableFile string, readOnly bool) (*Client, error) {
 	return cli, nil
 }
 
-func (cli *Client) addServer(x *ctl.WorkerCheckpoint) {
+func (cli *Client) addServer(x *server.WorkerCheckpoint) {
 	cli.lk.Lock()
 	defer cli.lk.Unlock()
-	cli.metric.Add(&shard{x.Key, x.Server})
+	cli.metric.Add(&shard{x.ShardKey, x.Server})
 }
 
 // Add sends an ADD request to the database to add value to key; if key does not exist, it is created with the given value.
@@ -72,13 +71,13 @@ func (cli *Client) Add(updateTime time.Time, key sumr.Key, value float64) (resul
 	defer func() {
 		if err := recover(); err != nil {
 			log.Printf("dead shard: %s", err)
-			// XXX: Take more comprehensive action here
+			// XXX: Take a more comprehensive action here
 			result = math.NaN()
 		}
 	}()
 
 	cli.lk.Lock()
-	server := cli.metric.Nearest(xor.Key(key), 1)[0].(*ctl.WorkerCheckpoint).Server
+	server := cli.metric.Nearest(xor.Key(key), 1)[0].(*server.WorkerCheckpoint).Server
 	cli.lk.Unlock()
 
 	retrn := server.Call("Add", updateTime, key, value)
@@ -125,7 +124,7 @@ func (cli *Client) Sum(key sumr.Key) (result float64) {
 	}()
 
 	cli.lk.Lock()
-	server := cli.metric.Nearest(xor.Key(key), 1)[0].(*ctl.WorkerCheckpoint).Server
+	server := cli.metric.Nearest(xor.Key(key), 1)[0].(*server.WorkerCheckpoint).Server
 	cli.lk.Unlock()
 
 	retrn := server.Call("Sum", key)
@@ -134,7 +133,7 @@ func (cli *Client) Sum(key sumr.Key) (result float64) {
 
 // SumRequest captures the input parameters for a sumr ADD request
 type SumRequest struct {
-	Key        sumr.Key
+	Key sumr.Key
 }
 
 // SumBatch sends a batch of SUM requests to the sumr database

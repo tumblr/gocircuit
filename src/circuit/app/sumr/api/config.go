@@ -1,9 +1,6 @@
 package api
 
-import (
-	"circuit/use/circuit"
-	"encoding/gob"
-)
+import "encoding/gob"
 
 func init() {
 	gob.Register(&Config{})

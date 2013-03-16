@@ -8,7 +8,6 @@ package server
 
 import (
 	"circuit/app/sumr"
-	"circuit/app/sumr/server"
 	"circuit/kit/sched/limiter"
 	"circuit/use/circuit"
 	"log"
@@ -19,22 +18,22 @@ import (
 // Spawn launches a sumr database cluster as specified by config.
 //
 func Spawn(config *Config) {
-	s := &checkpoint{Config: config}
+	s := &Checkpoint{Config: config}
 	s.Workers = boot(config.Anchor, config.Workers)
 }
 
 // Boot starts a sumr shard server on each host specified in cluster, and returns
 // a list of shards and respective keys and a corresponding list of runtime processes.
 //
-func boot(anchor string, shard []*WorkerConfig) []*workerCheckpoint {
+func boot(anchor string, shard []*WorkerConfig) []*WorkerCheckpoint {
 	var (
 		lk     sync.Mutex
 		lmtr   limiter.Limiter
-		shv    []*workerCheckpoint
+		shv    []*WorkerCheckpoint
 		metric xor.Metric // Used to allocate initial keys in a balanced fashion
 	)
 	lmtr.Init(20)
-	shv = make([]*workerCheckpoint, len(shard))
+	shv = make([]*WorkerCheckpoint, len(shard))
 	for i_, sh_ := range shard {
 		i, sh := i_, sh_
 		xkey := metric.ChooseMinK(5)
@@ -47,11 +46,11 @@ func boot(anchor string, shard []*WorkerConfig) []*workerCheckpoint {
 				}
 				lk.Lock()
 				defer lk.Unlock()
-				shv[i] = &workerCheckpoint{
-					Key:     sumr.Key(xkey),
-					Runtime: addr,
-					Server:  x,
-					Host:    sh.Host,
+				shv[i] = &WorkerCheckpoint{
+					ShardKey: sumr.Key(xkey),
+					Addr:     addr,
+					Server:   x,
+					Host:     sh.Host,
 				}
 			},
 		)
@@ -62,7 +61,7 @@ func boot(anchor string, shard []*WorkerConfig) []*workerCheckpoint {
 
 func bootShard(anchor string, sh *WorkerConfig) (x circuit.XPerm, addr circuit.Addr, err error) {
 
-	retrn, addr, err := circuit.Spawn(sh.Host, []string{anchor}, server.main{}, sh.DiskPath, sh.Forget)
+	retrn, addr, err := circuit.Spawn(sh.Host, []string{anchor}, main{}, sh.DiskPath, sh.Forget)
 	if retrn[1] != nil {
 		err = retrn[1].(error)
 		return nil, nil, err

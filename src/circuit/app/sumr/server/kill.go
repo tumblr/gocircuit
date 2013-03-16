@@ -13,7 +13,7 @@ func remove(durableFile string) error {
 
 // Kill reads a sumr service checkpoint from the durableFile in the durable file system and kills the entire service
 func Kill(durableFile string) error {
-	chk, err := readCheckpoint(durableFile)
+	chk, err := ReadCheckpoint(durableFile)
 	if err != nil {
 		return circuit.NewError("Problem reading checkpoint (%s)", err)
 	}
@@ -23,7 +23,7 @@ func Kill(durableFile string) error {
 	return remove(durableFile)
 }
 
-func killCheckpoint(chk *checkpoint) error {
+func killCheckpoint(chk *Checkpoint) error {
 	var err error
 	for i, wrkr := range chk.Workers {
 		println("s", i)

@@ -2,7 +2,7 @@ package api
 
 import (
 	"circuit/use/anchorfs"
-	"circuit/use/n"
+	"circuit/use/worker"
 	"log"
 	"strconv"
 )
@@ -31,7 +31,7 @@ func Kill(config *Config) error {
 			return e
 		}
 		for _, f := range files {
-			if e = n.Kill(f.Owner()); e != nil {
+			if e = worker.Kill(f.Owner()); e != nil {
 				log.Printf("Problem killing %s (%s)", f.Owner(), e)
 			}
 			break

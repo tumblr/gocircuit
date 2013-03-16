@@ -63,7 +63,7 @@ func (api *API) respondAdd(req []interface{}) []interface{} {
 	api.lmtr.Open()
 	defer api.lmtr.Close()
 
-	q := make([]client.addRequest, len(req))
+	q := make([]client.AddRequest, len(req))
 	for i, a_ := range req {
 		a := a_.(*addRequest)
 		q[i].UpdateTime = a.change.Time
@@ -82,7 +82,7 @@ func (api *API) respondSum(req []interface{}) []interface{} {
 	api.lmtr.Open()
 	defer api.lmtr.Close()
 
-	q := make([]client.sumRequest, len(req))
+	q := make([]client.SumRequest, len(req))
 	for i, a_ := range req {
 		a := a_.(*sumRequest)
 		q[i].Key = a.Key()
