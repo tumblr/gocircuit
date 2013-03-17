@@ -4,8 +4,6 @@ finish language rules doc
 CONFIG FRICTION:
 	circuit configs are user specific since they contain hardcoded absolute paths
 
-bug: xtc/test workers don't die
-
 A newly started worker would get its job from an incoming "Go" call. This 
 calls also defines the death semantics. If this call doesn't arrive for a network
 or type-mismatch reason, worker should die on its own after waiting for a "Go" a bit.

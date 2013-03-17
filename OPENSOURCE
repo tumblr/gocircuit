@@ -1,4 +1,9 @@
+generate-circuit-config.sh in tutorials
+resolve open issues in /src/circuit/TODO
 document cross-build environment requirements
 verify cross-build works with new modifications
 license
 fonts on typekit, delegate to default ones
+wipe repo
+repo release/master branches
+readme.md

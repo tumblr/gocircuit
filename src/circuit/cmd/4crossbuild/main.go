@@ -7,7 +7,7 @@ import (
 	"circuit/load/config"
 )
 
-var flagShow = flag.Bool("v", false, "Verbose mode")
+var flagShow = flag.Bool("show", true, "Verbose mode")
 
 func main() {
 	flag.Parse()

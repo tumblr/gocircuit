@@ -3,12 +3,10 @@ package main
 import (
 	"bytes"
 	"errors"
-	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
-	"sync"
 	"text/template"
 	"circuit/kit/posix"
 	"circuit/load/config"
@@ -90,43 +88,4 @@ func Build(cfg *config.BuildConfig) error {
 	}
 	println("Download successful.")
 	return nil
-}
-
-type combinedReader struct {
-	pipe   *io.PipeReader
-	wlk    sync.Mutex
-	closed int
-}
-
-func combine(r1, r2 io.Reader) io.Reader {
-	pr, pw := io.Pipe()
-	c := &combinedReader{pipe: pr}
-	go c.readTo(r1, pw)
-	go c.readTo(r2, pw)
-	return c
-}
-
-func (c *combinedReader) readTo(r io.Reader, w *io.PipeWriter) {
-	p := make([]byte, 1e5)
-	for {
-		n, err := r.Read(p)
-		if n > 0 {
-			c.wlk.Lock()
-			w.Write(p[:n])
-			c.wlk.Unlock()
-		}
-		if err != nil {
-			c.wlk.Lock()
-			defer c.wlk.Unlock()
-			c.closed++
-			if c.closed == 2 {
-				w.Close()
-			}
-			return
-		}
-	}
-}
-
-func (c *combinedReader) Read(p []byte) (int, error) {
-	return c.pipe.Read(p)
 }

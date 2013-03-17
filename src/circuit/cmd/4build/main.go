@@ -47,6 +47,7 @@ func main() {
 	if flags.PrefixPath != "" {
 		x.env.Set("PATH", flags.PrefixPath + ":" + x.env.Get("PATH"))
 	}
+	//println(fmt.Sprintf("%#v\n", x.env))
 	x.jail = flags.Jail
 	x.appPkgs = []string{flags.Pkg}
 	x.zinclude = flags.ZInclude
@@ -89,7 +90,7 @@ func shipCircuit() string {
 	}
 
 	// Copy worker binary over to shipping directory
-	println("+Packaging", x.binary)
+	println("--Packaging", x.binary)
 	binpkg := workerPkgPath()
 	shipFile := path.Join(tmpdir, x.binary)
 	if _, err = CopyFile(path.Join(binpkg, x.binary), shipFile); err != nil {
@@ -111,7 +112,7 @@ func shipCircuit() string {
 	}
 
 	// zookeeper lib
-	println("+Packaging Zookeeper libraries")
+	println("--Packaging Zookeeper libraries")
 	if err = ShellCopyFile(path.Join(x.zlib, "libzookeeper*"), tmpdir + "/"); err != nil {
 		Fatalf("Problem copying Zookeeper library files (%s)\n", err)
 	}
@@ -160,7 +161,7 @@ func buildCircuit() {
 
 	// Re-build command-line tools
 	for _, cpkg := range cmdPkg {
-		if err := Exec(x.env, path.Join(x.goPath["circuit"], "src/circuit/cmd", cpkg) , x.goCmd, "build"); err != nil {
+		if err := Shell(x.env, path.Join(x.goPath["circuit"], "src/circuit/cmd", cpkg) , x.goCmd + " build"); err != nil {
 			Fatalf("Problem compiling %s (%s)\n", cpkg, err)
 		}
 	}
@@ -186,9 +187,9 @@ func buildCircuit() {
 	}
 
 	// Build circuit runtime binary
-	println("+Building", x.binary)
-	if err := Exec(x.env, binpkg, x.goCmd, "build"); err != nil {
-		Fatalf("Problem compiling main.go (%s)\n", err)
+	println("--Building", x.binary)
+	if err := Shell(x.env, binpkg, "env\n" + x.goCmd + " build"); err != nil {
+		Fatalf("Problem with ‘(working directory %s) %s build’ (%s)\n", binpkg, x.goCmd, err)
 	}
 }
 
@@ -222,19 +223,19 @@ func repoSchema(s string) (schema, url string) {
 
 func cloneGitRepo(repo, parent string) {
 	// If not, clone the source tree
-	if err := Exec(nil, parent, "git", "clone", repo); err != nil {
+	if err := Shell(x.env, parent, "git clone " + repo); err != nil {
 		Fatalf("Problem cloning repo '%s' (%s)", repo, err)
 	}
 }
 
 func pullGitRepo(dir string) {
-	if err := Exec(nil, dir, "git", "pull", "origin", "master"); err != nil {
+	if err := Shell(x.env, dir, "git pull origin master"); err != nil {
 		Fatalf("Problem pulling repo in %s (%s)", dir, err)
 	}
 }
 
 func rsyncRepo(src, dstparent string) {
-	if err := Exec(nil, "", "rsync", "-acrv", "--delete", "--exclude", ".git", "--exclude", ".hg", "--exclude", "*.a", src, dstparent); err != nil {
+	if err := Shell(x.env, "", "rsync -acrv --delete --exclude .git --exclude .hg --exclude *.a " + src + " " + dstparent); err != nil {
 		Fatalf("Problem rsyncing dir '%s' to within '%s' (%s)", src, dstparent, err)
 	}
 }
@@ -303,7 +304,7 @@ func buildGoCompiler(rebuild bool) {
 	//Exec(x.env, x.jail, "which", "hg")
 	if !ok {
 		// If not, fetch the source tree
-		if err = Exec(x.env, x.jail, "hg", "clone", "-u", "tip", "https://code.google.com/p/go"); err != nil {
+		if err = Shell(x.env, x.jail, "hg clone -u tip https://code.google.com/p/go"); err != nil {
 			Fatalf("Problem cloning Go repository (%s)", err)
 		}
 		// Force rebuild
@@ -311,18 +312,18 @@ func buildGoCompiler(rebuild bool) {
 	} else {
 		if rebuild {
 			// Pull changes
-			if err = Exec(x.env, path.Join(x.jail, "/go"), "hg", "pull"); err != nil {
+			if err = Shell(x.env, path.Join(x.jail, "/go"), "hg pull"); err != nil {
 				Fatalf("Problem pulling Go repository changes (%s)", err)
 			}
 			// Update working copy
-			if err = Exec(x.env, path.Join(x.jail, "/go"), "hg", "update"); err != nil {
+			if err = Shell(x.env, path.Join(x.jail, "/go"), "hg update"); err != nil {
 				Fatalf("Problem updating Go repository changes (%s)", err)
 			}
 		}
 	}
 	if rebuild {
 		// Build Go compiler
-		if err = Exec(x.env, path.Join(x.jail, "/go/src"), path.Join(x.jail, "/go/src/all.bash")); err != nil {
+		if err = Shell(x.env, path.Join(x.jail, "/go/src"), path.Join(x.jail, "/go/src/all.bash")); err != nil {
 			if !IsExitError(err) {
 				Fatalf("Problem building Go (%s)", err)
 			}

@@ -10,6 +10,8 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"sync"
+	"circuit/kit/iomisc"
 )
 
 func Printf(fmt_ string, arg_ ...interface{}) {
@@ -47,17 +49,43 @@ func Exists(path string) (bool, error) {
 	return true, nil
 }
 
-func Exec(env Env, dir, prog string, argv ...string) error {
-	cmd := exec.Command(prog, argv...)
+func Shell(env Env, dir, shellScript string) error {
+	cmd := exec.Command("sh")
+	println("%", "cd", dir)
 	cmd.Dir = dir
 	if env != nil {
+		//println(fmt.Sprintf("%#v\n", env.Environ()))
 		cmd.Env = env.Environ()
 	}
-	combined, err := cmd.CombinedOutput()
-	if *flagShow && len(combined) > 0 {
-		println(string(combined))
+	println("%", shellScript)
+	cmd.Stdin = bytes.NewBufferString(shellScript)
+
+	if *flagShow {
+		stderr, err := cmd.StderrPipe()
+		if err != nil {
+			return err
+		}
+		stdout, err := cmd.StdoutPipe()
+		if err != nil {
+			return err
+		}
+		if err = cmd.Start(); err != nil {
+			return err
+		}
+		io.Copy(os.Stdout, iomisc.Combine(stderr, stdout))
 	}
-	return err
+	return cmd.Wait()
+}
+
+type writeBuffer struct {
+	lk  sync.Mutex
+	buf bytes.Buffer
+}
+
+func (b *writeBuffer) Write(p []byte) (n int, err error) {
+	b.lk.Lock()
+	defer b.lk.Unlock()
+	return b.Write(p)
 }
 
 // IsExitError returns true if err represents a process exit error
