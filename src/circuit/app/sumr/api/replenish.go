@@ -71,7 +71,7 @@ func replenishWorker(durableFile string, c *Config, i int) (replenished bool, er
 // start is a worker function for starting an API worker
 type start struct{}
 
-func (start) start(durableFile string, port int, readOnly bool) (circuit.XPerm, error) {
+func (start) Start(durableFile string, port int, readOnly bool) (circuit.XPerm, error) {
 	a, err := New(durableFile, port, readOnly)
 	if err != nil {
 		return nil, err
