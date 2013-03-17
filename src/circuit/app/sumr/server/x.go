@@ -15,7 +15,7 @@ func init() {
 // Main starts a sumr shard server
 // diskpath is a directory path on the local file system, where the function is executed,
 // where the shard will persist its data.
-func (main) main(diskpath string, forgetafter time.Duration) (circuit.XPerm, error) {
+func (main) Main(diskpath string, forgetafter time.Duration) (circuit.XPerm, error) {
 	srv, err := New(diskpath, forgetafter)
 	if err != nil {
 		return nil, err
