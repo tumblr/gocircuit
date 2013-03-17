@@ -9,11 +9,11 @@ package server
 import (
 	"circuit/app/sumr"
 	"circuit/kit/sched/limiter"
+	"circuit/kit/xor"
 	"circuit/use/circuit"
 	"circuit/use/durablefs"
 	"log"
 	"sync"
-	"tumblr/struct/xor"
 )
 
 // Spawn launches a sumr database cluster as specified by config.

@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"errors"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
@@ -11,6 +10,7 @@ import (
 	"circuit/kit/posix"
 	"circuit/load/config"
 	"fmt"
+	"io/ioutil"
 )
 
 const build_sh_src = `{{.Tool}} ` +

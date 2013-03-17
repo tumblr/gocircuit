@@ -50,7 +50,7 @@ func Exists(path string) (bool, error) {
 }
 
 func Shell(env Env, dir, shellScript string) error {
-	cmd := exec.Command("sh")
+	cmd := exec.Command("sh", "-v")
 	println("%", "cd", dir)
 	cmd.Dir = dir
 	if env != nil {
@@ -72,7 +72,8 @@ func Shell(env Env, dir, shellScript string) error {
 		if err = cmd.Start(); err != nil {
 			return err
 		}
-		io.Copy(os.Stdout, iomisc.Combine(stderr, stdout))
+		// Build tool cannot write anything to stdout, other than the result directory at the end
+		io.Copy(os.Stderr, iomisc.Combine(stderr, stdout))
 	}
 	return cmd.Wait()
 }
@@ -155,7 +156,7 @@ func CopyFile(srcName, dstName string) (written int64, err error) {
 }
 
 func ShellCopyFile(src, dst string) error {
-	cmd := exec.Command("sh")
+	cmd := exec.Command("sh", "-l")
 	cmd.Stdin = bytes.NewBufferString(fmt.Sprintf("cp %s %s\n", src, dst))
 	combined, err := cmd.CombinedOutput()
 	if *flagShow {

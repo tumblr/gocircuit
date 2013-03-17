@@ -188,7 +188,7 @@ func buildCircuit() {
 
 	// Build circuit runtime binary
 	println("--Building", x.binary)
-	if err := Shell(x.env, binpkg, "env\n" + x.goCmd + " build"); err != nil {
+	if err := Shell(x.env, binpkg, x.goCmd + " build"); err != nil {
 		Fatalf("Problem with ‘(working directory %s) %s build’ (%s)\n", binpkg, x.goCmd, err)
 	}
 }
