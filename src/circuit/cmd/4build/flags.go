@@ -11,7 +11,7 @@ import (
 
 var (
 	flagBinary      = flag.String("binary", "4r", "Preferred name for the resulting runtime binary")
-	flagJail        = flag.String("jail", path.Join(os.Getenv("HOME"), "_circuit/build"), "Build jail directory")
+	flagJail        = flag.String("jail", "", "Build jail directory")
 
 	flagAppRepo     = flag.String("app", "", "App repository")
 	flagAppPath     = flag.String("appsrc", "", "GOPATH relative to app repository")
@@ -21,8 +21,8 @@ var (
 	flagShow        = flag.Bool("show", false, "Show output of underlying build commands")
 	flagRebuildGo   = flag.Bool("rebuildgo", false, "Force fetch and rebuild of the Go compiler")
 
-	flagZInclude    = flag.String("zinclude", path.Join(os.Getenv("HOME"), "local/include/c-client-src") , "Zookeeper C headers directory")
-	flagZLib        = flag.String("zlib", path.Join(os.Getenv("HOME"), "local/lib") , "Zookeeper libraries directory")
+	flagZInclude    = flag.String("zinclude", "", "Zookeeper C headers directory")
+	flagZLib        = flag.String("zlib", "", "Zookeeper libraries directory")
 
 	flagCircuitRepo = flag.String("cir", "git@github.com:tumblr/gocircuit.git", "Circuit repository")
 	flagCircuitPath = flag.String("cirsrc", ".", "GOPATH relative to circuit repository")

@@ -1,15 +1,47 @@
-The Go Circuit Project
-======================
+A new abstraction for developing and maintaining Big Data applications
+======================================================================
 
-The Go Circuit is an extension to the Go Language and Runtime, which enables
-development of distributed applications entirely inside the Go programming
-environment in a manner similar to Erlang: by the addition of a `Spawn`
-operator for spawning arbitrary goroutines on remote hosts.
+The Go Circuit extends the reach of [Go](http://golang.org)'s linguistic
+environment to multi-host/multi-process applications.  In simple terms, the Go
+Circuit was born from the desire to be able to write:
 
-The Go Circuit programming and deployment interface could be likened to that of
-Google AppEngine, conceptually. In particular, the circuit is much like "your
-own AppEngine". Unlike with AppEngine, programming for the circuit is
-considerably more integrated with the Go Language and access to low-level
-machine facilities is exposed to the user.
+	feedback := make(chan int)
+	circuit.Spawn("host25.datacenter.net", func() {
+		feedback <- 1
+	})
+	<-feedback
+	println("Roundtrip complete.")
 
-See the [Go Circuit project page](http://gocircuit.org) for more details.
+The `Spawn` operator will start its argument function on a desired
+remote host in a new goroutine, while making it possible to communicate between
+the parent and child goroutines using the same Go code that you would use to
+communicate between traditional goroutines. Above, the channel
+`feedback` is transparently “stretched” between the parent
+goroutine, executing locally, and the child goroutine, executing remotely and
+hosting the anonymous function execution.
+
+Using the circuit one is able to write complex distributed applications —
+involving multiple types of collaborating processes — within a single
+_circuit program_.  The _circuit language_ used therein is
+syntactically identical to Go while also:
+
+* Providing facilities for spawning goroutines on remote hardware, and
+* Treating local and remote goroutines in the same manner, both syntactically and semantically.
+
+As a result, distributed application code becomes orders of magnitude shorter,
+as compared to using traditional alternatives. For isntance, we have been able
+to write large real-world cloud applications — e.g. streaming multi-stage
+MapReduce pipelines — in as many as 200 lines of code.
+
+For lifecycle maintenance, the circuit provides a powerful toolkit that can
+introspect into, control and modify various dynamic aspects of a live circuit
+application.  Robust networking protocols allow for complex runtime maneuvers
+like, for instance, surgically replacing components of running cloud
+applications with binaries from different versions of the source tree, without
+causing service interruption.
+
+The transparent source of the circuit runtime makes it easy to instrument
+circuit deployments with custom logic that has full visibility of cross-runtime
+information flow dynamics. Out of the box the circuit comes with a set of tools
+for debugging and profiling in-production applications with minimal impact on
+uptime.

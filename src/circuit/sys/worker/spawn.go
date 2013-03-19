@@ -11,6 +11,7 @@ import (
 	"circuit/sys/transport"
 	"circuit/use/circuit"
 	"circuit/load/config"
+	"path"
 )
 
 type Config struct {
@@ -60,13 +61,17 @@ func (c *Config) Spawn(host string, anchors ...string) (circuit.Addr, error) {
 	defer cmd.Wait() /// Make sure that ssh does not remain zombie
 
 	// Feed shell script to execute circuit binary
+	bindir, _ := path.Split(c.Binary)
+	if bindir == "" {
+		panic("binary path not absolute")
+	}
 	var sh string
 	if c.LibPath == "" {
-		sh = fmt.Sprintf("%s=%s %s\n", config.RoleEnv, config.Daemonizer, c.Binary)
+		sh = fmt.Sprintf("cd %s\n%s=%s %s\n", bindir, config.RoleEnv, config.Daemonizer, c.Binary)
 	} else {
 		sh = fmt.Sprintf(
-			"LD_LIBRARY_PATH=%s DYLD_LIBRARY_PATH=%s %s=%s %s\n", 
-			c.LibPath, c.LibPath, config.RoleEnv, config.Daemonizer, c.Binary)
+			"cd %s\nLD_LIBRARY_PATH=%s DYLD_LIBRARY_PATH=%s %s=%s %s\n", 
+			bindir, c.LibPath, c.LibPath, config.RoleEnv, config.Daemonizer, c.Binary)
 	}
 	stdin.Write([]byte(sh))
 

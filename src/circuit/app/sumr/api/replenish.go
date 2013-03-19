@@ -72,8 +72,10 @@ func replenishWorker(durableFile string, c *Config, i int) (replenished bool, er
 type start struct{}
 
 func (start) Start(durableFile string, port int, readOnly bool) (circuit.XPerm, error) {
+	println("WHOAAA")
 	a, err := New(durableFile, port, readOnly)
 	if err != nil {
+		println("FLOPPP")
 		return nil, err
 	}
 	return circuit.PermRef(a), nil

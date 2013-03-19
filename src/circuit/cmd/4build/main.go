@@ -147,7 +147,12 @@ func buildCircuit() {
 	// Prepare cgo environment for Zookeeper
 	// TODO: Add Zookeeper build step. Don't rely on a prebuilt one.
 	x.env.Set("CGO_CFLAGS", "-I" + x.zinclude)
-	x.env.Set("CGO_LDFLAGS", "-L" + x.zlib + " -lm -lpthread -lzookeeper_mt")
+
+	// Static link (not available in Go1.0.3, available later, in +4ad21a3b23a4, for example)
+	x.env.Set("CGO_LDFLAGS", path.Join(x.zlib, "libzookeeper_mt.a"))
+	// Dynamic link
+	// x.env.Set("CGO_LDFLAGS", x.zlib + " -lzookeeper_mt"))
+
 	defer x.env.Unset("CGO_CFLAGS")
 	defer x.env.Unset("CGO_LDFLAGS")
 
@@ -161,7 +166,7 @@ func buildCircuit() {
 
 	// Re-build command-line tools
 	for _, cpkg := range cmdPkg {
-		if err := Shell(x.env, path.Join(x.goPath["circuit"], "src/circuit/cmd", cpkg) , x.goCmd + " build"); err != nil {
+		if err := Shell(x.env, path.Join(x.goPath["circuit"], "src/circuit/cmd", cpkg) , x.goCmd + " build -a"); err != nil {
 			Fatalf("Problem compiling %s (%s)\n", cpkg, err)
 		}
 	}
