@@ -1,3 +1,6 @@
+* misc libzookeeper libraries seem to require hardcoded location
+* hostname anchors show /host/%s(MISSING)/
+
 generate-circuit-config.sh in tutorials
 resolve open issues in /src/circuit/TODO
 document cross-build environment requirements

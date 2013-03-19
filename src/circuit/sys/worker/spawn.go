@@ -27,6 +27,8 @@ func New(libpath, binary, jaildir string) *Config {
 	}
 }
 
+// (PARENT_HOST) --- 4r_worker/parent --- ssh --- (CHILD_HOST) --- sh --- 4r_worker/daemonizer --- 4r_worker/worker
+
 func (c *Config) Spawn(host string, anchors ...string) (circuit.Addr, error) {
 
 	cmd := exec.Command("ssh", host, "sh")
@@ -47,7 +49,9 @@ func (c *Config) Spawn(host string, anchors ...string) (circuit.Addr, error) {
 	}
 	//posix.ForwardStderrBatch(stderr)
 	id := circuit.ChooseRuntimeID()
-	posix.ForwardStderr(fmt.Sprintf("|%s:stderr> ", id), stderr)
+
+	// Forward the stderr of the ssh process to this process' stderr
+	posix.ForwardStderr(fmt.Sprintf("%s.dmnzr/err: ", id), stderr)
 
 	// Start process
 	if err := cmd.Start(); err != nil {

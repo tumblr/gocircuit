@@ -47,7 +47,7 @@ func Build(cfg *config.BuildConfig) error {
 	if err != nil {
 		return err
 	}
-	prefix := fmt.Sprintf("%s:4build>", cfg.Host)
+	prefix := fmt.Sprintf("%s/4build|", cfg.Host)
 	posix.ForwardStderr(prefix, stderr)
 
 	if err = cmd.Start(); err != nil {
