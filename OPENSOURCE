@@ -1,5 +1,5 @@
 * misc libzookeeper libraries seem to require hardcoded location
-* hostname anchors show /host/%s(MISSING)/
+* sumr apis no listening
 
 generate-circuit-config.sh in tutorials
 resolve open issues in /src/circuit/TODO

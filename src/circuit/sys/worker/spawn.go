@@ -76,7 +76,7 @@ func (c *Config) Spawn(host string, anchors ...string) (circuit.Addr, error) {
 			ID:       id,
 			BindAddr: "",
 			Host:     host,
-			Anchor:   append(anchors, fmt.Sprintf("/host/%s")),
+			Anchor:   append(anchors, fmt.Sprintf("/host/%s", host)),
 		},
 		Zookeeper: config.Config.Zookeeper,
 		Install:   config.Config.Install,

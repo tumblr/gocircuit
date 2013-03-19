@@ -45,6 +45,7 @@ func New(durableFile string, port int, readOnly bool) (api *API, err error) {
 		return nil, err
 	}
 	api.lmtr.Init(200)
+	println("YAY")
 	api.server, err = startServer(
 		port,
 		func(req []interface{}) []interface{} {
