@@ -1,4 +1,11 @@
+* test that sumr db works correctly
+	* split: sumr-start-db, sumr-start-api (demo the use of durable fs)
 * durable fs browser + garbage collecion
+	* is it ok that in ~/gocircuit/src/circuit/sys/zanchorfs/dir.go on IsNoNode we are skipping fetch()?
+	* 4dcat show contents of durable file (prettify cross interfaces)
+
+RuntimeID->WorkerID
+illustration that shows data flow in the lifecycle, with annotations for 4build, 4crossbuild, 4install, etc.
 
 generate-circuit-config.sh in tutorials
 resolve open issues in /src/circuit/TODO

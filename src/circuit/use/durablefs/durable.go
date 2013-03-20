@@ -64,18 +64,25 @@ type Dir interface {
 	Path() string
 
 	// Children returns a map of directory children names
-	Children() (children map[string]struct{})
+	Children() (children map[string]Info)
 
 	// Change blocks until a change in the contents of this directory is detected and 
 	// returns a map of children names
-	Change() (children map[string]struct{})
+	Change() (children map[string]Info)
 
 	// Expire behaves like Change except, if the expiration interval is
 	// reached, it returns before a change is observed in the directory
-	Expire(expire time.Duration) (children map[string]struct{})
+	Expire(expire time.Duration) (children map[string]Info)
 
 	// Close closes this directory
 	Close()
+}
+
+// Info holds metadata about a node (file or directory) in the file system
+type Info struct {
+	Name        string  // Name of the file or sub-directory
+	HasBody     bool    // True if the Zookeeper node has non-empty data
+	HasChildren bool    // True if the Zookeeper node has children
 }
 
 // File is an interface to a file in the durable file system

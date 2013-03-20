@@ -1,3 +1,4 @@
+// Package zdurablefs implements a durable file system that meets the interface of circuit/use/durablefs
 package zdurablefs
 
 import (
