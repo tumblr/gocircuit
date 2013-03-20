@@ -7,7 +7,7 @@ import (
 
 var (
 	ValueTabl *TypeTabl = makeTypeTabl() // Type table for values
-	FuncTabl *TypeTabl = makeTypeTabl() // Type table for functions
+	FuncTabl  *TypeTabl = makeTypeTabl() // Type table for functions
 )
 
 // RegisterValue registers the type of x with the type table.

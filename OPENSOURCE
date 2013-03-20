@@ -8,6 +8,9 @@ verify cross-build works with new modifications
 
 fonts on typekit, delegate to default ones
 
+static link vs dynamic link, 4build does static, but requires higher go release; explain somewhere
+maybe 4build should not make autopkg, instead user makes it themselves?
+
 test everything against a release version of Go
 test against linux
 wipe repo

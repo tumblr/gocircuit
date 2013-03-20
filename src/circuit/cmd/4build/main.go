@@ -193,7 +193,13 @@ func buildCircuit() {
 
 	// Build circuit runtime binary
 	println("--Building", x.binary)
-	if err := Shell(x.env, binpkg, x.goCmd + " build"); err != nil {
+	// TODO: The -a flag here seems necessary. Otherwise changes in
+	// circuit/sys do not seem to be reflected in recompiled tutorials when
+	// the synchronization method for all repositories is rsync.
+	// Understand what is going on. The flag should not be needed as the
+	// circuit should see the changes in the sources inside the build jail.
+	// Is this a file timestamp problem introduced by rsync?
+	if err := Shell(x.env, binpkg, x.goCmd + " build -a"); err != nil {
 		Fatalf("Problem with ‘(working directory %s) %s build’ (%s)\n", binpkg, x.goCmd, err)
 	}
 }

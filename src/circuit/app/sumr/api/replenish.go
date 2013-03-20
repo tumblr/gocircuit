@@ -40,6 +40,13 @@ func Replenish(durableFile string, c *Config) []*Replenished {
 }
 
 func replenishWorker(durableFile string, c *Config, i int) (replenished bool, err error) {
+	defer func() {
+		if err != nil {
+			println("replenished", replenished, "#", i, "err", err.Error())
+		} else {
+			println("replenished", replenished, "#", i)
+		}
+	}()
 
 	// Check if worker already running
 	anchor := path.Join(c.Anchor, strconv.Itoa(i))
@@ -56,7 +63,7 @@ func replenishWorker(durableFile string, c *Config, i int) (replenished bool, er
 	}
 
 	// If not, start a new worker
-	retrn, _, err := circuit.Spawn(c.Workers[i].Host, []string{anchor}, durableFile, c.Workers[i].Port, c.ReadOnly)
+	retrn, _, err := circuit.Spawn(c.Workers[i].Host, []string{anchor}, start{}, durableFile, c.Workers[i].Port, c.ReadOnly)
 	if err != nil {
 		return false, err
 	}
@@ -72,10 +79,8 @@ func replenishWorker(durableFile string, c *Config, i int) (replenished bool, er
 type start struct{}
 
 func (start) Start(durableFile string, port int, readOnly bool) (circuit.XPerm, error) {
-	println("WHOAAA")
 	a, err := New(durableFile, port, readOnly)
 	if err != nil {
-		println("FLOPPP")
 		return nil, err
 	}
 	return circuit.PermRef(a), nil

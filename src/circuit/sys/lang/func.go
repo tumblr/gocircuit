@@ -55,6 +55,7 @@ func (r *Runtime) closeDaemonizer() bool {
 }
 
 func (r *Runtime) serveGo(req *goMsg, conn circuit.Conn) {
+	println("serveGo")
 
 	// Go guarantees the defer runs even if panic occurs
 	defer conn.Close()
@@ -136,6 +137,9 @@ func (r *Runtime) tryRemoteGo(addr circuit.Addr, ufn circuit.Func, in ...interfa
 
 	expGo, _ := r.exportValues(in, addr)
 	t := types.FuncTabl.TypeOf(ufn)
+	if t == nil {
+		panic(fmt.Sprintf("type '%T' is not a registered worker function type", ufn))
+	}
 	req := &goMsg{
 		// If TypeOf returns nil (causing panic), the user forgot to
 		// register the type of ufn
