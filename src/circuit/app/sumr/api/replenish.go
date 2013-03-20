@@ -12,6 +12,7 @@ import (
 // Replenished holds the return values of a call to Replenish.
 type Replenished struct {
 	Config      *WorkerConfig	// Config specifies a worker configuration passed to Replenish.
+	Addr        circuit.Addr
 	Replenished bool		// Replenished is true if the API worker on this host needed replenishing.
 	Err         error		// Err is non-nil if the operation failed.
 }
@@ -28,10 +29,10 @@ func Replenish(durableFile string, c *Config) []*Replenished {
 		i, wcfg := i_, wcfg_
 		lmtr.Go(
 			func() {
-				re, err := replenishWorker(durableFile, c, i)
+				re, addr, err := replenishWorker(durableFile, c, i)
 				lk.Lock()
 				defer lk.Unlock()
-				r[i] = &Replenished{Config: wcfg, Replenished: re, Err: err}
+				r[i] = &Replenished{Config: wcfg, Addr: addr, Replenished: re, Err: err}
 			},
 		)
 	}
@@ -39,40 +40,33 @@ func Replenish(durableFile string, c *Config) []*Replenished {
 	return r
 }
 
-func replenishWorker(durableFile string, c *Config, i int) (replenished bool, err error) {
-	defer func() {
-		if err != nil {
-			println("replenished", replenished, "#", i, "err", err.Error())
-		} else {
-			println("replenished", replenished, "#", i)
-		}
-	}()
+func replenishWorker(durableFile string, c *Config, i int) (replenished bool, addr circuit.Addr, err error) {
 
 	// Check if worker already running
 	anchor := path.Join(c.Anchor, strconv.Itoa(i))
 	dir, e := anchorfs.OpenDir(anchor)
 	if e != nil {
-		return false, e
+		return false, nil, e
 	}
 	_, files, err := dir.Files()
 	if e != nil {
-		return false, e
+		return false, nil, e
 	}
 	if len(files) > 0 {
-		return false, nil
+		return false, nil, nil
 	}
 
 	// If not, start a new worker
-	retrn, _, err := circuit.Spawn(c.Workers[i].Host, []string{anchor}, start{}, durableFile, c.Workers[i].Port, c.ReadOnly)
+	retrn, addr, err := circuit.Spawn(c.Workers[i].Host, []string{anchor}, start{}, durableFile, c.Workers[i].Port, c.ReadOnly)
 	if err != nil {
-		return false, err
+		return false, nil, err
 	}
 	if retrn[1] != nil {
 		err = retrn[1].(error)
-		return false, err
+		return false, addr, err
 	}
 
-	return true, nil
+	return true, addr, nil
 }
 
 // start is a worker function for starting an API worker

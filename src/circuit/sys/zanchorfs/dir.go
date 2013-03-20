@@ -148,10 +148,9 @@ func (dir *Dir) change(sinceRev int64, expire time.Duration) error {
 	dir.Unlock()
 
 	children, stat, err := dir.watch.ChildrenChange(stat, expire)
-	if err != nil {
-		if zutil.IsNoNode(err) {
-			return nil
-		}
+	if zutil.IsNoNode(err) {
+		return dir.clear()
+	} else if err != nil {
 		return err
 	}
 
@@ -162,10 +161,9 @@ func (dir *Dir) change(sinceRev int64, expire time.Duration) error {
 func (dir *Dir) sync() error {
 
 	children, stat, err := dir.watch.Children()
-	if err != nil {
-		if zutil.IsNoNode(err) {
-			return nil
-		}
+	if zutil.IsNoNode(err) {
+		return dir.clear()
+	} else if err != nil {
 		return err
 	}
 
@@ -195,6 +193,15 @@ func (dir *Dir) fetch(children []string, stat *zookeeper.Stat) error {
 	dir.dirs = dirsNew
 	dir.files = filesNew
 	dir.stat = stat
+	return nil
+}
+
+func (dir *Dir) clear() error {
+	dir.Lock()
+	defer dir.Unlock()
+	dir.dirs = nil
+	dir.files = nil
+	dir.stat = nil
 	return nil
 }
 
@@ -238,11 +245,10 @@ func fetch(z *zookeeper.Conn, zdir string, children []string) (dirs map[string]s
 func (dir *Dir) prune(dirs map[string]struct{}) error {
 	for cname, _ := range dirs {
 		cdir_, err := dir.OpenDir(cname)
-		if err != nil {
-			if zutil.IsNoNode(err) {
-				delete(dirs, cname)
-				continue
-			}
+		if zutil.IsNoNode(err) {
+			delete(dirs, cname)
+			continue
+		} else if err != nil {
 			return err
 		}
 		cdir := cdir_.(*Dir)
