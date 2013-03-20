@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"math"
 	"net"
 	"net/http"
 	"strconv"
@@ -85,6 +86,9 @@ func handler(read readRequestBatchFunc, w http.ResponseWriter, r *http.Request, 
 	var bb bytes.Buffer
 	enc := json.NewEncoder(&bb)
 	for _, r := range resp {
+		if math.IsNaN(r.(float64)) {
+			r = "ERR"
+		}
 		if err := enc.Encode(r); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf("problem json marshaling response %#v: %s", r, err)))
