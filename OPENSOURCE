@@ -1,5 +1,7 @@
-* misc libzookeeper libraries seem to require hardcoded location
+* durable fs browser
 * sumr apis no listening
+	--
+	(3) client.Sum will return NaN if there is an I/O problem; API fails to marshal this as JSON
 
 generate-circuit-config.sh in tutorials
 resolve open issues in /src/circuit/TODO

@@ -83,6 +83,7 @@ func (start) Start(durableFile string, port int, readOnly bool) (circuit.XPerm, 
 	if err != nil {
 		return nil, err
 	}
+	circuit.Daemonize(func() { <-(chan int)(nil) })	// Daemonize this worker forever, i.e. worker should never die
 	return circuit.PermRef(a), nil
 }
 

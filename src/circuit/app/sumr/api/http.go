@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -33,10 +34,10 @@ func startServer(port int, respondAdd, respondSum respondFunc) (*httpServer, err
 	serveMux := http.NewServeMux()
 	x.server.Handler = serveMux
 
-	serveMux.Handle("/v0/add", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	serveMux.Handle("/add", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		handler(readAddRequestBatch, w, r, respondAdd)
 	}))
-	serveMux.Handle("/v0/sum", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	serveMux.Handle("/sum", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		handler(readSumRequestBatch, w, r, respondSum)
 	}))
 
@@ -85,7 +86,9 @@ func handler(read readRequestBatchFunc, w http.ResponseWriter, r *http.Request, 
 	enc := json.NewEncoder(&bb)
 	for _, r := range resp {
 		if err := enc.Encode(r); err != nil {
-			panic("marshal response")
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(fmt.Sprintf("problem json marshaling response %#v: %s", r, err)))
+			return
 		}
 	}
 	w.Write(bb.Bytes())

@@ -55,7 +55,6 @@ func (r *Runtime) closeDaemonizer() bool {
 }
 
 func (r *Runtime) serveGo(req *goMsg, conn circuit.Conn) {
-	println("serveGo")
 
 	// Go guarantees the defer runs even if panic occurs
 	defer conn.Close()

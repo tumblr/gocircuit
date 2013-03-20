@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	ErrClosed  = circuit.NewError("closed")
+	ErrClosed  = circuit.NewError("durable file system: closed")
 )
 
 // FS implements a durable file system on top of Zookeeper

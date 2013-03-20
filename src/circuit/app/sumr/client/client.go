@@ -115,6 +115,10 @@ func (cli *Client) Sum(key sumr.Key) (result float64) {
 	cli.lmtr.Open()
 	defer cli.lmtr.Close()
 
+	cli.lk.Lock()
+	server := cli.metric.Nearest(xor.Key(key), 1)[0].(*shard).Server
+	cli.lk.Unlock()
+
 	// Recover from dead shard panic
 	defer func() {
 		if err := recover(); err != nil {
@@ -122,10 +126,6 @@ func (cli *Client) Sum(key sumr.Key) (result float64) {
 			result = math.NaN()
 		}
 	}()
-
-	cli.lk.Lock()
-	server := cli.metric.Nearest(xor.Key(key), 1)[0].(*server.WorkerCheckpoint).Server
-	cli.lk.Unlock()
 
 	retrn := server.Call("Sum", key)
 	return retrn[0].(float64)
