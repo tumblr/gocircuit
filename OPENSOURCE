@@ -1,5 +1,4 @@
 * test that sumr db works correctly
-	* split: sumr-start-db, sumr-start-api (demo the use of durable fs)
 * 4dcat show contents of durable file (prettify cross interfaces)
 
 RuntimeID->WorkerID
