@@ -1,4 +1,4 @@
-// Common Thrift protocol definitions for Facebook services, like Scribe
+// Package fb303 contains common Apache Thrift protocol definitions for Facebook services like Apache Scribe
 package fb303
 
 import (

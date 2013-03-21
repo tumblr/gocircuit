@@ -1,3 +1,4 @@
+// Package util implements miscellaneous compiler utilities
 package util
 
 import (

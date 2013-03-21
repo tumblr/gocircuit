@@ -1,4 +1,4 @@
-// Thrift protocol definitions for Scribe
+// Package scribe contains Apache Thrift protocol definitions for Apache Scribe
 package scribe
 
 import (

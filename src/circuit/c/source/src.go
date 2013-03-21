@@ -1,3 +1,4 @@
+// Package source implements compiler facilities for managing and parsing source trees
 package source
 
 import (

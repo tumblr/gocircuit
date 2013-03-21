@@ -1,3 +1,4 @@
+// Package types implements the circuit compiler's type system
 package types
 
 import (

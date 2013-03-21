@@ -1,3 +1,4 @@
+// Package dep implements dependency-tracking facilities
 package dep
 
 import (

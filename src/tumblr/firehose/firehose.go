@@ -1,4 +1,4 @@
-// Package firehose implements a clients for the Tumblr Firehose/Firegeyser streaming API.
+// Package firehose implements a clients for the Tumblr Firehose streaming API
 package firehose
 
 import (

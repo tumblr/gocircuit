@@ -1,3 +1,4 @@
+// Package errors implements error facilities for the circuit compiler
 package errors
 
 import (

@@ -1,3 +1,4 @@
+// Package scribe implements a client and a server for the Apache Scribe protocol
 package scribe
 
 import (
