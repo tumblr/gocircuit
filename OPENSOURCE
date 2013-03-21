@@ -1,7 +1,5 @@
-* test that sumr db works correctly
 * 4dcat show contents of durable file (prettify cross interfaces)
 
-RuntimeID->WorkerID
 illustration that shows data flow in the lifecycle, with annotations for 4build, 4crossbuild, 4install, etc.
 
 generate-circuit-config.sh in tutorials
