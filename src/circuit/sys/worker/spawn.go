@@ -3,16 +3,16 @@ package worker
 
 import (
 	"bufio"
+	"circuit/kit/posix"
+	"circuit/load/config"
+	"circuit/sys/transport"
+	"circuit/use/circuit"
 	"encoding/json"
 	"fmt"
 	"io"
 	"os/exec"
-	"strconv"
-	"circuit/kit/posix"
-	"circuit/sys/transport"
-	"circuit/use/circuit"
-	"circuit/load/config"
 	"path"
+	"strconv"
 )
 
 type Config struct {
@@ -50,7 +50,7 @@ func (c *Config) Spawn(host string, anchors ...string) (circuit.Addr, error) {
 		return nil, err
 	}
 	//posix.ForwardStderrBatch(stderr)
-	id := circuit.ChooseRuntimeID()
+	id := circuit.ChooseWorkerID()
 
 	// Forward the stderr of the ssh process to this process' stderr
 	posix.ForwardStderr(fmt.Sprintf("%s.dmnzr/err: ", id), stderr)
@@ -71,7 +71,7 @@ func (c *Config) Spawn(host string, anchors ...string) (circuit.Addr, error) {
 		sh = fmt.Sprintf("cd %s\n%s=%s %s\n", bindir, config.RoleEnv, config.Daemonizer, c.Binary)
 	} else {
 		sh = fmt.Sprintf(
-			"cd %s\nLD_LIBRARY_PATH=%s DYLD_LIBRARY_PATH=%s %s=%s %s\n", 
+			"cd %s\nLD_LIBRARY_PATH=%s DYLD_LIBRARY_PATH=%s %s=%s %s\n",
 			bindir, c.LibPath, c.LibPath, config.RoleEnv, config.Daemonizer, c.Binary)
 	}
 	stdin.Write([]byte(sh))
@@ -148,6 +148,6 @@ func kill(remote circuit.Addr) error {
 		return err
 	}
 	stdinWriter.Close()
-	
+
 	return cmd.Wait()
 }

@@ -2,9 +2,9 @@
 package io
 
 import (
-	"runtime"
 	"circuit/use/circuit"
 	"io"
+	"runtime"
 )
 
 func NewClient(x circuit.X) *Client {
@@ -86,7 +86,7 @@ func (srv *Server) Read(n int) ([]byte, error) {
 	return p[:m], err
 }
 
-func min (x, y int) int {
+func min(x, y int) int {
 	if x < y {
 		return x
 	}

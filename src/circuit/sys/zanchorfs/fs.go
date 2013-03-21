@@ -3,22 +3,22 @@ package zanchorfs
 
 import (
 	"bytes"
-	"encoding/gob"
-	"path"
-	"sync"
-	"circuit/use/circuit"
 	"circuit/kit/zookeeper"
 	"circuit/kit/zookeeper/zutil"
 	"circuit/use/anchorfs"
+	"circuit/use/circuit"
+	"encoding/gob"
+	"path"
+	"sync"
 )
 
 // FS is a client for the anchor file system on Zookeeper
 type FS struct {
 	sync.Mutex
-	zookeeper  *zookeeper.Conn
-	root       string
-	anchors    map[string]*Dir
-	created    map[string]struct{}  // Anchors created by this worker
+	zookeeper *zookeeper.Conn
+	root      string
+	anchors   map[string]*Dir
+	created   map[string]struct{} // Anchors created by this worker
 }
 
 func New(zookeeper *zookeeper.Conn, root string) *FS {
@@ -52,9 +52,9 @@ func (fs *FS) CreateFile(anchor string, owner circuit.Addr) error {
 	}
 
 	_, err = fs.zookeeper.Create(
-		path.Join(_anchor, owner.RuntimeID().String()), 
-		string(w.Bytes()), 
-		zookeeper.EPHEMERAL, 
+		path.Join(_anchor, owner.WorkerID().String()),
+		string(w.Bytes()),
+		zookeeper.EPHEMERAL,
 		zutil.PermitAll,
 	)
 	if err != nil {
@@ -104,7 +104,7 @@ func (fs *FS) OpenDir(anchor string) (anchorfs.Dir, error) {
 
 func (fs *FS) OpenFile(anchor string) (anchorfs.File, error) {
 	ad, af := path.Split(anchor)
-	id, err := circuit.ParseRuntimeID(af)
+	id, err := circuit.ParseWorkerID(af)
 	if err != nil {
 		return nil, err
 	}

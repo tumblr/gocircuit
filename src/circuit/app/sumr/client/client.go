@@ -2,15 +2,15 @@
 package client
 
 import (
+	"circuit/app/sumr"
+	"circuit/app/sumr/server"
+	"circuit/kit/sched/limiter"
+	"circuit/kit/xor"
+	"circuit/use/circuit"
 	"log"
 	"math"
 	"sync"
 	"time"
-	"circuit/app/sumr"
-	"circuit/app/sumr/server"
-	"circuit/use/circuit"
-	"circuit/kit/sched/limiter"
-	"circuit/kit/xor"
 )
 
 // TODO: Enforce read only
@@ -20,9 +20,9 @@ type Client struct {
 	dfile      string
 	readOnly   bool
 	checkpoint *server.Checkpoint
-	lmtr       limiter.Limiter	// Global client rate limiter
+	lmtr       limiter.Limiter // Global client rate limiter
 	lk         sync.Mutex
-	metric     xor.Metric		// Items in the metric are shard
+	metric     xor.Metric // Items in the metric are shard
 }
 
 type shard struct {
@@ -67,6 +67,10 @@ func (cli *Client) Add(updateTime time.Time, key sumr.Key, value float64) (resul
 	cli.lmtr.Open()
 	defer cli.lmtr.Close()
 
+	cli.lk.Lock()
+	server := cli.metric.Nearest(xor.Key(key), 1)[0].(*shard).Server
+	cli.lk.Unlock()
+
 	// Recover from dead shard panic
 	defer func() {
 		if err := recover(); err != nil {
@@ -75,10 +79,6 @@ func (cli *Client) Add(updateTime time.Time, key sumr.Key, value float64) (resul
 			result = math.NaN()
 		}
 	}()
-
-	cli.lk.Lock()
-	server := cli.metric.Nearest(xor.Key(key), 1)[0].(*server.WorkerCheckpoint).Server
-	cli.lk.Unlock()
 
 	retrn := server.Call("Add", updateTime, key, value)
 	return retrn[0].(float64)

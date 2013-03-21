@@ -1,9 +1,9 @@
 package lang
 
 import (
+	"circuit/use/circuit"
 	"log"
 	"strings"
-	"circuit/use/circuit"
 )
 
 func (r *Runtime) serveDropPtr(q *dropPtrMsg, conn circuit.Conn) {
@@ -52,7 +52,7 @@ func (u *_ptr) Call(proc string, in ...interface{}) []interface{} {
 	// Import return values
 	out, err := u.r.importValues(retrn.Out, fn.OutTypes, u.imph.Exporter, true, conn)
 	if err != nil {
-		// An error from importValues implies that the remote is using an 
+		// An error from importValues implies that the remote is using an
 		// incompatible protocol. Thus, we consider it dead to us.
 		// And in such cases, by design, we panic.
 		panic(err)

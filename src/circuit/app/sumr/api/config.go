@@ -9,13 +9,13 @@ func init() {
 
 // Config specifies a cluster of HTTP API servers
 type Config struct {
-	Anchor   string			// Anchor for the sumr API workers
-	ReadOnly bool			// Reject requests resulting in change
-	Workers  []*WorkerConfig	// Specification of service workers
+	Anchor   string          // Anchor for the sumr API workers
+	ReadOnly bool            // Reject requests resulting in change
+	Workers  []*WorkerConfig // Specification of service workers
 }
 
 // WorkerConfig specifies an individual API server
 type WorkerConfig struct {
-	Host string	// Host is the circuit hostname where the worker is to be deployed
-	Port int	// Port is the port number when the HTTP API server is to listen
+	Host string // Host is the circuit hostname where the worker is to be deployed
+	Port int    // Port is the port number when the HTTP API server is to listen
 }

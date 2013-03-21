@@ -2,10 +2,10 @@ package lang
 
 import (
 	"bytes"
+	"circuit/use/circuit"
 	"encoding/gob"
 	"io"
 	"sync"
-	"circuit/use/circuit"
 )
 
 func NewBytesConn(addr string) circuit.Conn {
@@ -27,7 +27,7 @@ func (a stringAddr) Host() string {
 	panic("not network host underlying")
 }
 
-func (a stringAddr) RuntimeID() circuit.RuntimeID {
+func (a stringAddr) WorkerID() circuit.WorkerID {
 	return 0
 }
 

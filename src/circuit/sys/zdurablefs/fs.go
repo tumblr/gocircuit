@@ -2,19 +2,19 @@
 package zdurablefs
 
 import (
-	"path"
-	"circuit/use/circuit"
 	"circuit/kit/zookeeper"
+	"circuit/use/circuit"
+	"path"
 )
 
 var (
-	ErrClosed  = circuit.NewError("durable file system: closed")
+	ErrClosed = circuit.NewError("durable file system: closed")
 )
 
 // FS implements a durable file system on top of Zookeeper
 type FS struct {
-	conn     *zookeeper.Conn
-	zroot    string
+	conn  *zookeeper.Conn
+	zroot string
 }
 
 func New(conn *zookeeper.Conn, zroot string) *FS {

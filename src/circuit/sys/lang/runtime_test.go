@@ -1,13 +1,13 @@
 package lang
 
 import (
+	"circuit/sys/lang/types"
+	"circuit/use/circuit"
 	"fmt"
 	"runtime"
 	"strconv"
 	"testing"
 	"time"
-	"circuit/use/circuit"
-	"circuit/sys/lang/types"
 )
 
 type testBoot struct {
@@ -33,7 +33,7 @@ func (x *testBoot) ReturnNil() *TestData {
 func (x *testBoot) ReturnNilMap() *TestData {
 	m := make(map[string]interface{})
 	m["a"] = nil
-	return &TestData{M:m}
+	return &TestData{M: m}
 }
 
 type testGreeter struct{}
@@ -46,7 +46,7 @@ func (x *testGreeter) String() string {
 
 func TestX(t *testing.T) {
 	l1 := NewSandbox()
-	r1 := New(l1) 
+	r1 := New(l1)
 	r1.Listen("test", &testBoot{"π1"})
 
 	l2 := NewSandbox()
@@ -66,7 +66,7 @@ func TestX(t *testing.T) {
 	if p1.Call("Name")[0].(string) != "π1" {
 		t.Errorf("return val 1")
 	}
-	
+
 	if p2.Call("Name")[0].(string) != "π2" {
 		t.Errorf("return val 2")
 	}
@@ -88,10 +88,10 @@ func TestRe(t *testing.T) {
 	if err != nil {
 		t.Fatalf("dial r1b0 (%s)", err)
 	}
-	
+
 	// R1 gets an ptr to a new greeter residing on R0
 	g0 := r1b0.Call("NewGreeter")[0].(circuit.X)
-	
+
 	// R1 gets boot value of R2
 	r1b2, err := r[1].TryDial(l[2].Addr(), "test")
 	if err != nil {
@@ -111,12 +111,13 @@ func TestRe(t *testing.T) {
 }
 
 type testFunc struct{}
+
 func (testFunc) Func(msg string, p *TestData) *string {
 	s := msg + " world " + strconv.Itoa(p.M["a"].(int))
 	return &s
 }
 
-type TestData struct{
+type TestData struct {
 	X int
 	M map[string]interface{}
 	I interface{}
@@ -132,8 +133,8 @@ func TestGo(t *testing.T) {
 	types.RegisterFunc(testFunc{})
 
 	x := &TestData{
-		X:3, 
-		M:make(map[string]interface{}),
+		X: 3,
+		M: make(map[string]interface{}),
 		I: (*int)(nil),
 	}
 
@@ -147,7 +148,7 @@ func TestGo(t *testing.T) {
 		if !ok {
 			t.Fatalf("reply type")
 		}
-		if *s != "hello world " + strconv.Itoa(i) {
+		if *s != "hello world "+strconv.Itoa(i) {
 			t.Fatalf("reply value")
 		}
 	}

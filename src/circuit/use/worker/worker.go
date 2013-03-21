@@ -7,7 +7,7 @@ import (
 )
 
 // Spawn starts a new worker process on host and registers it under the given
-// anchors directories in the anchor file system. On success, Spawn returns 
+// anchors directories in the anchor file system. On success, Spawn returns
 // the address of the new work. Spawn is a low-level function. The spawned
 // worker will wait idle for further interaction. It is the caller's responsibility
 // to manage the lifespan of the newworker.

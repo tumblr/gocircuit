@@ -95,7 +95,7 @@ func compileTypeExpr(pkgPath string, fimp *util.FileImports, expr ast.Expr) (typ
 			return &Slice{Elt: elt}, nil
 		}
 		if _, ok := q.Len.(*ast.Ellipsis); ok {
-			return &Array{Len: -1/*XXX*/, Elt: elt}, nil
+			return &Array{Len: -1 /*XXX*/, Elt: elt}, nil
 		}
 		return nil, errors.New("unknown array length")
 

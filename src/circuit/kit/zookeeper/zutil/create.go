@@ -2,10 +2,10 @@
 package zutil
 
 import (
+	"circuit/kit/zookeeper"
 	"errors"
 	"path"
 	"strings"
-	"circuit/kit/zookeeper"
 )
 
 func CreateRecursive(z *zookeeper.Conn, leafPath string, aclv []zookeeper.ACL) error {

@@ -2,6 +2,7 @@
 package transport
 
 import (
+	"circuit/use/circuit"
 	"encoding/gob"
 	"fmt"
 	"log"
@@ -9,7 +10,6 @@ import (
 	"os"
 	"strings"
 	"sync"
-	"circuit/use/circuit"
 )
 
 // gobConn keeps a Conn instance together with its gob codecs
@@ -21,37 +21,37 @@ type gobConn struct {
 
 func newGobConn(c net.Conn) *gobConn {
 	return &gobConn{
-		Encoder:  gob.NewEncoder(c),
-		Decoder:  gob.NewDecoder(c),
-		Conn:     c,
+		Encoder: gob.NewEncoder(c),
+		Decoder: gob.NewDecoder(c),
+		Conn:    c,
 	}
 }
 
 // Transport ..
 // Transport implements circuit.Transport, circuit.Dialer and circuit.Listener
 type Transport struct {
-	self       circuit.Addr
-	bind       *Addr
-	listener   *net.TCPListener
-	addrtabl   *addrTabl
+	self     circuit.Addr
+	bind     *Addr
+	listener *net.TCPListener
+	addrtabl *addrTabl
 
 	// How many unacknowledged messages we are willing to keep per link, before
 	// we start blocking on writes
-	pipelining int  
+	pipelining int
 
-	lk         sync.Mutex
-	remote     map[circuit.RuntimeID]*link
+	lk     sync.Mutex
+	remote map[circuit.WorkerID]*link
 
-	ach        chan *conn  // Channel for accepting new connections
+	ach chan *conn // Channel for accepting new connections
 }
 
-func NewClient(id circuit.RuntimeID) *Transport {
+func NewClient(id circuit.WorkerID) *Transport {
 	return New(id, "", "localhost")
 }
 
 const DefaultPipelining = 333
 
-func New(id circuit.RuntimeID, bindAddr string, host string) *Transport {
+func New(id circuit.WorkerID, bindAddr string, host string) *Transport {
 
 	// Bind
 	var l *net.TCPListener
@@ -62,14 +62,14 @@ func New(id circuit.RuntimeID, bindAddr string, host string) *Transport {
 	if err != nil {
 		panic(err)
 	}
-	
+
 	// Build transport structure
 	l = l_.(*net.TCPListener)
 	t := &Transport{
 		listener:   l,
 		addrtabl:   makeAddrTabl(),
 		pipelining: DefaultPipelining,
-		remote:     make(map[circuit.RuntimeID]*link),
+		remote:     make(map[circuit.WorkerID]*link),
 		ach:        make(chan *conn),
 	}
 
@@ -103,7 +103,7 @@ func (t *Transport) loop() {
 	for {
 		c, err := t.listener.AcceptTCP()
 		if err != nil {
-			panic(err)  // Best not to be quiet about it
+			panic(err) // Best not to be quiet about it
 		}
 		t.link(c, nil)
 	}
@@ -137,7 +137,7 @@ func (t *Transport) dialLink(a *Addr) (*link, error) {
 	return l, nil
 }
 
-func (t *Transport) drop(id circuit.RuntimeID) {
+func (t *Transport) drop(id circuit.WorkerID) {
 	t.lk.Lock()
 	delete(t.remote, id)
 	t.lk.Unlock()
@@ -168,7 +168,7 @@ func (t *Transport) link(c *net.TCPConn, a *Addr) (*link, error) {
 	}
 
 	addr := t.addrtabl.Normalize(&Addr{
-		ID:   welcome.ID, 
+		ID:   welcome.ID,
 		PID:  welcome.PID,
 		Addr: c.RemoteAddr().(*net.TCPAddr),
 	})
@@ -189,12 +189,12 @@ func (t *Transport) link(c *net.TCPConn, a *Addr) (*link, error) {
 	return l, nil
 }
 
-func (t *Transport) Dialer() circuit.Dialer { 
-	return t 
+func (t *Transport) Dialer() circuit.Dialer {
+	return t
 }
 
-func (t *Transport) Listener() circuit.Listener { 
-	return t 
+func (t *Transport) Listener() circuit.Listener {
+	return t
 }
 
 func (t *Transport) Close() {

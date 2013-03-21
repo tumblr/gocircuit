@@ -36,7 +36,7 @@ var (
 		Args: []*TopicPartitionMessages{
 			{
 				TopicPartition: TopicPartition{
-					Topic: "hello",
+					Topic:     "hello",
 					Partition: 0x00112233,
 				},
 				Messages: []*Message{
@@ -82,11 +82,11 @@ var (
 		Args: []*TopicPartitionOffset{
 			{
 				TopicPartition: TopicPartition{
-					Topic:         "hello",
-					Partition:     0x00112233,
+					Topic:     "hello",
+					Partition: 0x00112233,
 				},
-				Offset:        0x0011223344556677,
-				MaxSize:       0x00112233,
+				Offset:  0x0011223344556677,
+				MaxSize: 0x00112233,
 			},
 		},
 	}
@@ -115,11 +115,11 @@ func TestFetchRequest(t *testing.T) {
 var (
 	testOffsetsRequest = &OffsetsRequest{
 		TopicPartition: TopicPartition{
-			Topic:         "hello",
-			Partition:     0x00112233,
+			Topic:     "hello",
+			Partition: 0x00112233,
 		},
-		Time:          0x0011223344556677,
-		MaxOffsets:    0x00112233,
+		Time:       0x0011223344556677,
+		MaxOffsets: 0x00112233,
 	}
 )
 

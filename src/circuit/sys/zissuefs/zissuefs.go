@@ -2,6 +2,12 @@ package zissuefs
 
 import (
 	"bytes"
+	"circuit/kit/sched/limiter"
+	"circuit/kit/zookeeper"
+	"circuit/kit/zookeeper/zutil"
+	"circuit/use/anchorfs"
+	"circuit/use/circuit"
+	"circuit/use/issuefs"
 	"encoding/gob"
 	"fmt"
 	"log"
@@ -9,12 +15,6 @@ import (
 	"path"
 	"sync"
 	"time"
-	"circuit/use/circuit"
-	"circuit/kit/sched/limiter"
-	"circuit/kit/zookeeper"
-	"circuit/kit/zookeeper/zutil"
-	"circuit/use/anchorfs"
-	"circuit/use/issuefs"
 )
 
 // TODO: Add global locks on issue read/write
@@ -32,7 +32,7 @@ func New(z *zookeeper.Conn, root string) *FS {
 	return &FS{z: z, root: root}
 }
 
-func (fs *FS) Add(msg string/*, affected circuit.Addr*/) int64 {
+func (fs *FS) Add(msg string /*, affected circuit.Addr*/) int64 {
 	fs.Lock()
 	defer fs.Unlock()
 
@@ -42,8 +42,8 @@ func (fs *FS) Add(msg string/*, affected circuit.Addr*/) int64 {
 		Time:     time.Now(),
 		Reporter: circuit.WorkerAddr(),
 		//Affected: affected,
-		Anchor:   anchorfs.Created(),
-		Msg:      msg,
+		Anchor: anchorfs.Created(),
+		Msg:    msg,
 	}
 
 	// Prepare body
@@ -86,7 +86,7 @@ func (fs *FS) List() []*issuefs.Issue {
 func (fs *FS) Resolve(id int64) error {
 	fs.Lock()
 	defer fs.Unlock()
-	
+
 	// Read issue file
 	unresolved := path.Join(fs.root, "unresolved", issuefs.IDString(id))
 	data, _, err := fs.z.Get(unresolved)
@@ -96,7 +96,7 @@ func (fs *FS) Resolve(id int64) error {
 	if err != nil {
 		panic(err)
 	}
-	
+
 	// Write issue file in resolved
 	if _, err = fs.z.Create(path.Join(fs.root, "resolved", issuefs.IDString(id)), data, 0, zutil.PermitAll); err != nil {
 		panic(err)

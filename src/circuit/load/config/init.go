@@ -15,6 +15,7 @@ const (
 	Daemonizer = "daemonizer"
 	Worker     = "worker"
 )
+
 var Role string
 
 // CIRCUIT_ROLE names the environment variable that determines the role of this invokation
@@ -76,6 +77,7 @@ type WorkerConfig struct {
 	Install   *InstallConfig
 	Build     *BuildConfig
 }
+
 var Config *WorkerConfig
 
 func parseBag(r io.Reader) {

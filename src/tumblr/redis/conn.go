@@ -6,9 +6,9 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"net/textproto"
 	"strconv"
 	"time"
-	"net/textproto"
 )
 
 // Conn is a connection to a Redis server.

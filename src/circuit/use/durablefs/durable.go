@@ -2,9 +2,9 @@
 package durablefs
 
 import (
-	"time"
 	"circuit/kit/join"
 	"circuit/use/circuit"
+	"time"
 )
 
 var link = join.SetThenGet{Name: "durable file system"}
@@ -66,7 +66,7 @@ type Dir interface {
 	// Children returns a map of directory children names
 	Children() (children map[string]Info)
 
-	// Change blocks until a change in the contents of this directory is detected and 
+	// Change blocks until a change in the contents of this directory is detected and
 	// returns a map of children names
 	Change() (children map[string]Info)
 
@@ -80,9 +80,9 @@ type Dir interface {
 
 // Info holds metadata about a node (file or directory) in the file system
 type Info struct {
-	Name        string  // Name of the file or sub-directory
-	HasBody     bool    // True if the Zookeeper node has non-empty data
-	HasChildren bool    // True if the Zookeeper node has children
+	Name        string // Name of the file or sub-directory
+	HasBody     bool   // True if the Zookeeper node has non-empty data
+	HasChildren bool   // True if the Zookeeper node has children
 }
 
 // File is an interface to a file in the durable file system

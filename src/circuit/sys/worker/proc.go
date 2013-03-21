@@ -1,9 +1,9 @@
 package worker
 
 import (
-	"io"
-	"circuit/use/circuit"
 	"circuit/sys/transport"
+	"circuit/use/circuit"
+	"io"
 )
 
 type Console struct {
@@ -25,7 +25,7 @@ func (p *Process) Kill() error {
 	return kill(p.addr)
 }
 
-func (p *Process) Stdin()  io.WriteCloser {
+func (p *Process) Stdin() io.WriteCloser {
 	panic("ni")
 	return p.console.stdin
 }

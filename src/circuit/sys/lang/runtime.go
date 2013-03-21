@@ -1,30 +1,30 @@
 package lang
 
 import (
-	"log"
-	"sync"
-	"circuit/use/circuit"
 	"circuit/sys/acid"
 	"circuit/sys/lang/prof"
 	"circuit/sys/lang/types"
+	"circuit/use/circuit"
+	"log"
+	"sync"
 )
 
 // Runtime represents that state of the circuit program at the present moment.
 // This state can change in two ways: by a 'linguistic' action ...
 type Runtime struct {
-	dialer  circuit.Transport
-	exp     *expTabl
-	imp     *impTabl
-	srv     srvTabl
-	blk     sync.Mutex
-	boot    interface{}
-	lk      sync.Mutex
-	live    map[circuit.Addr]struct{}  // Set of peers we monitor for liveness
-	prof    *prof.Profile
+	dialer circuit.Transport
+	exp    *expTabl
+	imp    *impTabl
+	srv    srvTabl
+	blk    sync.Mutex
+	boot   interface{}
+	lk     sync.Mutex
+	live   map[circuit.Addr]struct{} // Set of peers we monitor for liveness
+	prof   *prof.Profile
 
-	dlk     sync.Mutex
-	dallow  bool
-	daemon  bool
+	dlk    sync.Mutex
+	dallow bool
+	daemon bool
 }
 
 func New(t circuit.Transport) *Runtime {

@@ -18,6 +18,6 @@ func (App) Open(filepath string) circuit.X {
 	if err != nil {
 		return nil
 	}
-	circuit.Daemonize(func() { time.Sleep(5*time.Second) })
+	circuit.Daemonize(func() { time.Sleep(5 * time.Second) })
 	return circuit.Ref(file.NewFileServer(f))
 }

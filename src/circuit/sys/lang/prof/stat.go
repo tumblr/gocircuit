@@ -17,10 +17,10 @@ type Stat struct {
 }
 
 func (s *Stat) String() string {
-	return fmt.Sprintf("type=%s completed=%10d pending=%10d avg/dev=%.1g/%.1g ms abort—avg/dev=%.1g/%.1g ms", 
-		s.Type, s.End, s.Begin - s.End - s.Abort, 
-		s.DurAvg / 1e6, s.DurStdDev / 1e6,
-		s.AbortDurAvg / 1e6, s.AbortDurStdDev / 1e6,
+	return fmt.Sprintf("type=%s completed=%10d pending=%10d avg/dev=%.1g/%.1g ms abort—avg/dev=%.1g/%.1g ms",
+		s.Type, s.End, s.Begin-s.End-s.Abort,
+		s.DurAvg/1e6, s.DurStdDev/1e6,
+		s.AbortDurAvg/1e6, s.AbortDurStdDev/1e6,
 	)
 }
 

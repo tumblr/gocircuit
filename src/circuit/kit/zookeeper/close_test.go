@@ -1,9 +1,9 @@
 package zookeeper_test
 
 import (
+	zk "circuit/kit/zookeeper"
 	"io"
 	. "launchpad.net/gocheck"
-	zk "circuit/kit/zookeeper"
 	"log"
 	"net"
 	"time"

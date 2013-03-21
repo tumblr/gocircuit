@@ -26,7 +26,7 @@ type Node struct {
 	Item
 	Left, Right *Node // Pointers to left and right child nodes
 	Black       bool  // If set, the color of the link (incoming from the parent) is black
-	                  // In the LLRB, new nodes are always red, hence the zero-value for node
+	// In the LLRB, new nodes are always red, hence the zero-value for node
 }
 
 type Item interface{}

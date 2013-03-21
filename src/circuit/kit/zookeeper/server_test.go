@@ -2,10 +2,10 @@ package zookeeper_test
 
 import (
 	"bufio"
+	zk "circuit/kit/zookeeper"
 	"flag"
 	"fmt"
 	. "launchpad.net/gocheck"
-	zk "circuit/kit/zookeeper"
 	"os"
 	"os/exec"
 	"strings"

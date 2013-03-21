@@ -2,10 +2,10 @@
 package anchorfs
 
 import (
+	"circuit/use/circuit"
 	"path"
 	"strings"
 	"time"
-	"circuit/use/circuit"
 )
 
 var (
@@ -26,11 +26,11 @@ type Dir interface {
 	Name() string
 	Dirs() ([]string, error)
 
-	Files()                                            (rev int64, workers map[circuit.RuntimeID]File, err error)
-	Change(sinceRev int64)                             (rev int64, workers map[circuit.RuntimeID]File, err error)
-	ChangeExpire(sinceRev int64, expire time.Duration) (rev int64, workers map[circuit.RuntimeID]File, err error)
+	Files() (rev int64, workers map[circuit.WorkerID]File, err error)
+	Change(sinceRev int64) (rev int64, workers map[circuit.WorkerID]File, err error)
+	ChangeExpire(sinceRev int64, expire time.Duration) (rev int64, workers map[circuit.WorkerID]File, err error)
 
-	OpenFile(circuit.RuntimeID) (File, error)
+	OpenFile(circuit.WorkerID) (File, error)
 	OpenDir(string) (Dir, error)
 }
 
@@ -48,7 +48,7 @@ func Sanitize(anchor string) ([]string, string, error) {
 	}
 	parts := strings.Split(anchor[1:], "/")
 	for _, part := range parts {
-		if _, err := circuit.ParseRuntimeID(part); err == nil {
+		if _, err := circuit.ParseWorkerID(part); err == nil {
 			return nil, "", ErrName
 		}
 	}

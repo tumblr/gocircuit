@@ -32,7 +32,7 @@ func deep(shown shownMap, w *bufio.Writer, v reflect.Value, prefix string) {
 			w.WriteString("{\n")
 			for i := 0; i < v.Len(); i++ {
 				w.WriteString(prefix + ind)
-				deep(shown, w, v.Index(i), prefix + ind)
+				deep(shown, w, v.Index(i), prefix+ind)
 				w.WriteString(",\n")
 			}
 			w.WriteString(prefix + "}")
@@ -56,7 +56,7 @@ func deep(shown shownMap, w *bufio.Writer, v reflect.Value, prefix string) {
 				w.WriteString(prefix + ind)
 				w.WriteString(typ.Field(i).Name)
 				w.WriteString(": ")
-				deep(shown, w, v.Field(i), prefix + ind)
+				deep(shown, w, v.Field(i), prefix+ind)
 				w.WriteString(",\n")
 			}
 			w.WriteString(prefix + "}")
@@ -71,9 +71,9 @@ func deep(shown shownMap, w *bufio.Writer, v reflect.Value, prefix string) {
 			w.WriteString("{\n")
 			for _, k := range v.MapKeys() {
 				w.WriteString(prefix + ind)
-				deep(shown, w, k, prefix + ind)
+				deep(shown, w, k, prefix+ind)
 				w.WriteString(": ")
-				deep(shown, w, v.MapIndex(k), prefix + ind)
+				deep(shown, w, v.MapIndex(k), prefix+ind)
 				w.WriteString(",\n")
 			}
 			w.WriteString(prefix + "}")

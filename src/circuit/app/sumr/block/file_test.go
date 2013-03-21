@@ -1,8 +1,8 @@
 package block
 
 import (
-	"testing"
 	"circuit/kit/fs/diskfs"
+	"testing"
 )
 
 const testNBlobs = 100

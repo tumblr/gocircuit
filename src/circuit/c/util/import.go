@@ -8,7 +8,7 @@ import (
 
 // CompilePkgImports returns a map of all package paths, directly imported by pkg
 func CompilePkgImports(pkg *ast.Package) map[string]struct{} {
-	imprts := make(map[string]struct{}) 
+	imprts := make(map[string]struct{})
 	for _, file := range pkg.Files {
 		for _, impSpec := range file.Imports {
 			_, importPath := parseImportSpec(impSpec)
@@ -19,9 +19,9 @@ func CompilePkgImports(pkg *ast.Package) map[string]struct{} {
 }
 
 type FileImports struct {
-	Alias      map[string]string		// Import alias to package path
-	Dot        []string			// List of package paths imported with the dot alias
-	Underscore []string			// List of package paths imported with the underscore alias
+	Alias      map[string]string // Import alias to package path
+	Dot        []string          // List of package paths imported with the dot alias
+	Underscore []string          // List of package paths imported with the underscore alias
 }
 
 // CompileFileImports …

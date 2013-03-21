@@ -3,13 +3,13 @@ package zipfs
 
 import (
 	"archive/zip"
+	fspkg "circuit/kit/fs"
 	"io"
 	"os"
 	"path"
 	"strings"
 	"sync"
 	"time"
-	fspkg "circuit/kit/fs"
 )
 
 // FS provides a read-only file system access to a local zip file
@@ -19,7 +19,7 @@ type FS struct {
 }
 
 func Mount(zipfile string) (fs *FS, err error) {
-	fs = &FS{root: NewDir("") }
+	fs = &FS{root: NewDir("")}
 	if fs.r, err = zip.OpenReader(zipfile); err != nil {
 		return nil, err
 	}
@@ -158,7 +158,7 @@ func (d *Dir) Stat() (os.FileInfo, error) {
 func (d *Dir) Readdir(count int) ([]os.FileInfo, error) {
 	d.lk.Lock()
 	defer d.lk.Unlock()
-	ls := make([]os.FileInfo, 0, len(d.dirs) + len(d.files))
+	ls := make([]os.FileInfo, 0, len(d.dirs)+len(d.files))
 	for _, dir := range d.dirs {
 		fi, _ := dir.Stat()
 		ls = append(ls, fi)

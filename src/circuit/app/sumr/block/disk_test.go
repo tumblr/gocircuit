@@ -1,9 +1,9 @@
 package block
 
 import (
+	"circuit/facility/fs/diskfs"
 	"os"
 	"testing"
-	"circuit/facility/fs/diskfs"
 )
 
 func TestDiskWriteRead(t *testing.T) {
@@ -17,7 +17,7 @@ func TestDiskWriteRead(t *testing.T) {
 	}
 
 	// Mount empty and write
-	d, err := Mount(disk)	
+	d, err := Mount(disk)
 	if err != nil {
 		t.Fatalf("mount disk (%s)", err)
 	}
@@ -31,7 +31,7 @@ func TestDiskWriteRead(t *testing.T) {
 	}
 
 	// Mount non-empty and verify contents
-	d, err = Mount(disk)	
+	d, err = Mount(disk)
 	if err != nil {
 		t.Fatalf("mount2 disk (%s)", err)
 	}
@@ -53,7 +53,7 @@ func TestDiskPromote(t *testing.T) {
 	}
 
 	// Mount write
-	d, err := Mount(disk)	
+	d, err := Mount(disk)
 	if err != nil {
 		t.Fatalf("mount disk (%s)", err)
 	}
@@ -72,7 +72,7 @@ func TestDiskPromote(t *testing.T) {
 	}
 
 	// Mount non-empty and verify contents
-	d, err = Mount(disk)	
+	d, err = Mount(disk)
 	if err != nil {
 		t.Fatalf("mount2 disk (%s)", err)
 	}

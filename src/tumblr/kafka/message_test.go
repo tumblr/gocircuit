@@ -9,7 +9,7 @@ import (
 var (
 	testMessage = &Message{
 		Compression: NoCompression,
-		Payload:     []byte{1,2,3},
+		Payload:     []byte{1, 2, 3},
 	}
 )
 

@@ -1,8 +1,8 @@
 package transport
 
 import (
-	"encoding/gob"
 	"circuit/use/circuit"
+	"encoding/gob"
 )
 
 func init() {
@@ -23,7 +23,7 @@ type linkMsg struct {
 }
 
 type welcomeMsg struct {
-	ID  circuit.RuntimeID   // Runtime ID of sender
+	ID  circuit.WorkerID // Runtime ID of sender
 	PID int              // Process ID of sender runtime
 }
 

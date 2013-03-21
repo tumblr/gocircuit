@@ -2,10 +2,10 @@
 package main
 
 import (
-	"os"
 	"circuit/kit/lockfile"
 	"circuit/use/circuit"
 	"fmt"
+	"os"
 	"path"
 )
 
@@ -32,7 +32,7 @@ func main() {
 		if !fi.IsDir() {
 			continue
 		}
-		if _, err := circuit.ParseRuntimeID(fi.Name()); err != nil {
+		if _, err := circuit.ParseWorkerID(fi.Name()); err != nil {
 			continue
 		}
 

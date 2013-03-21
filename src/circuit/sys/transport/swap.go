@@ -5,21 +5,21 @@ import (
 )
 
 type swapConn struct {
-	g         *gobConn			// RW write, R+W read
-	rlk, wlk  sync.Mutex	
-	nsent     int64				// W read-write
-	ackd      int64				// W read-write
-	pipe      chan *linkMsg		// W read-write
-	gsr       int64				// RW write, W read
+	g        *gobConn // RW write, R+W read
+	rlk, wlk sync.Mutex
+	nsent    int64         // W read-write
+	ackd     int64         // W read-write
+	pipe     chan *linkMsg // W read-write
+	gsr      int64         // RW write, W read
 }
 
 func makeSwapConn(g *gobConn, pipelining int) *swapConn {
 	return &swapConn{
-		g:     g, 
-		pipe:  make(chan *linkMsg, pipelining), 
-		nsent: 0, 
-		ackd:  -1, 
-		gsr:   -1, 
+		g:     g,
+		pipe:  make(chan *linkMsg, pipelining),
+		nsent: 0,
+		ackd:  -1,
+		gsr:   -1,
 	}
 }
 
@@ -93,7 +93,7 @@ func (c *swapConn) onRead(rmsg *linkMsg) {
 	if c.g == nil {
 		return
 	}
-	
+
 	// Update ackd. Discard messages from the pipe that have been acknowledged.
 	for c.ackd < rmsg.AckNo {
 		m := <-c.pipe

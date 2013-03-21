@@ -15,7 +15,7 @@ package lang
 	*permPtrMsg		n/a			n/a				n/a					*permptr
 	*permPtrPtrMsg	n/a			n/a				n/a					*permptr
 
-	
+
 	USER VS RUNTIME TYPES
 
 	X     ≈ xptr,		*_ref,		*_ptr,		*ptrMsg,		*ptrPtrMsg

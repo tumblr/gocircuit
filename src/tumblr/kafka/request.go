@@ -44,20 +44,20 @@ type RequestHeader struct {
 	_NonHeaderLen int32
 
 	// _Type represents the request type. It is exposed for the user to fill out
-	// mandatorily only on the cases of produce and fetch requests, where there 
+	// mandatorily only on the cases of produce and fetch requests, where there
 	// are two possible choices RequestProduce, RequestMultiProduce and
 	// ReqeustFetch, RequestMultiFetch, respectively.
-	_Type         RequestType
+	_Type RequestType
 
 	// For produce and fetch requests, _N is the number of topic/partition pairs.
 	// For offsets request _N should always be 1.
-	_N            int16
+	_N int16
 }
 
 // TopicPartition identifies a topic and a partition pair
 type TopicPartition struct {
 	// Topic is the Kafka request topic
-	Topic         string
+	Topic string
 
 	// Partition is the Kafka request partition
 	Partition
@@ -109,11 +109,11 @@ type RequestType int16
 
 // Request Types
 const (
-  RequestProduce RequestType = iota
-  RequestFetch
-  RequestMultiFetch
-  RequestMultiProduce
-  RequestOffsets
+	RequestProduce RequestType = iota
+	RequestFetch
+	RequestMultiFetch
+	RequestMultiProduce
+	RequestOffsets
 )
 
 func isValidRequestType(t RequestType) bool {
@@ -195,7 +195,7 @@ func (x *RequestHeader) Read(r io.Reader) error {
 // on the fact that the most significant bit will never be necessary.
 type Partition int32
 
-// isValidPartition returns true if p does not use the most significant bit. 
+// isValidPartition returns true if p does not use the most significant bit.
 // While this is not required by the Kafka spec, it is an additional safety measure.
 func isValidPartition(p Partition) bool {
 	return p >= 0
@@ -392,6 +392,7 @@ func (x *TopicPartitionOffset) Read(r io.Reader) error {
 // It is intentionally signed to help discover arithmetic errors, resting
 // on the fact that the most significant bit will never be necessary.
 type Offset int64
+
 const OffsetWireLen = 8
 
 // Write encodes the FetchRequest to the writer w in Kafka wire format

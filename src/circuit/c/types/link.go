@@ -1,6 +1,5 @@
 package types
 
-
 /*
 func (tt *Table) linkType(…) … {
 	…

@@ -16,7 +16,7 @@ func TestClientConn(t *testing.T) {
 	err = c.Produce(&ProduceArg{
 		Topic:     "_hello",
 		Partition: 0,
-		Messages:  [][]byte{ {1,2,3}, {4,5,6} },
+		Messages:  [][]byte{{1, 2, 3}, {4, 5, 6}},
 	})
 	if err != nil {
 		t.Errorf("produce (%s)", err)
@@ -57,12 +57,12 @@ func TestClientConn(t *testing.T) {
 		&ProduceArg{
 			Topic:     "_hello",
 			Partition: 0,
-			Messages:  [][]byte{ {7,8,9}, {1,1,1} },
+			Messages:  [][]byte{{7, 8, 9}, {1, 1, 1}},
 		},
 		&ProduceArg{
 			Topic:     "_hello",
 			Partition: 0,
-			Messages:  [][]byte{ {3,3,3}, {2,2,2} },
+			Messages:  [][]byte{{3, 3, 3}, {2, 2, 2}},
 		},
 	)
 	if err != nil {

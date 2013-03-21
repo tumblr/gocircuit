@@ -1,9 +1,9 @@
 package acid
 
 import (
-	"circuit/use/circuit"
 	teleio "circuit/kit/tele/io"
 	"circuit/load/config"
+	"circuit/use/circuit"
 	"io"
 	"os/exec"
 	"path"
@@ -12,9 +12,9 @@ import (
 // JailTail opens a file within this worker's jail directory and prepares a
 // cross-circuit pointer to the open file
 func (a *Acid) JailTail(jailFile string) (circuit.X, error) {
-	abs := path.Join(config.Config.Install.JailDir(), circuit.WorkerAddr().RuntimeID().String(), jailFile)
-	
-	cmd := exec.Command("/bin/sh", "-c", "tail -f " + abs)
+	abs := path.Join(config.Config.Install.JailDir(), circuit.WorkerAddr().WorkerID().String(), jailFile)
+
+	cmd := exec.Command("/bin/sh", "-c", "tail -f "+abs)
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {

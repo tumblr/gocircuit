@@ -60,7 +60,7 @@ func (cs *clientServer) Error(err error) {
 }
 
 func TestClientServer(t *testing.T) {
-	cs := &clientServer{t:t}
+	cs := &clientServer{t: t}
 
 	// Start the server
 	if err := Listen("localhost:9090", cs); err != nil {

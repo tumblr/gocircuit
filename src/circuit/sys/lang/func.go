@@ -1,12 +1,12 @@
 package lang
 
 import (
+	"circuit/sys/lang/types"
+	"circuit/use/circuit"
+	"circuit/use/worker"
 	"fmt"
 	"os"
 	"time"
-	"circuit/use/circuit"
-	"circuit/sys/lang/types"
-	"circuit/use/worker"
 )
 
 func (r *Runtime) Kill(addr circuit.Addr) error {

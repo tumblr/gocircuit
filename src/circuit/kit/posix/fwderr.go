@@ -70,7 +70,7 @@ func (lr *lineReader) ReadLine() (line string, isprefix bool, err error) {
 
 			var r []byte
 			r, lr.fill = append(lr.fill, nibble[:ex]...), nil
-			
+
 			// Skip over separators after first
 			var nsep int
 			for _, b := range nibble[ex:] {

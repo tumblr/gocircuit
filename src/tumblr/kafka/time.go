@@ -7,10 +7,10 @@ import (
 // Handy time constants for use in Kafka client invokations
 const (
 	Second = 1
-	Minute = 60*Second
-	Hour   = 60*Minute
-	Day    = 24*Hour
-	Week   = 7*Day
+	Minute = 60 * Second
+	Hour   = 60 * Minute
+	Day    = 24 * Hour
+	Week   = 7 * Day
 
 	Earliest = -2
 	Latest   = -1

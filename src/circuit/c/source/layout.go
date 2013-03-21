@@ -8,9 +8,9 @@ import (
 
 // Layout describes the user's Go compilation environment
 type Layout struct {
-	goRoot        string    // GOROOT directory
-	goPaths       GoPaths   // All GOPATH paths
-	workingGoPath string    // A distinct GOPATH
+	goRoot        string  // GOROOT directory
+	goPaths       GoPaths // All GOPATH paths
+	workingGoPath string  // A distinct GOPATH
 }
 
 func NewLayout(goroot string, gopaths GoPaths, working string) *Layout {

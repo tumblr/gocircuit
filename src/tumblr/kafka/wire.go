@@ -40,7 +40,7 @@ func int16Bytes(value int16) []byte {
 	return result
 }
 
-// 64-bit 
+// 64-bit
 
 func bytesInt64(p []byte) int64 {
 	return int64(binary.BigEndian.Uint64(p))
@@ -50,7 +50,7 @@ func bytesUint64(p []byte) uint64 {
 	return binary.BigEndian.Uint64(p)
 }
 
-// 32-bit 
+// 32-bit
 
 func bytesInt32(p []byte) int32 {
 	return int32(binary.BigEndian.Uint32(p))

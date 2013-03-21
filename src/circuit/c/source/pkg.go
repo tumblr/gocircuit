@@ -9,11 +9,11 @@ import (
 
 // Pkg captures a parsed Go source package
 type Pkg struct {
-	FileSet  *token.FileSet           // File names are relative to SrcDir
-	SrcDir   string                   // SrcDir/PkgPath = absolute local path to package directory
-	PkgPath  string                   // Package import path
-	PkgAST   map[string]*ast.Package  // Package name to package AST
-	FileAST  map[string]*ast.File
+	FileSet *token.FileSet          // File names are relative to SrcDir
+	SrcDir  string                  // SrcDir/PkgPath = absolute local path to package directory
+	PkgPath string                  // Package import path
+	PkgAST  map[string]*ast.Package // Package name to package AST
+	FileAST map[string]*ast.File
 }
 
 func (p *Pkg) link() {
@@ -80,8 +80,8 @@ func (p *Pkg) AddFile(pkgName, fileName string) *ast.File {
 		ff := p.FileSet.AddFile(filePath, p.FileSet.Base(), 1)
 		pos := ff.Pos(0)
 		f = &ast.File{
-			Package:   pos,
-			Name:      &ast.Ident{Name: pkgName},
+			Package: pos,
+			Name:    &ast.Ident{Name: pkgName},
 		}
 		pkg.Files[filePath] = f
 	}

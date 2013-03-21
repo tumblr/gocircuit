@@ -11,10 +11,10 @@ import (
 
 // Replenished holds the return values of a call to Replenish.
 type Replenished struct {
-	Config      *WorkerConfig	// Config specifies a worker configuration passed to Replenish.
+	Config      *WorkerConfig // Config specifies a worker configuration passed to Replenish.
 	Addr        circuit.Addr
-	Replenished bool		// Replenished is true if the API worker on this host needed replenishing.
-	Err         error		// Err is non-nil if the operation failed.
+	Replenished bool  // Replenished is true if the API worker on this host needed replenishing.
+	Err         error // Err is non-nil if the operation failed.
 }
 
 // durableFile is the name of the durable file describing the SUMR server cluster
@@ -77,10 +77,9 @@ func (start) Start(durableFile string, port int, readOnly bool) (circuit.XPerm, 
 	if err != nil {
 		return nil, err
 	}
-	circuit.Daemonize(func() { <-(chan int)(nil) })	// Daemonize this worker forever, i.e. worker should never die
+	circuit.Daemonize(func() { <-(chan int)(nil) }) // Daemonize this worker forever, i.e. worker should never die
 	return circuit.PermRef(a), nil
 }
-
 
 func init() {
 	circuit.RegisterFunc(start{})

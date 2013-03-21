@@ -1,8 +1,8 @@
 package lang
 
 import (
-	"circuit/use/circuit"
 	"circuit/sys/lang/types"
+	"circuit/use/circuit"
 )
 
 func (r *Runtime) Listen(service string, receiver interface{}) {

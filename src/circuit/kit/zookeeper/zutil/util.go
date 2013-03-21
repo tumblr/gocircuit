@@ -3,9 +3,9 @@ package zutil
 
 import (
 	"bytes"
+	"circuit/kit/zookeeper"
 	"errors"
 	"time"
-	"circuit/kit/zookeeper"
 )
 
 var (
@@ -67,7 +67,7 @@ func ZookeeperString(ss []string) string {
 	var w bytes.Buffer
 	for i, z := range ss {
 		w.WriteString(z)
-		if i + 1 < len(ss) {
+		if i+1 < len(ss) {
 			w.WriteByte(',')
 		}
 	}

@@ -26,9 +26,9 @@ func Dial(broker string) (c *ClientConn, err error) {
 
 // ProduceArg is a user-facing representation of a produce request to the Kafka broker
 type ProduceArg struct {
-	Topic     string
-	Partition 
-	Messages  [][]byte
+	Topic string
+	Partition
+	Messages [][]byte
 }
 
 // Convert the produce request argument into a set of messages with a topic and partition annotation attached
@@ -78,10 +78,10 @@ func (c *ClientConn) Produce(args ...*ProduceArg) error {
 
 // FetchArg is a user-facing representation of a fetch request to the Kafka broker
 type FetchArg struct {
-	Topic   string	// Topic to fetch
-	Partition	// Partition within the topic
-	Offset		// Offset within the partition
-	MaxSize int32	// Maximum size of returned result
+	Topic     string // Topic to fetch
+	Partition        // Partition within the topic
+	Offset           // Offset within the partition
+	MaxSize   int32  // Maximum size of returned result
 }
 
 // TopicPartitionOffset converts a fetch request into a topic/partition/offset tuple
@@ -98,7 +98,7 @@ func (x *FetchArg) TopicPartitionOffset() *TopicPartitionOffset {
 
 // FetchReturn holds a user-facing representation of the result of a fetch request
 type FetchReturn struct {
-	Err      KafkaError	// Err records any error conditions
+	Err      KafkaError // Err records any error conditions
 	Messages [][]byte
 }
 
@@ -172,8 +172,8 @@ func (c *ClientConn) Fetch(args ...*FetchArg) (returns []FetchReturn, err error)
 
 // OffsetsArg is a user-facing representation of an offset request to the Kafka broker
 type OffsetsArg struct {
-	Topic      string
-	Partition 
+	Topic string
+	Partition
 	Time       int64
 	MaxOffsets int32
 }
@@ -216,7 +216,7 @@ func (c *ClientConn) Offsets(arg *OffsetsArg) (offsets []Offset, err error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	offsets = resp.Offsets
 
 	return offsets, nil

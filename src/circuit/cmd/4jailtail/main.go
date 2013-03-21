@@ -2,13 +2,13 @@
 package main
 
 import (
-	"fmt"
-	"os"
-	_ "circuit/load"
 	teleio "circuit/kit/tele/io"
+	_ "circuit/load"
 	"circuit/use/anchorfs"
 	"circuit/use/circuit"
+	"fmt"
 	"io"
+	"os"
 )
 
 func main() {
@@ -49,14 +49,14 @@ func tailViaCircuit(addr circuit.Addr, jailpath string) {
 	io.Copy(os.Stdout, teleio.NewClient(r[0].(circuit.X)))
 
 	/*
-	tailr := teleio.NewClient(r[0].(circuit.X))
-	for {
-		p := make([]byte, 1e3)
-		n, err := tailr.Read(p)
-		if err != nil {
-			println(err.Error(),"+++")
-			break
-		}
-		println("n=", n)
-	}*/
+		tailr := teleio.NewClient(r[0].(circuit.X))
+		for {
+			p := make([]byte, 1e3)
+			n, err := tailr.Read(p)
+			if err != nil {
+				println(err.Error(),"+++")
+				break
+			}
+			println("n=", n)
+		}*/
 }

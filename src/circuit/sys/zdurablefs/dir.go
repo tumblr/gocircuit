@@ -1,18 +1,18 @@
 package zdurablefs
 
 import (
-	"path"
-	"sync"
-	"time"
 	"circuit/kit/zookeeper"
 	"circuit/kit/zookeeper/zutil"
 	"circuit/use/durablefs"
+	"path"
+	"sync"
+	"time"
 )
 
 type Dir struct {
-	conn     *zookeeper.Conn
-	zroot    string	// Zookeeper root directory of the durable file system
-	dpath    string	// Directory path within the durable file system
+	conn  *zookeeper.Conn
+	zroot string // Zookeeper root directory of the durable file system
+	dpath string // Directory path within the durable file system
 
 	sync.Mutex
 	stat     *zookeeper.Stat

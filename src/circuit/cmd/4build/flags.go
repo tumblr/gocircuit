@@ -4,30 +4,30 @@ import (
 	"encoding/json"
 	"flag"
 	"io/ioutil"
-	"path"
 	"os"
+	"path"
 	"strings"
 )
 
 var (
-	flagBinary      = flag.String("binary", "4r", "Preferred name for the resulting runtime binary")
-	flagJail        = flag.String("jail", "", "Build jail directory")
+	flagBinary = flag.String("binary", "4r", "Preferred name for the resulting runtime binary")
+	flagJail   = flag.String("jail", "", "Build jail directory")
 
-	flagAppRepo     = flag.String("app", "", "App repository")
-	flagAppPath     = flag.String("appsrc", "", "GOPATH relative to app repository")
+	flagAppRepo = flag.String("app", "", "App repository")
+	flagAppPath = flag.String("appsrc", "", "GOPATH relative to app repository")
 
-	flagPkg         = flag.String("pkg", "", "Package to import for side-effects in circuit runtime binary")
+	flagPkg = flag.String("pkg", "", "Package to import for side-effects in circuit runtime binary")
 
-	flagShow        = flag.Bool("show", false, "Show output of underlying build commands")
-	flagRebuildGo   = flag.Bool("rebuildgo", false, "Force fetch and rebuild of the Go compiler")
+	flagShow      = flag.Bool("show", false, "Show output of underlying build commands")
+	flagRebuildGo = flag.Bool("rebuildgo", false, "Force fetch and rebuild of the Go compiler")
 
-	flagZInclude    = flag.String("zinclude", "", "Zookeeper C headers directory")
-	flagZLib        = flag.String("zlib", "", "Zookeeper libraries directory")
+	flagZInclude = flag.String("zinclude", "", "Zookeeper C headers directory")
+	flagZLib     = flag.String("zlib", "", "Zookeeper libraries directory")
 
 	flagCircuitRepo = flag.String("cir", "git@github.com:tumblr/gocircuit.git", "Circuit repository")
 	flagCircuitPath = flag.String("cirsrc", ".", "GOPATH relative to circuit repository")
 
-	flagPrefixPath  = flag.String("prefixpath", "", "Prefix to add to default PATH environment")
+	flagPrefixPath = flag.String("prefixpath", "", "Prefix to add to default PATH environment")
 )
 
 // Flags is used to persist the state of command-line flags in the jail

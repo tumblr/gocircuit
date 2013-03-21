@@ -11,27 +11,26 @@ import (
 	"time"
 
 	"circuit/kit/lockfile"
-	
+
 	"circuit/sys/lang"
-	workerBackend "circuit/sys/worker"
 	"circuit/sys/transport"
+	workerBackend "circuit/sys/worker"
 	"circuit/sys/zanchorfs"
 	"circuit/sys/zdurablefs"
 	"circuit/sys/zissuefs"
 
 	"circuit/use/anchorfs"
+	"circuit/use/circuit"
 	"circuit/use/durablefs"
 	"circuit/use/issuefs"
-	"circuit/use/circuit"
 	"circuit/use/worker"
-	
+
 	"circuit/load/config" // Side-effect of reading in configurations
 )
 
-
 func init() {
 	// Seed random number generator
-	rand.Seed(time.Now().UnixNano())	
+	rand.Seed(time.Now().UnixNano())
 
 	switch config.Role {
 	case config.Main:

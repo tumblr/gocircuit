@@ -1,13 +1,13 @@
 package block
 
 import (
+	"circuit/kit/fs"
 	"errors"
 	"math/rand"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
-	"circuit/kit/fs"
 )
 
 // Disk implements a specialized file system abstraction that is used by the write-ahead logging mechanism.
@@ -72,7 +72,7 @@ func parseMasterName(name string) (seqno int, err error) {
 	if t < 0 {
 		return 0, errors.New("master file name")
 	}
-	return strconv.Atoi(name[s+1:s+t+1])
+	return strconv.Atoi(name[s+1 : s+t+1])
 }
 
 func (d *Disk) makeName() string {
@@ -89,11 +89,11 @@ func (d *Disk) Master() File {
 	return diskFile{d.master}
 }
 
-// CreateShadow creates an empty "shadow" file. 
+// CreateShadow creates an empty "shadow" file.
 // Eventually a shadow file can be promoted as a master atomically.
 func (d *Disk) CreateShadow() (File, error) {
-	sf, err := Create(d.disk, "shadow." + time.Now().Format(fileStamp) + 
-		"." + strconv.Itoa(int(rand.Int31())))
+	sf, err := Create(d.disk, "shadow."+time.Now().Format(fileStamp)+
+		"."+strconv.Itoa(int(rand.Int31())))
 	if err != nil {
 		return nil, err
 	}

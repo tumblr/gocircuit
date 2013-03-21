@@ -2,9 +2,9 @@ package block
 
 import (
 	"bytes"
+	"circuit/app/sumr"
 	"encoding/binary"
 	"time"
-	"circuit/app/sumr"
 )
 
 type add struct {
@@ -14,9 +14,9 @@ type add struct {
 }
 
 type addOnDisk struct {
-	UTime  int64
-	Key    sumr.Key
-	Value  float64
+	UTime int64
+	Key   sumr.Key
+	Value float64
 }
 
 // OPTIMIZE: Use a code object that uses the same underlying gob coder on each file
@@ -31,7 +31,7 @@ func encodeAdd(a *add) []byte {
 
 func decodeAdd(p []byte) (*add, error) {
 	r := bytes.NewBuffer(p)
-	_a :=&addOnDisk{}
+	_a := &addOnDisk{}
 	if err := binary.Read(r, binary.LittleEndian, _a); err != nil {
 		return nil, err
 	}

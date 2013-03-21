@@ -6,8 +6,8 @@ import (
 )
 
 type GlobalNames struct {
-	names map[string]*Named	       // Fully-qualified type name to type structure
-	pkgs  map[string]PackageNames  // Package path to type name to type structure
+	names map[string]*Named       // Fully-qualified type name to type structure
+	pkgs  map[string]PackageNames // Package path to type name to type structure
 }
 
 type PackageNames map[string]*Named
@@ -38,7 +38,7 @@ func (tt *GlobalNames) Add(t *Named) error {
 	tt.names[t.FullName()] = t
 
 	// Add type to per-package structure
-	pkgMap, ok := tt.pkgs[t.PkgPath] 
+	pkgMap, ok := tt.pkgs[t.PkgPath]
 	if !ok {
 		pkgMap = make(map[string]*Named)
 		tt.pkgs[t.PkgPath] = pkgMap

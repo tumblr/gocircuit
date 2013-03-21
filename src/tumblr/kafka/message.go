@@ -43,9 +43,9 @@ func (x *Message) Write(w io.Writer) error {
 	}
 	var _length int32 = 1 /* magic */ + _magic /* compression */ + 4 /* checksum */ + int32(len(x.Payload))
 	w.Write(int32Bytes(_length))
-	w.Write([]byte{ byte(_magic) })
+	w.Write([]byte{byte(_magic)})
 	if _magic == 1 {
-		w.Write([]byte{ byte(x.Compression) })
+		w.Write([]byte{byte(x.Compression)})
 	}
 	w.Write(uint32Bytes(crc32.ChecksumIEEE(x.Payload)))
 	_, err := w.Write(x.Payload)

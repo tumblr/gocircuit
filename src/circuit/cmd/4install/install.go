@@ -2,12 +2,12 @@ package main
 
 import (
 	"bytes"
-	"fmt"
-	"os"
-	"text/template"
 	"circuit/kit/posix"
 	"circuit/kit/sched/limiter"
 	"circuit/load/config"
+	"fmt"
+	"os"
+	"text/template"
 )
 
 const limitParallelTasks = 20
@@ -34,7 +34,7 @@ func installHost(i *config.InstallConfig, b *config.BuildConfig, host string) er
 	t := template.New("_")
 	template.Must(t.Parse(installShSrc))
 	var w bytes.Buffer
-	if err := t.Execute(&w, &struct{BinDir, JailDir, VarDir string}{
+	if err := t.Execute(&w, &struct{ BinDir, JailDir, VarDir string }{
 		BinDir:  i.BinDir(),
 		JailDir: i.JailDir(),
 		VarDir:  i.VarDir(),

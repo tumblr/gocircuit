@@ -3,23 +3,23 @@ package main
 
 import (
 	"bufio"
-	"flag"
-	"os"
-	"fmt"
-	"path"
 	"circuit/kit/posix"
-	"circuit/use/circuit"
 	"circuit/load/config"
+	"circuit/use/circuit"
+	"flag"
+	"fmt"
 	"io"
+	"os"
+	"path"
 	"strings"
 )
 
 func init() {
 	flag.Usage = func() {
 		_, prog := path.Split(os.Args[0])
-		fmt.Fprintf(os.Stderr, "Usage: %s [RuntimeID]\n", prog)
+		fmt.Fprintf(os.Stderr, "Usage: %s [WorkerID]\n", prog)
 		fmt.Fprintf(os.Stderr,
-`
+			`
 4hardkill kills worker processes pertaining to the contextual circuit on all
 hosts supplied on standard input and separated by new lines.
 
@@ -27,7 +27,7 @@ Instead of using the in-circuit facilities to do so, this utility logs directly
 into the target hosts (using ssh), finds and kills relevant processes using
 POSIX-level facilities.
 
-If a RuntimeID is specified, only the worker having the ID in question is killed.
+If a WorkerID is specified, only the worker having the ID in question is killed.
 `)
 		os.Exit(1)
 	}
@@ -36,14 +36,14 @@ If a RuntimeID is specified, only the worker having the ID in question is killed
 func main() {
 	flag.Parse()
 
-	// Parse RuntimeID argument
+	// Parse WorkerID argument
 	var (
 		err    error
-		id     circuit.RuntimeID
+		id     circuit.WorkerID
 		withID bool
 	)
 	if flag.NArg() == 1 {
-		id, err = circuit.ParseRuntimeID(flag.Arg(0))
+		id, err = circuit.ParseWorkerID(flag.Arg(0))
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Problem parsing runtime ID (%s)\n", err)
 			os.Exit(1)

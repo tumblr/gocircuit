@@ -2,9 +2,9 @@
 package prof
 
 import (
+	"circuit/kit/stat"
 	"sync"
 	"time"
-	"circuit/kit/stat"
 )
 
 // Profile keeps various load-related statistics for a worker
@@ -13,9 +13,9 @@ type Profile struct {
 	replyTotal sketch
 	replyProc  map[string]*sketch
 
-	clk        sync.Mutex
-	callTotal  sketch
-	callProc   map[string]*sketch
+	clk       sync.Mutex
+	callTotal sketch
+	callProc  map[string]*sketch
 }
 
 type sketch struct {
@@ -41,23 +41,23 @@ func (p *Profile) Stat() *WorkerStat {
 	r.ReplyProc = make(map[string]*Stat)
 	for name, sk := range p.replyProc {
 		r.ReplyProc[name] = &Stat{
-			Type:      "reply",
-			Begin:     sk.Begin,
-			End:       sk.End,
-			Abort:     sk.Abort,
-			DurAvg:    sk.Dur.Average(),
-			DurStdDev: sk.Dur.StdDev(),
+			Type:           "reply",
+			Begin:          sk.Begin,
+			End:            sk.End,
+			Abort:          sk.Abort,
+			DurAvg:         sk.Dur.Average(),
+			DurStdDev:      sk.Dur.StdDev(),
 			AbortDurAvg:    sk.AbortDur.Average(),
 			AbortDurStdDev: sk.AbortDur.StdDev(),
 		}
 	}
 	r.ReplyTotal = &Stat{
-		Type:      "reply",
-		Begin:     p.replyTotal.Begin,
-		End:       p.replyTotal.End,
-		Abort:     p.replyTotal.Abort,
-		DurAvg:    p.replyTotal.Dur.Average(),
-		DurStdDev: p.replyTotal.Dur.StdDev(),
+		Type:           "reply",
+		Begin:          p.replyTotal.Begin,
+		End:            p.replyTotal.End,
+		Abort:          p.replyTotal.Abort,
+		DurAvg:         p.replyTotal.Dur.Average(),
+		DurStdDev:      p.replyTotal.Dur.StdDev(),
 		AbortDurAvg:    p.replyTotal.AbortDur.Average(),
 		AbortDurStdDev: p.replyTotal.AbortDur.StdDev(),
 	}
@@ -67,23 +67,23 @@ func (p *Profile) Stat() *WorkerStat {
 	r.CallProc = make(map[string]*Stat)
 	for name, sk := range p.callProc {
 		r.CallProc[name] = &Stat{
-			Type:      "call",
-			Begin:     sk.Begin,
-			Abort:     sk.Abort,
-			End:       sk.End,
-			DurAvg:    sk.Dur.Average(),
-			DurStdDev: sk.Dur.StdDev(),
+			Type:           "call",
+			Begin:          sk.Begin,
+			Abort:          sk.Abort,
+			End:            sk.End,
+			DurAvg:         sk.Dur.Average(),
+			DurStdDev:      sk.Dur.StdDev(),
 			AbortDurAvg:    sk.AbortDur.Average(),
 			AbortDurStdDev: sk.AbortDur.StdDev(),
 		}
 	}
 	r.CallTotal = &Stat{
-		Type:      "call",
-		Begin:     p.callTotal.Begin,
-		End:       p.callTotal.End,
-		Abort:     p.callTotal.Abort,
-		DurAvg:    p.callTotal.Dur.Average(),
-		DurStdDev: p.callTotal.Dur.StdDev(),
+		Type:           "call",
+		Begin:          p.callTotal.Begin,
+		End:            p.callTotal.End,
+		Abort:          p.callTotal.Abort,
+		DurAvg:         p.callTotal.Dur.Average(),
+		DurStdDev:      p.callTotal.Dur.StdDev(),
 		AbortDurAvg:    p.callTotal.AbortDur.Average(),
 		AbortDurStdDev: p.callTotal.AbortDur.StdDev(),
 	}

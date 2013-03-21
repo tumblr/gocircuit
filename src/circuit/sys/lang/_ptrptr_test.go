@@ -28,7 +28,7 @@ func TestPtrPtr(t *testing.T) {
 	if p1.Call("Name")[0].(string) != "π1" {
 		t.Errorf("return val 1")
 	}
-	
+
 	if p2.Call("Name")[0].(string) != "π2" {
 		t.Errorf("return val 2")
 	}

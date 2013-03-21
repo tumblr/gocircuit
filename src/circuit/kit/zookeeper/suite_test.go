@@ -1,9 +1,9 @@
 package zookeeper_test
 
 import (
+	zk "circuit/kit/zookeeper"
 	"fmt"
 	. "launchpad.net/gocheck"
-	zk "circuit/kit/zookeeper"
 	"os"
 	"testing"
 	"time"

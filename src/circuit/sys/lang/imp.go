@@ -2,18 +2,18 @@ package lang
 
 import (
 	"bytes"
+	"circuit/sys/lang/types"
+	"circuit/use/circuit"
 	"fmt"
 	"runtime"
 	"sync"
-	"circuit/use/circuit"
-	"circuit/sys/lang/types"
 )
 
 // impTabl keeps track of values that have been imported
 type impTabl struct {
-	tt  *types.TypeTabl
-	lk  sync.Mutex
-	id  map[handleID]*impHandle
+	tt *types.TypeTabl
+	lk sync.Mutex
+	id map[handleID]*impHandle
 }
 
 type impHandle struct {
@@ -23,7 +23,7 @@ type impHandle struct {
 	Type     *types.TypeChar
 
 	// Garbage collection
-	wg       sync.WaitGroup
+	wg sync.WaitGroup
 }
 
 // GetPtr builds a new user-facing representation of the imported handle.

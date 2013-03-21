@@ -1,8 +1,8 @@
 package dep
 
 import (
-	"go/ast"
 	"circuit/c/util"
+	"go/ast"
 )
 
 // Parser parses a package path on demand
@@ -14,13 +14,13 @@ type Parser interface {
 // target packages
 type Dep struct {
 	parser Parser
-	pkgs   map[string]*Pkg	// Package path to package dependency structure
+	pkgs   map[string]*Pkg // Package path to package dependency structure
 	follow []string
 }
 
 // Pkg summarizes all package paths imported by this package
 type Pkg struct {
-	Imports  []string	// List of package paths needed for this package
+	Imports []string // List of package paths needed for this package
 }
 
 // New creates an empty dependency table

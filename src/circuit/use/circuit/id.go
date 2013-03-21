@@ -9,27 +9,27 @@ import (
 
 var ErrParse = NewError("parse")
 
-// RuntimeID ...
-type RuntimeID uint64
+// WorkerID represents the ID of a circuit worker process.
+type WorkerID uint64
 
-func (r RuntimeID) String() string {
+func (r WorkerID) String() string {
 	return fmt.Sprintf("R%016x", int64(r))
 }
 
-// ChooseRuntimeID returns a random runtime ID
-func ChooseRuntimeID() RuntimeID {
-	return RuntimeID(rand.Int63())
+// ChooseWorkerID returns a random runtime ID
+func ChooseWorkerID() WorkerID {
+	return WorkerID(rand.Int63())
 }
 
-func ParseOrHashRuntimeID(s string) RuntimeID {
-	id, err := ParseRuntimeID(s)
+func ParseOrHashWorkerID(s string) WorkerID {
+	id, err := ParseWorkerID(s)
 	if err != nil {
-		return HashRuntimeID(s)
+		return HashWorkerID(s)
 	}
 	return id
 }
 
-func ParseRuntimeID(s string) (RuntimeID, error) {
+func ParseWorkerID(s string) (WorkerID, error) {
 	if len(s) != 17 || s[0] != 'R' {
 		return 0, ErrParse
 	}
@@ -37,11 +37,11 @@ func ParseRuntimeID(s string) (RuntimeID, error) {
 	if err != nil {
 		return 0, ErrParse
 	}
-	return RuntimeID(ui64), nil
+	return WorkerID(ui64), nil
 }
 
-func HashRuntimeID(s string) RuntimeID {
+func HashWorkerID(s string) WorkerID {
 	h := fnv.New64a()
 	h.Write([]byte(s))
-	return RuntimeID(h.Sum64())
+	return WorkerID(h.Sum64())
 }

@@ -3,6 +3,7 @@ package worker
 import (
 	"bufio"
 	"bytes"
+	"circuit/load/config"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -11,7 +12,6 @@ import (
 	"path"
 	"strconv"
 	"strings"
-	"circuit/load/config"
 )
 
 // pie (Panic-If-Error) panics if err is non-nil
@@ -26,7 +26,7 @@ func pie2(underscore interface{}, err interface{}) {
 	pie(err)
 }
 
-// piefwd panics of err is non-nil, in which case it prints the entire 
+// piefwd panics of err is non-nil, in which case it prints the entire
 // contents of stdout and stderr to this process' standard error, followed
 // by the panic stack trace
 func piefwd(stdout, stderr *os.File, err interface{}) {
@@ -85,7 +85,7 @@ func Daemonize(wc *config.WorkerConfig) {
 	pie(err)
 	cmd.ExtraFiles = []*os.File{bpw}
 
-	// stdin 
+	// stdin
 	// Relay stdin of daemonizer to stdin of child runtime process
 	var w bytes.Buffer
 	pie(json.NewEncoder(&w).Encode(wc))
@@ -121,7 +121,7 @@ func Daemonize(wc *config.WorkerConfig) {
 		cmd.Wait()
 		piefwd(stdout, stderr, bpw.Close())
 	}()
-	
+
 	// Read the first two lines of stdout. They should hold the Port and PID of the runtime process.
 	back := bufio.NewReader(bpr)
 
@@ -135,7 +135,7 @@ func Daemonize(wc *config.WorkerConfig) {
 	// Read port
 	line, err = back.ReadString('\n')
 	piefwd(stdout, stderr, err)
-	
+
 	port, err := strconv.Atoi(strings.TrimSpace(line))
 	piefwd(stdout, stderr, err)
 

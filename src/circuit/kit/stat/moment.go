@@ -6,13 +6,13 @@ import (
 )
 
 type Moment struct {
-	sum	float64
-	sumAbs	float64
-	sumSq	float64
-	min     float64
-	max     float64
-	weight  float64
-	n       int64
+	sum    float64
+	sumAbs float64
+	sumSq  float64
+	min    float64
+	max    float64
+	weight float64
+	n      int64
 }
 
 func (x *Moment) Init() {
@@ -25,9 +25,9 @@ func (x *Moment) Add(sample float64) {
 
 func (x *Moment) AddWeighted(sample float64, weight float64) {
 	x.n++
-	x.sum += sample*weight
-	x.sumAbs += math.Abs(sample*weight)
-	x.sumSq += sample*sample*weight
+	x.sum += sample * weight
+	x.sumAbs += math.Abs(sample * weight)
+	x.sumSq += sample * sample * weight
 	x.weight += weight
 	if math.IsNaN(x.min) || sample < x.min {
 		x.min = sample

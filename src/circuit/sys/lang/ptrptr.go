@@ -1,8 +1,8 @@
 package lang
 
 import (
-	"strings"
 	"circuit/use/circuit"
+	"strings"
 )
 
 func (r *Runtime) callGetPtr(srcID handleID, exporter circuit.Addr) (circuit.X, error) {

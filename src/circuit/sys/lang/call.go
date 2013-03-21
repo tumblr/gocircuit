@@ -1,10 +1,10 @@
 package lang
 
 import (
+	"circuit/sys/lang/types"
 	"fmt"
 	"reflect"
 	"runtime/debug"
-	"circuit/sys/lang/types"
 )
 
 // call invokes the method of r encoded by f with respect to t, with arguments a
@@ -28,7 +28,7 @@ func call(recv reflect.Value, t *types.TypeChar, id types.FuncID, arg []interfac
 	if fn == nil {
 		return nil, NewError("no func")
 	}
-	av := make([]reflect.Value, 0, 1 + len(arg))
+	av := make([]reflect.Value, 0, 1+len(arg))
 	av = append(av, recv)
 	for _, a := range arg {
 		av = append(av, reflect.ValueOf(a))

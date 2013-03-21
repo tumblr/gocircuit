@@ -1,15 +1,15 @@
 package block
 
 import (
+	"circuit/kit/fs"
 	"errors"
 	"hash/crc32"
 	"math"
 	"os"
 	"sync"
-	"circuit/kit/fs"
 )
 
-// File is an interface to file-like device. 
+// File is an interface to file-like device.
 // We use is to be able to swap *os.File for a file with a generic write-ahead log
 type File interface {
 	Name() string
@@ -29,7 +29,7 @@ type file struct {
 }
 
 var ErrEndOfLog = errors.New("end of log")
-var ErrTooBig   = errors.New("too big")
+var ErrTooBig = errors.New("too big")
 
 // Open opens the file name within the file system fs
 func Open(fs fs.FS, name string) (File, error) {

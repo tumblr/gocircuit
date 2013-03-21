@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-// StopWatch represents a stop watch 
+// StopWatch represents a stop watch
 type StopWatch interface {
 	Stop()
 	Abort()

@@ -1,8 +1,8 @@
 package a
 
 import (
-	_ "strings"
 	"os"
+	_ "strings"
 )
 
 type T1 (int)

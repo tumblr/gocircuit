@@ -1,8 +1,8 @@
 package anchorfs
 
 import (
-	"circuit/use/circuit"
 	"circuit/kit/join"
+	"circuit/use/circuit"
 )
 
 var link = join.SetThenGet{Name: "anchor file system"}

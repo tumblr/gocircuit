@@ -10,8 +10,8 @@ type Start struct{}
 func (Start) Main(dummy circuit.X) {
 }
 
-func init() { 
-	circuit.RegisterFunc(Start{}) 
+func init() {
+	circuit.RegisterFunc(Start{})
 }
 
 type Dummy struct{}

@@ -9,7 +9,7 @@ import (
 // BestEffortConn is a connection to a Scribe node that ignores common Scribe errors
 type BestEffortConn struct {
 	sync.Mutex
-	conn *Conn
+	conn     *Conn
 	hostport string
 }
 
@@ -64,7 +64,7 @@ func (bec *BestEffortConn) redial() {
 	var err error
 	var reconn *Conn
 	for reconn == nil {
-		time.Sleep(2*time.Second)  // Sleep a bit so things don't spin out of control
+		time.Sleep(2 * time.Second) // Sleep a bit so things don't spin out of control
 		bec.Lock()
 		hostport := bec.hostport
 		bec.Unlock()

@@ -1,9 +1,9 @@
 package lang
 
 import (
-	"encoding/gob"
-	"circuit/use/circuit"
 	"circuit/sys/lang/types"
+	"circuit/use/circuit"
+	"encoding/gob"
 )
 
 func init() {
@@ -28,7 +28,7 @@ func init() {
 // Top-level messages
 
 type exportedMsg struct {
-	Value  []interface{}
+	Value []interface{}
 	Stack string
 }
 
@@ -63,7 +63,7 @@ type gotPtrMsg struct {
 type dontReplyMsg struct{}
 
 // dialMsg requests that the receiver send back a handle to its permanent.
-type dialMsg struct{
+type dialMsg struct {
 	Service string
 }
 
@@ -76,11 +76,11 @@ type dropPtrMsg struct {
 
 // ptrMsg carries ...
 type ptrMsg struct {
-	ID      handleID
-	TypeID  types.TypeID
+	ID     handleID
+	TypeID types.TypeID
 }
 
-func (*ptrMsg) Addr() circuit.Addr { 
+func (*ptrMsg) Addr() circuit.Addr {
 	panic("not for use")
 }
 
@@ -100,7 +100,7 @@ type ptrPtrMsg struct {
 	Src circuit.Addr
 }
 
-func (*ptrPtrMsg) Addr() circuit.Addr { 
+func (*ptrPtrMsg) Addr() circuit.Addr {
 	panic("not for use")
 }
 
@@ -116,11 +116,11 @@ func (*ptrPtrMsg) String() string {
 
 // permPtrMsg carries ...
 type permPtrMsg struct {
-	ID      handleID
-	TypeID  types.TypeID
+	ID     handleID
+	TypeID types.TypeID
 }
 
-func (*permPtrMsg) Addr() circuit.Addr { 
+func (*permPtrMsg) Addr() circuit.Addr {
 	panic("not for use")
 }
 

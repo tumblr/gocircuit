@@ -1,16 +1,16 @@
 package lang
 
 import (
+	"circuit/use/circuit"
 	"reflect"
 	"sync"
-	"circuit/use/circuit"
 )
 
 type importGroup struct {
-	AllowPP bool	// Allow import of re-exported values (PtrPtr)
-	ConnPP  circuit.Conn	// If non-nil, acknowledge receipt of Ptr for each PtrPtr
+	AllowPP bool         // Allow import of re-exported values (PtrPtr)
+	ConnPP  circuit.Conn // If non-nil, acknowledge receipt of Ptr for each PtrPtr
 	sync.Mutex
-	Err     error
+	Err error
 }
 
 func (r *Runtime) importValues(values []interface{}, types []reflect.Type, exporter circuit.Addr, allowPP bool, connPP circuit.Conn) ([]interface{}, error) {

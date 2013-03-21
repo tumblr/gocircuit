@@ -2,15 +2,15 @@ package main
 
 import (
 	"bytes"
+	"circuit/kit/posix"
+	"circuit/load/config"
 	"errors"
+	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
 	"text/template"
-	"circuit/kit/posix"
-	"circuit/load/config"
-	"fmt"
-	"io/ioutil"
 )
 
 const build_sh_src = `{{.Tool}} ` +

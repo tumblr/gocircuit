@@ -1,9 +1,9 @@
 package c
 
 import (
+	"circuit/c/source"
 	"os"
 	"testing"
-	"circuit/c/source"
 )
 
 var (

@@ -30,22 +30,22 @@ func (b *Build) TransformRegisterValues() error {
 
 		// Create source file for registrations in this package
 		pkgName := pkg.Name()
-		astFile := pkg.AddFile(pkgName, pkgName + "_circuit.go") 
+		astFile := pkg.AddFile(pkgName, pkgName+"_circuit.go")
 
 		util.AddImport(astFile, "circuit/use/circuit")
 
 		// For every package name defined in the package directory
-		for _/*pkgSubName*/, pkgAST := range pkg.PkgAST {
+		for _ /*pkgSubName*/, pkgAST := range pkg.PkgAST {
 
 			var typeNames []string
-			
+
 			// Compile interface types in package
-			if err := types.VisitPkgTypeSpecs(pkg.FileSet, pkgAST, 
-					func (fimp *util.FileImports, spec *ast.TypeSpec) error {
-						typeNames = append(typeNames, spec.Name.Name)
-						return nil
-					},
-				); err != nil {
+			if err := types.VisitPkgTypeSpecs(pkg.FileSet, pkgAST,
+				func(fimp *util.FileImports, spec *ast.TypeSpec) error {
+					typeNames = append(typeNames, spec.Name.Name)
+					return nil
+				},
+			); err != nil {
 				return err
 			}
 
@@ -73,7 +73,7 @@ func transformRegisterPkgValues(file *ast.File, typeNames []string) {
 		stmt := &ast.ExprStmt{
 			X: &ast.CallExpr{
 				Fun: &ast.SelectorExpr{
-					X:   &ast.Ident{Name: "circuit" },       // Refers to import circuit/use/circuit
+					X:   &ast.Ident{Name: "circuit"}, // Refers to import circuit/use/circuit
 					Sel: &ast.Ident{Name: "RegisterValue"},
 				},
 				Args: []ast.Expr{

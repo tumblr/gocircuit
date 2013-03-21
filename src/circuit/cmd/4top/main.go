@@ -2,14 +2,14 @@
 package main
 
 import (
+	_ "circuit/load"
+	"circuit/sys/acid"
+	"circuit/use/anchorfs"
+	"circuit/use/circuit"
 	"flag"
 	"fmt"
 	"os"
 	"path"
-	"circuit/sys/acid"
-	"circuit/use/anchorfs"
-	"circuit/use/circuit"
-	_ "circuit/load"
 	"sort"
 	"strings"
 )
@@ -20,7 +20,7 @@ func main() {
 		println("Usage:", os.Args[0], "AnchorPath")
 		println("	Examples of AnchorPath: /host, /host/...")
 		println(
-`4top displays real-time vitals (cpu, mem, io) of circuit deployments at
+			`4top displays real-time vitals (cpu, mem, io) of circuit deployments at
 various anchor granularities (file, directory, subtree).
 `)
 		os.Exit(1)
@@ -68,7 +68,7 @@ func top(query string, recurse bool) {
 	}
 }
 
-func topFile(anchor string, id circuit.RuntimeID, addr circuit.Addr) {
+func topFile(anchor string, id circuit.WorkerID, addr circuit.Addr) {
 	x, err := circuit.TryDial(addr, "acid")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Problem dialing acid service (%s)", err)
@@ -83,7 +83,7 @@ func topFile(anchor string, id circuit.RuntimeID, addr circuit.Addr) {
 	}()
 
 	r := x.Call("Stat")[0].(*acid.Stat)
-	fmt.Printf("%40s: user=%s sys=%s #malloc=%d #free=%d\n", 
+	fmt.Printf("%40s: user=%s sys=%s #malloc=%d #free=%d\n",
 		anchor, FormatBytes(r.MemStats.Alloc), FormatBytes(r.MemStats.Sys),
 		r.MemStats.Mallocs, r.MemStats.Frees,
 	)

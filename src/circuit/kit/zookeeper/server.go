@@ -22,7 +22,7 @@ type Server struct {
 // server environment inside it.  It is an error if runDir already
 // exists and is not empty.  The server will listen on the specified TCP
 // port.
-// 
+//
 // The ZooKeeper installation directory is specified by zkDir.
 // If this is empty, a system default will be used.
 //

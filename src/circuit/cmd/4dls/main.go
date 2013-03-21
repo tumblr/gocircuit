@@ -2,12 +2,12 @@
 package main
 
 import (
+	_ "circuit/load"
+	"circuit/use/durablefs"
 	"flag"
 	"fmt"
 	"os"
 	"path"
-	"circuit/use/durablefs"
-	_ "circuit/load"
 	"sort"
 	"strings"
 )

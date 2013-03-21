@@ -65,7 +65,7 @@ func Ref(v interface{}) circuit.X {
 	case *_permptr:
 		return v
 	case *_permref:
-		panic("applying ref on permref")	
+		panic("applying ref on permref")
 	}
 	return &_ref{v}
 }

@@ -40,7 +40,6 @@ type Message struct {
 	Payload  string
 }
 
-
 // Write sends a single message write request to the Scribe node.
 func (conn *Conn) Write(category, payload string) error {
 	return conn.Emit(Message{category, payload})
@@ -71,7 +70,7 @@ func (conn *Conn) WriteMany(msgs ...Message) error {
 }
 
 var (
-	ErrUnknown = errors.New("thrift unknown result code")
+	ErrUnknown  = errors.New("thrift unknown result code")
 	ErrTryLater = errors.New("thrift try later")
 )
 

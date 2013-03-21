@@ -1,18 +1,18 @@
 package limiter
 
 import (
-	"time"
 	"testing"
+	"time"
 )
 
 func TestLimiter(t *testing.T) {
 	l := New(2)
 	for i := 0; i < 9; i++ {
 		i_ := i
-		l.Go(func() { 
-			println("{", i_) 
-			time.Sleep(time.Second); 
-			println("}", i_) 
+		l.Go(func() {
+			println("{", i_)
+			time.Sleep(time.Second)
+			println("}", i_)
 		})
 	}
 	l.Wait()

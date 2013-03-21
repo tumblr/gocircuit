@@ -4,8 +4,8 @@ package main
 import (
 	"bytes"
 	"io/ioutil"
-	"path"
 	"os"
+	"path"
 	"strings"
 	"text/template"
 )
@@ -19,16 +19,16 @@ import (
 */
 
 var x struct {
-	env       Env
-	jail      string
-	appPkgs   []string
-	binary    string
-	zinclude  string
-	zlib      string
-	goRoot    string
-	goBin     string
-	goCmd     string
-	goPath    map[string]string
+	env      Env
+	jail     string
+	appPkgs  []string
+	binary   string
+	zinclude string
+	zlib     string
+	goRoot   string
+	goBin    string
+	goCmd    string
+	goPath   map[string]string
 }
 
 // Command-line tools to be built
@@ -45,7 +45,7 @@ func main() {
 	}
 	x.env = OSEnv()
 	if flags.PrefixPath != "" {
-		x.env.Set("PATH", flags.PrefixPath + ":" + x.env.Get("PATH"))
+		x.env.Set("PATH", flags.PrefixPath+":"+x.env.Get("PATH"))
 	}
 	//println(fmt.Sprintf("%#v\n", x.env))
 	x.jail = flags.Jail
@@ -113,7 +113,7 @@ func shipCircuit() string {
 
 	// zookeeper lib
 	println("--Packaging Zookeeper libraries")
-	if err = ShellCopyFile(path.Join(x.zlib, "libzookeeper*"), tmpdir + "/"); err != nil {
+	if err = ShellCopyFile(path.Join(x.zlib, "libzookeeper*"), tmpdir+"/"); err != nil {
 		Fatalf("Problem copying Zookeeper library files (%s)\n", err)
 	}
 
@@ -135,7 +135,7 @@ func main() {
 `
 
 func workerPkgPath() string {
-	return path.Join(x.goPath["circuit"], "src", "autopkg", x.binary)	
+	return path.Join(x.goPath["circuit"], "src", "autopkg", x.binary)
 }
 
 func helperPkgPath(helper string) string {
@@ -146,7 +146,7 @@ func buildCircuit() {
 
 	// Prepare cgo environment for Zookeeper
 	// TODO: Add Zookeeper build step. Don't rely on a prebuilt one.
-	x.env.Set("CGO_CFLAGS", "-I" + x.zinclude)
+	x.env.Set("CGO_CFLAGS", "-I"+x.zinclude)
 
 	// Static link (not available in Go1.0.3, available later, in +4ad21a3b23a4, for example)
 	x.env.Set("CGO_LDFLAGS", path.Join(x.zlib, "libzookeeper_mt.a"))
@@ -166,7 +166,7 @@ func buildCircuit() {
 
 	// Re-build command-line tools
 	for _, cpkg := range cmdPkg {
-		if err := Shell(x.env, path.Join(x.goPath["circuit"], "src/circuit/cmd", cpkg) , x.goCmd + " build -a"); err != nil {
+		if err := Shell(x.env, path.Join(x.goPath["circuit"], "src/circuit/cmd", cpkg), x.goCmd+" build -a"); err != nil {
 			Fatalf("Problem compiling %s (%s)\n", cpkg, err)
 		}
 	}
@@ -179,7 +179,7 @@ func buildCircuit() {
 	if err := os.MkdirAll(binpkg, 0700); err != nil {
 		Fatalf("Problem creating runtime package %s (%s)\n", binpkg, err)
 	}
-	
+
 	// Write main.go
 	t := template.New("main")
 	template.Must(t.Parse(mainSrc))
@@ -199,7 +199,7 @@ func buildCircuit() {
 	// Understand what is going on. The flag should not be needed as the
 	// circuit should see the changes in the sources inside the build jail.
 	// Is this a file timestamp problem introduced by rsync?
-	if err := Shell(x.env, binpkg, x.goCmd + " build -a"); err != nil {
+	if err := Shell(x.env, binpkg, x.goCmd+" build -a"); err != nil {
 		Fatalf("Problem with ‘(working directory %s) %s build’ (%s)\n", binpkg, x.goCmd, err)
 	}
 }
@@ -208,13 +208,13 @@ func buildCircuit() {
 // E.g. git@github.com:tumblr/cirapp.git -> cirapp
 func repoName(repo string) string {
 	if strings.HasSuffix(repo, ".git") {
-		repo = repo[:len(repo) - len(".git")]
+		repo = repo[:len(repo)-len(".git")]
 	}
 __For:
 	for i := len(repo) - 1; i >= 0; i-- {
 		switch repo[i] {
 		case ':', '/', '@':
-			repo = repo[i + 1:]
+			repo = repo[i+1:]
 			break __For
 		}
 	}
@@ -234,7 +234,7 @@ func repoSchema(s string) (schema, url string) {
 
 func cloneGitRepo(repo, parent string) {
 	// If not, clone the source tree
-	if err := Shell(x.env, parent, "git clone " + repo); err != nil {
+	if err := Shell(x.env, parent, "git clone "+repo); err != nil {
 		Fatalf("Problem cloning repo '%s' (%s)", repo, err)
 	}
 }
@@ -246,7 +246,7 @@ func pullGitRepo(dir string) {
 }
 
 func rsyncRepo(src, dstparent string) {
-	if err := Shell(x.env, "", "rsync -acrv --delete --exclude .git --exclude .hg --exclude *.a " + src + " " + dstparent); err != nil {
+	if err := Shell(x.env, "", "rsync -acrv --delete --exclude .git --exclude .hg --exclude *.a "+src+" "+dstparent); err != nil {
 		Fatalf("Problem rsyncing dir '%s' to within '%s' (%s)", src, dstparent, err)
 	}
 }
@@ -295,7 +295,7 @@ func fetchRepo(namespace, repo, gopath string, fetchFresh bool) {
 	} else {
 		p = path.Join(repoPath, gopath)
 	}
-	x.env.Set("GOPATH", p + ":" + oldGoPath)
+	x.env.Set("GOPATH", p+":"+oldGoPath)
 	x.goPath[namespace] = p
 }
 
@@ -345,6 +345,6 @@ func buildGoCompiler(rebuild bool) {
 	x.goRoot = path.Join(x.jail, "/go")
 	x.goBin = path.Join(x.goRoot, "/bin")
 	x.goCmd = path.Join(x.goBin, "go")
-	x.env.Set("PATH", x.goBin + ":" + x.env.Get("PATH"))
+	x.env.Set("PATH", x.goBin+":"+x.env.Get("PATH"))
 	x.env.Set("GOROOT", x.goRoot)
 }

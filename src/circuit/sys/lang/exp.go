@@ -1,13 +1,13 @@
 package lang
 
 import (
+	"circuit/sys/lang/types"
+	"circuit/use/circuit"
 	"fmt"
 	"math/rand"
 	"reflect"
-	"sync"
-	"circuit/use/circuit"
-	"circuit/sys/lang/types"
 	"runtime"
+	"sync"
 )
 
 // handleID is a universal ID referring to a local value
@@ -22,7 +22,7 @@ func chooseHandleID() handleID {
 	return handleID(rand.Int63())
 }
 
-// expTabl issues (and reclaims) universal handles to local values 
+// expTabl issues (and reclaims) universal handles to local values
 // and matching local handle structures
 type expTabl struct {
 	tt      *types.TypeTabl
@@ -36,7 +36,7 @@ type expTabl struct {
 type expHandle struct {
 	ID       handleID
 	Importer circuit.Addr
-	Value    reflect.Value     // receiver of methods
+	Value    reflect.Value // receiver of methods
 	Type     *types.TypeChar
 }
 
@@ -83,10 +83,10 @@ func (exp *expTabl) Add(receiver interface{}, importer circuit.Addr) *expHandle 
 		panic("bug: wrong type")
 	}
 	exph := &expHandle{
-		ID:         chooseHandleID(),
-		Importer:   importer,
-		Value:      reflect.ValueOf(receiver),
-		Type:       typ,
+		ID:       chooseHandleID(),
+		Importer: importer,
+		Value:    reflect.ValueOf(receiver),
+		Type:     typ,
 	}
 
 	// Insert in handle map
@@ -119,7 +119,7 @@ func (exp *expTabl) Lookup(id handleID) *expHandle {
 }
 
 // Remove removes the exported value with handle id from the table, if present.
-// If present, a check is performed that importer is the same one, registered 
+// If present, a check is performed that importer is the same one, registered
 // with the table. If not, an error is returned.
 func (exp *expTabl) Remove(id handleID, importer circuit.Addr) {
 	if importer == nil {
@@ -127,7 +127,7 @@ func (exp *expTabl) Remove(id handleID, importer circuit.Addr) {
 	}
 	exp.lk.Lock()
 	defer exp.lk.Unlock()
-	
+
 	exph, present := exp.id[id]
 	if !present {
 		return
@@ -154,7 +154,7 @@ func (exp *expTabl) RemoveImporter(importer circuit.Addr) {
 	}
 	exp.lk.Lock()
 	defer exp.lk.Unlock()
-	
+
 	impTabl, present := exp.nonperm[importer]
 	if !present {
 		return

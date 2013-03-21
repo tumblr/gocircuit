@@ -51,11 +51,11 @@ type ACL struct {
 
 // Event channels are used to provide notifications of changes in the
 // ZooKeeper connection state and in specific node aspects.
-// 
+//
 // There are two sources of events: the session channel obtained during
 // initialization with Init, and any watch channels obtained
 // through one of the W-suffixed functions (GetW, ExistsW, etc).
-// 
+//
 // The session channel will only receive session-level events notifying
 // about critical and transient changes in the ZooKeeper connection
 // state (STATE_CONNECTED, STATE_EXPIRED_SESSION, etc).  On long

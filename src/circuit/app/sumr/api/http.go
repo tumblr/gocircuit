@@ -86,8 +86,8 @@ func handler(read readRequestBatchFunc, w http.ResponseWriter, r *http.Request, 
 	var bb bytes.Buffer
 	enc := json.NewEncoder(&bb)
 	for _, r := range resp {
-		if math.IsNaN(r.(float64)) {
-			r = "ERR"
+		if math.IsNaN(r.(*response).Sum) {
+			r = "null"
 		}
 		if err := enc.Encode(r); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)

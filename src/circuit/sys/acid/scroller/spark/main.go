@@ -2,8 +2,8 @@ package main
 
 import (
 	_ "circuit/load"
-	"circuit/use/circuit"
 	"circuit/sys/acid/scroller/worker"
+	"circuit/use/circuit"
 )
 
 func main() {

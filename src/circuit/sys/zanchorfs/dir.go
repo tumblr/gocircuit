@@ -2,33 +2,33 @@ package zanchorfs
 
 import (
 	"bytes"
+	"circuit/kit/zookeeper"
+	"circuit/kit/zookeeper/zutil"
+	"circuit/use/anchorfs"
+	"circuit/use/circuit"
 	"encoding/gob"
 	"log"
 	"path"
 	"sync"
 	"time"
-	"circuit/use/circuit"
-	"circuit/use/anchorfs"
-	"circuit/kit/zookeeper"
-	"circuit/kit/zookeeper/zutil"
 )
 
 /*
 	TODO: When a directory changes on Zookeeper, Dir will fetch the entire
 	list of children, instea of just the difference. This can be
 	inefficient with large directories.
- */
+*/
 
 // Dir is responsible for keeping a fresh list of the files in a given Zookeeper directory
 type Dir struct {
-	fs        *FS
-	anchor     string
+	fs     *FS
+	anchor string
 
 	sync.Mutex
-	stat      *zookeeper.Stat
-	watch     *zutil.Watch
-	files     map[circuit.RuntimeID]*File
-	dirs      map[string]struct{}
+	stat  *zookeeper.Stat
+	watch *zutil.Watch
+	files map[circuit.WorkerID]*File
+	dirs  map[string]struct{}
 }
 
 func makeDir(fs *FS, anchor string) (*Dir, error) {
@@ -38,7 +38,7 @@ func makeDir(fs *FS, anchor string) (*Dir, error) {
 	}
 	dir.watch = zutil.InstallWatch(fs.zookeeper, dir.zdir())
 	// The semantics of AnchorFS pretend that all directories always exist,
-	// which is not the case in Zookeeper. To make this work, we create the 
+	// which is not the case in Zookeeper. To make this work, we create the
 	// directory on access.
 	if err := zutil.CreateRecursive(dir.fs.zookeeper, dir.zdir(), zutil.PermitAll); err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func (dir *Dir) Name() string {
 }
 
 // Files returns the current view of the files in this directory
-func (dir *Dir) Files() (rev int64, files map[circuit.RuntimeID]anchorfs.File, err error) {
+func (dir *Dir) Files() (rev int64, files map[circuit.WorkerID]anchorfs.File, err error) {
 	if err = dir.sync(); err != nil {
 		return 0, nil, err
 	}
@@ -72,7 +72,7 @@ func (dir *Dir) rev() int64 {
 	return int64(dir.stat.CVersion())
 }
 
-func (dir *Dir) Change(sinceRev int64) (rev int64, files map[circuit.RuntimeID]anchorfs.File, err error) {
+func (dir *Dir) Change(sinceRev int64) (rev int64, files map[circuit.WorkerID]anchorfs.File, err error) {
 	if err = dir.change(sinceRev, 0); err != nil {
 		return 0, nil, err
 	}
@@ -81,7 +81,7 @@ func (dir *Dir) Change(sinceRev int64) (rev int64, files map[circuit.RuntimeID]a
 	return dir.rev(), copyFiles(dir.files), nil
 }
 
-func (dir *Dir) ChangeExpire(sinceRev int64, expire time.Duration) (rev int64, files map[circuit.RuntimeID]anchorfs.File, err error) {
+func (dir *Dir) ChangeExpire(sinceRev int64, expire time.Duration) (rev int64, files map[circuit.WorkerID]anchorfs.File, err error) {
 	if err = dir.change(sinceRev, expire); err != nil {
 		return 0, nil, err
 	}
@@ -90,8 +90,8 @@ func (dir *Dir) ChangeExpire(sinceRev int64, expire time.Duration) (rev int64, f
 	return dir.rev(), copyFiles(dir.files), nil
 }
 
-func copyFiles(files map[circuit.RuntimeID]*File) map[circuit.RuntimeID]anchorfs.File {
-	copied := make(map[circuit.RuntimeID]anchorfs.File)
+func copyFiles(files map[circuit.WorkerID]*File) map[circuit.WorkerID]anchorfs.File {
+	copied := make(map[circuit.WorkerID]anchorfs.File)
 	for id, f := range files {
 		copied[id] = f
 	}
@@ -120,7 +120,7 @@ func (dir *Dir) syncDirs() (dirs []string, stat *zookeeper.Stat, err error) {
 }
 
 // OpenFile returns the worker view of the worker with the specified ID
-func (dir *Dir) OpenFile(id circuit.RuntimeID) (anchorfs.File, error) {
+func (dir *Dir) OpenFile(id circuit.WorkerID) (anchorfs.File, error) {
 	if err := dir.sync(); err != nil {
 		return nil, err
 	}
@@ -206,13 +206,13 @@ func (dir *Dir) clear() error {
 }
 
 // fetch returns the anchor files and subdirectories rooted at zdir
-func fetch(z *zookeeper.Conn, zdir string, children []string) (dirs map[string]struct{}, files map[circuit.RuntimeID]*File, err error) {
-	dirs    = make(map[string]struct{})
-	files = make(map[circuit.RuntimeID]*File)
+func fetch(z *zookeeper.Conn, zdir string, children []string) (dirs map[string]struct{}, files map[circuit.WorkerID]*File, err error) {
+	dirs = make(map[string]struct{})
+	files = make(map[circuit.WorkerID]*File)
 	for _, name := range children {
-		id, err := circuit.ParseRuntimeID(name)
+		id, err := circuit.ParseWorkerID(name)
 		if err != nil {
-			// Node names that are not files are ok. 
+			// Node names that are not files are ok.
 			// We treat them as subdirectories.
 			dirs[name] = struct{}{}
 			continue
@@ -231,8 +231,8 @@ func fetch(z *zookeeper.Conn, zdir string, children []string) (dirs map[string]s
 			continue
 		}
 
-		if zfile.Addr.RuntimeID() != id {
-			log.Printf("anchor file name vs addr mismatch: %s vs %s\n", id, zfile.Addr.RuntimeID())
+		if zfile.Addr.WorkerID() != id {
+			log.Printf("anchor file name vs addr mismatch: %s vs %s\n", id, zfile.Addr.WorkerID())
 			continue
 		}
 		file := &File{owner: zfile.Addr}

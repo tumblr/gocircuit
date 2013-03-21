@@ -5,8 +5,8 @@ import (
 	"net"
 	"time"
 	"tumblr/encoding/thrift"
-	"tumblr/net/scribe/thrift/scribe"
 	"tumblr/net/scribe/thrift/fb303"
+	"tumblr/net/scribe/thrift/scribe"
 )
 
 // Handler is a type that can handle incoming message log requests and errors
@@ -66,7 +66,7 @@ type server struct {
 	transport thrift.TTransportFactory
 	protocol  thrift.TProtocolFactory
 	processor *scribe.ScribeProcessor
-	server    /**thrift.TNonblockingServer*/*thrift.TSimpleServer
+	server/**thrift.TNonblockingServer*/ *thrift.TSimpleServer
 }
 
 type stub struct {

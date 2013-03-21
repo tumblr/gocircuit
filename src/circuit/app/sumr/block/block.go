@@ -2,13 +2,13 @@
 package block
 
 import (
+	"circuit/app/sumr"
+	"circuit/kit/fs"
 	"container/list"
 	"fmt"
 	"math"
 	"sync"
 	"time"
-	"circuit/app/sumr"
-	"circuit/kit/fs"
 )
 
 // Block encapsulates the database-related functionality of a sumr shard.
@@ -18,12 +18,12 @@ type Block struct {
 	// Forget events older than forgetAfter
 	forgetAfter time.Duration
 
-	lk    sync.Mutex
-	tabl  map[sumr.Key]*Sketch  // Key to sketch
-	list  *list.List
-	stat  Stat
+	lk   sync.Mutex
+	tabl map[sumr.Key]*Sketch // Key to sketch
+	list *list.List
+	stat Stat
 
-	disk  *Disk
+	disk *Disk
 }
 
 // Stat holds simple usage statistics pertaining to a sumr shard
@@ -56,7 +56,7 @@ func NewBlock(disk fs.FS, forgetAfter time.Duration) (*Block, error) {
 }
 
 func (b *Block) mountDisk(disk fs.FS) error {
-	d, err := Mount(disk)	
+	d, err := Mount(disk)
 	if err != nil {
 		return err
 	}

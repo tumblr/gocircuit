@@ -2,11 +2,11 @@
 package main
 
 import (
-	"fmt"
-	"os"
 	_ "circuit/load"
 	"circuit/use/anchorfs"
 	"circuit/use/circuit"
+	"fmt"
+	"os"
 	"strconv"
 	"time"
 )
@@ -16,14 +16,14 @@ func main() {
 		println("Usage:", os.Args[0], "AnchorPath DurationSeconds")
 		os.Exit(1)
 	}
-	
+
 	// Parse duration
 	dursec, err := strconv.Atoi(os.Args[2])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Problem parsing duration (%s)\n", err)
 		os.Exit(1)
 	}
-	dur := time.Duration(int64(dursec)*1e9)
+	dur := time.Duration(int64(dursec) * 1e9)
 
 	// Find anchor file
 	file, err := anchorfs.OpenFile(os.Args[1])

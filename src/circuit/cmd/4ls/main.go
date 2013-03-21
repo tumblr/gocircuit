@@ -2,14 +2,14 @@
 package main
 
 import (
+	_ "circuit/load"
+	"circuit/use/anchorfs"
+	"circuit/use/circuit"
 	"flag"
 	"fmt"
 	"log"
 	"os"
 	"path"
-	"circuit/use/anchorfs"
-	"circuit/use/circuit"
-	_ "circuit/load"
 	"sort"
 	"strings"
 )
@@ -33,7 +33,7 @@ func main() {
 	ls(q, recurse, *flagShort)
 }
 
-func fileMapToSlice(m map[circuit.RuntimeID]anchorfs.File) []string {
+func fileMapToSlice(m map[circuit.WorkerID]anchorfs.File) []string {
 	var r []string
 	for id, _ := range m {
 		r = append(r, id.String())

@@ -2,54 +2,65 @@
  *
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  */
-package fb303;
-
-
+package fb303
 
 /**
  *Common status reporting mechanism across all services
  */
 type FbStatus int
+
 const (
-  DEAD FbStatus = 0
-  STARTING FbStatus = 1
-  ALIVE FbStatus = 2
-  STOPPING FbStatus = 3
-  STOPPED FbStatus = 4
-  WARNING FbStatus = 5
+	DEAD     FbStatus = 0
+	STARTING FbStatus = 1
+	ALIVE    FbStatus = 2
+	STOPPING FbStatus = 3
+	STOPPED  FbStatus = 4
+	WARNING  FbStatus = 5
 )
+
 func (p FbStatus) String() string {
-  switch p {
-  case DEAD: return "DEAD"
-  case STARTING: return "STARTING"
-  case ALIVE: return "ALIVE"
-  case STOPPING: return "STOPPING"
-  case STOPPED: return "STOPPED"
-  case WARNING: return "WARNING"
-  }
-  return ""
+	switch p {
+	case DEAD:
+		return "DEAD"
+	case STARTING:
+		return "STARTING"
+	case ALIVE:
+		return "ALIVE"
+	case STOPPING:
+		return "STOPPING"
+	case STOPPED:
+		return "STOPPED"
+	case WARNING:
+		return "WARNING"
+	}
+	return ""
 }
 
 func FromFbStatusString(s string) FbStatus {
-  switch s {
-  case "DEAD": return DEAD
-  case "STARTING": return STARTING
-  case "ALIVE": return ALIVE
-  case "STOPPING": return STOPPING
-  case "STOPPED": return STOPPED
-  case "WARNING": return WARNING
-  }
-  return FbStatus(-10000)
+	switch s {
+	case "DEAD":
+		return DEAD
+	case "STARTING":
+		return STARTING
+	case "ALIVE":
+		return ALIVE
+	case "STOPPING":
+		return STOPPING
+	case "STOPPED":
+		return STOPPED
+	case "WARNING":
+		return WARNING
+	}
+	return FbStatus(-10000)
 }
 
 func (p FbStatus) Value() int {
-  return int(p)
+	return int(p)
 }
 
 func (p FbStatus) IsEnum() bool {
-  return true
+	return true
 }
 
 func init() {
 }
-

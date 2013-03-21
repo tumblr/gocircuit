@@ -1,26 +1,26 @@
 package zutil
 
 import (
+	"circuit/kit/zookeeper"
 	"errors"
 	"sync"
 	"time"
-	"circuit/kit/zookeeper"
 )
 
 // Watch returns the Children and Get values for a Zookeeper node, while
 // ensuring that reading from Zookeeper happens only after node modifications.
 type Watch struct {
-	lk         sync.Mutex
-	zpath      string
-	zookeeper  *zookeeper.Conn
+	lk        sync.Mutex
+	zpath     string
+	zookeeper *zookeeper.Conn
 
-	cwatch     <-chan zookeeper.Event
-	children   []string
-	cstat      *zookeeper.Stat
+	cwatch   <-chan zookeeper.Event
+	children []string
+	cstat    *zookeeper.Stat
 
-	dwatch     <-chan zookeeper.Event
-	data       string
-	dstat      *zookeeper.Stat
+	dwatch <-chan zookeeper.Event
+	data   string
+	dstat  *zookeeper.Stat
 }
 
 var (
@@ -48,12 +48,12 @@ func (w *Watch) Children() (children []string, stat *zookeeper.Stat, err error) 
 	}
 
 	// Check whether we should update the local view from Zookeeper
-	// An update is required if either there is no watch set, or there is a watch 
+	// An update is required if either there is no watch set, or there is a watch
 	// and there is an event waiting in the watch channel.
 	if w.cwatch != nil {
 		select {
 		case <-cwatch:
-			// If the watch has been closed or there is a message in the watch channel, 
+			// If the watch has been closed or there is a message in the watch channel,
 			// then we need to refresh from Zookeeper
 		default:
 			// If there is no message in the watch channel, it means there have been no
@@ -127,12 +127,12 @@ func (w *Watch) Data() (data string, stat *zookeeper.Stat, err error) {
 	}
 
 	// Check whether we should update the local view from Zookeeper
-	// An update is required if either there is no watch set, or there is a watch 
+	// An update is required if either there is no watch set, or there is a watch
 	// and there is an event waiting in the watch channel.
 	if dwatch != nil {
 		select {
 		case <-dwatch:
-			// If the watch has been closed or there is a message in the watch channel, 
+			// If the watch has been closed or there is a message in the watch channel,
 			// then we need to refresh from Zookeeper
 		default:
 			// If there is no message in the watch channel, it means there have been no

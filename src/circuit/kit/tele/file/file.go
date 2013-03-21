@@ -2,10 +2,10 @@
 package file
 
 import (
-	"os"
-	"runtime"
 	"circuit/use/circuit"
 	"encoding/gob"
+	"os"
+	"runtime"
 )
 
 func init() {
@@ -155,7 +155,7 @@ func (fsrv *FileServer) Read(n int) ([]byte, error) {
 	return p[:m], err
 }
 
-func min (x, y int) int {
+func min(x, y int) int {
 	if x < y {
 		return x
 	}

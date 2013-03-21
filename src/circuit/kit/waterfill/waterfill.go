@@ -17,7 +17,7 @@ type Bin interface {
 type Fill struct {
 	bin   []Bin
 	i     int
-	water Bin	// Bin holding the high water mark load
+	water Bin // Bin holding the high water mark load
 }
 
 func NewFill(bin []Bin) *Fill {

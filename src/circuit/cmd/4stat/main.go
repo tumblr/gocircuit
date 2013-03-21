@@ -2,11 +2,11 @@
 package main
 
 import (
-	"fmt"
-	"os"
 	_ "circuit/load"
 	"circuit/use/anchorfs"
 	"circuit/use/circuit"
+	"fmt"
+	"os"
 )
 
 func main() {

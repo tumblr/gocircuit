@@ -22,7 +22,7 @@ func (p *testBin) String() string {
 func TestFill(t *testing.T) {
 	bin := make([]FillBin, 10)
 	for i, _ := range bin {
-		b := testBin(i*2)
+		b := testBin(i * 2)
 		bin[i] = &b
 	}
 	f := NewFill(bin)

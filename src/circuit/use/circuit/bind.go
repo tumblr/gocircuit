@@ -88,7 +88,7 @@ func Listen(service string, receiver interface{}) {
 	get().Listen(service, receiver)
 }
 
-// TryDial behaves like Dial, with the exception that instead of panicking 
+// TryDial behaves like Dial, with the exception that instead of panicking
 // in the event of physical issues, an error is returned instead.
 func TryDial(addr Addr, service string) (X, error) {
 	return get().TryDial(addr, service)

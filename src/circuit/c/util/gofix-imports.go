@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Copyright 2012 Petar Maymounkov. All rights reserved.
-// Use of this source code is governed by a 
+// Use of this source code is governed by a
 // license that can be found in the LICENSE file.
 
 package util

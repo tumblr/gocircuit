@@ -1,8 +1,8 @@
 package lang
 
 import (
-	"reflect"
 	"circuit/use/circuit"
+	"reflect"
 )
 
 type exportGroup struct {
@@ -91,7 +91,7 @@ func (r *Runtime) exportPtr(v interface{}, importer circuit.Addr) interface{} {
 				println("problem writing on lifeline to", importer.String(), err.Error())
 				return
 			}
-			// Read returns when the remote dies and 
+			// Read returns when the remote dies and
 			// runs the conn into an error
 			conn.Read()
 		}()

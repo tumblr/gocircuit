@@ -3,13 +3,13 @@ package main
 
 import (
 	"bufio"
-	"flag"
-	"os"
-	"fmt"
-	"path"
 	"circuit/kit/posix"
 	"circuit/load/config"
+	"flag"
+	"fmt"
 	"io"
+	"os"
+	"path"
 	"strings"
 )
 
@@ -18,7 +18,7 @@ func init() {
 		_, prog := path.Split(os.Args[0])
 		fmt.Fprintf(os.Stderr, "Usage: %s\n", prog)
 		fmt.Fprintf(os.Stderr,
-`
+			`
 4clear deletes the jails of workers that are no longer alive, 
 on all hosts specified one per-line on standard input.
 `)

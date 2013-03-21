@@ -10,9 +10,9 @@ type Addr interface {
 	// that is running the worker identified by this address
 	Host() string
 
-	// RuntimeID is tentatively part of the transport address so that, if
-	// needed, we can verify the identity of the runtime we are talking to. 
-	RuntimeID() RuntimeID
+	// WorkerID is tentatively part of the transport address so that, if
+	// needed, we can verify the identity of the runtime we are talking to.
+	WorkerID() WorkerID
 }
 
 // Conn is a connection to a remote runtime.

@@ -1,8 +1,8 @@
 package block
 
 import (
-	"time"
 	"circuit/app/sumr"
+	"time"
 )
 
 // Sketch is the type of the value stored within the key-value store.

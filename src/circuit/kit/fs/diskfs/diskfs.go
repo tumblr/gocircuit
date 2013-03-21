@@ -2,10 +2,10 @@
 package diskfs
 
 import (
+	fspkg "circuit/kit/fs"
 	"errors"
 	"os"
 	"path"
-	fspkg "circuit/kit/fs"
 )
 
 var ErrNotDir = errors.New("not a directory")

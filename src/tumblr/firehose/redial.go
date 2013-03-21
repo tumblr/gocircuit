@@ -26,7 +26,7 @@ func Redial(req *Request) *RedialConn {
 }
 
 // Stat returns basic statistics about past re/connection attempts.
-// last is the timestamp of the last re/connect attempt. 
+// last is the timestamp of the last re/connect attempt.
 // nok is the number of times a re/connect was successful.
 // nerr is the number of times a re/connect failed.
 func (rc *RedialConn) Stat() (last time.Time, nok, nerr int32) {

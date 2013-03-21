@@ -1,8 +1,8 @@
 package worker
 
 import (
-	"time"
 	"circuit/use/circuit"
+	"time"
 )
 
 type App struct{}
@@ -16,6 +16,6 @@ func (App) Main() {
 	})
 }
 
-func init() { 
-	circuit.RegisterFunc(App{}) 
+func init() {
+	circuit.RegisterFunc(App{})
 }

@@ -28,7 +28,7 @@ func (id Key) String() string {
 // String returns a textual representation of the id, truncated to the k MSBs.
 func (id Key) ShortString(k uint) string {
 	shift := uint(8*unsafe.Sizeof(id)) - k
-	return fmt.Sprintf("%0" + strconv.Itoa(int(k))+ "b", ((id << shift) >> shift))
+	return fmt.Sprintf("%0"+strconv.Itoa(int(k))+"b", ((id << shift) >> shift))
 }
 
 // Item is any type that has an XOR-space Key
@@ -41,7 +41,7 @@ type Item interface {
 type Metric struct {
 	Item
 	sub [2]*Metric
-	n   int    // Number of items (not nodes) in the subtree of and including this node
+	n   int // Number of items (not nodes) in the subtree of and including this node
 }
 
 var ErrDup = errors.New("duplicate point")
@@ -94,7 +94,7 @@ func (m *Metric) calcSize() {
 	}
 }
 
-// Add adds the item to the metric. It returns the smallest number of 
+// Add adds the item to the metric. It returns the smallest number of
 // significant bits that distinguish this item from the rest in the metric.
 func (m *Metric) Add(item Item) (level int, err error) {
 	return m.add(item, 0)
@@ -131,7 +131,7 @@ func (m *Metric) forward(item Item, r int) (bottom int, err error) {
 	if m.sub[j] == nil {
 		m.sub[j] = &Metric{}
 	}
-	return m.sub[j].add(item, r + 1)
+	return m.sub[j].add(item, r+1)
 }
 
 // Remove removes an item with id from the metric, if present.
@@ -156,7 +156,7 @@ func (m *Metric) remove(id Key, r int) (Item, bool) {
 	if sub == nil {
 		return nil, false
 	}
-	item, emptied := sub.remove(id, r + 1)
+	item, emptied := sub.remove(id, r+1)
 	if emptied {
 		m.sub[b] = nil
 		if m.sub[1-b] == nil {
@@ -182,12 +182,12 @@ func (m *Metric) nearest(pivot Key, k int, r int) []Item {
 	b := pivot.Bit(r)
 	sub := m.sub[b]
 	if sub != nil {
-		result = sub.nearest(pivot, k, r + 1)
+		result = sub.nearest(pivot, k, r+1)
 	}
 	k -= len(result)
 	sub = m.sub[1-b]
 	if sub != nil {
-		result = append(result, sub.nearest(pivot, k, r + 1)...)
+		result = append(result, sub.nearest(pivot, k, r+1)...)
 	}
 	return result
 }

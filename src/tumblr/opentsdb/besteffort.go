@@ -10,7 +10,7 @@ import (
 // and continues operation when the OpenTSDB service is unresponsive.
 type BestEffortConn struct {
 	sync.Mutex
-	conn *Conn
+	conn     *Conn
 	hostport string
 }
 
@@ -48,7 +48,7 @@ func (c *BestEffortConn) redial() {
 	var err error
 	var conn *Conn
 	for conn == nil {
-		time.Sleep(2*time.Second)  // Sleep a bit so things don't spin out of control
+		time.Sleep(2 * time.Second) // Sleep a bit so things don't spin out of control
 		c.Lock()
 		hostport := c.hostport
 		c.Unlock()

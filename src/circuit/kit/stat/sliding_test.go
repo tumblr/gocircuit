@@ -10,7 +10,7 @@ func TestCarousel(t *testing.T) {
 
 	now := time.Now().UnixNano()
 	for i := 0; i < 20; i++ {
-		slot := c.Slot(time.Unix(0, now - int64(i)*1e9))
+		slot := c.Slot(time.Unix(0, now-int64(i)*1e9))
 		if slot != nil {
 			println("ok")
 			slot.Add(1)
@@ -19,7 +19,7 @@ func TestCarousel(t *testing.T) {
 		}
 	}
 	for i := 0; i < 5; i++ {
-		slot := c.Slot(time.Unix(0, now + int64(i)*1e9))
+		slot := c.Slot(time.Unix(0, now+int64(i)*1e9))
 		slot.Add(5)
 	}
 	slots, tlast := c.Slots()

@@ -1,9 +1,9 @@
 package zookeeper_test
 
 import (
+	zk "circuit/kit/zookeeper"
 	"errors"
 	. "launchpad.net/gocheck"
-	zk "circuit/kit/zookeeper"
 )
 
 func (s *S) TestRetryChangeCreating(c *C) {

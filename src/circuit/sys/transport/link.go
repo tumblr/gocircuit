@@ -15,13 +15,13 @@ type link struct {
 	addr       *Addr
 	onclose    func()
 
-	lk         sync.Mutex // protects open
-	open       map[connID]*conn
+	lk   sync.Mutex // protects open
+	open map[connID]*conn
 
-	trigger    Trigger
-	swap       *swapConn
+	trigger Trigger
+	swap    *swapConn
 
-	ach        chan *conn
+	ach chan *conn
 }
 
 func makeLink(a *Addr, g *gobConn, ach chan *conn, onclose func(), pipelining int) *link {
@@ -141,7 +141,7 @@ func (l *link) readLoop() {
 				// Unknown user connection.
 				// Usually a late packet, arriving after a local conn.Close
 				println("late message")
-				continue  // Drop
+				continue // Drop
 			}
 			c.sendRead(msg.Payload)
 
@@ -183,7 +183,7 @@ func (l *link) reconnect() {
 		return
 	}
 	defer l.trigger.Unlock()
-	
+
 	return
 }
 

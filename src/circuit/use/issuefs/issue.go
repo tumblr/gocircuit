@@ -3,12 +3,12 @@ package issuefs
 
 import (
 	"bytes"
+	"circuit/kit/join"
+	"circuit/use/circuit"
 	"fmt"
 	"math/rand"
 	"strconv"
 	"time"
-	"circuit/kit/join"
-	"circuit/use/circuit"
 )
 
 type Issue struct {

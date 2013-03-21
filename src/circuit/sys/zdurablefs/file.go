@@ -1,26 +1,25 @@
 package zdurablefs
 
-
 import (
 	"bytes"
+	"circuit/kit/zookeeper"
+	"circuit/kit/zookeeper/zutil"
+	"circuit/use/circuit"
+	"circuit/use/durablefs"
 	"encoding/gob"
 	"path"
 	"sync"
-	"circuit/use/circuit"
-	"circuit/kit/zookeeper"
-	"circuit/kit/zookeeper/zutil"
-	"circuit/use/durablefs"
 )
 
 type File struct {
-	conn     *zookeeper.Conn
-	zroot    string		// Root of file system in Zookeeper
-	fpath    string		// File path relative to file system root
+	conn  *zookeeper.Conn
+	zroot string // Root of file system in Zookeeper
+	fpath string // File path relative to file system root
 	sync.Mutex
-	rbuf     *bytes.Buffer
-	dec      *gob.Decoder
-	wbuf     *bytes.Buffer
-	enc      *gob.Encoder
+	rbuf *bytes.Buffer
+	dec  *gob.Decoder
+	wbuf *bytes.Buffer
+	enc  *gob.Encoder
 }
 
 func (fs *FS) CreateFile(fpath string) (durablefs.File, error) {
@@ -37,9 +36,9 @@ func (fs *FS) OpenFile(fpath string) (durablefs.File, error) {
 		return nil, err
 	}
 	f := &File{
-		conn:  fs.conn, 
-		zroot: fs.zroot, 
-		fpath: fpath, 
+		conn:  fs.conn,
+		zroot: fs.zroot,
+		fpath: fpath,
 		rbuf:  bytes.NewBufferString(data),
 	}
 	f.dec = gob.NewDecoder(f.rbuf)
@@ -117,6 +116,6 @@ func (sa stringAddr) String() string {
 	return sa.Addr
 }
 
-func (sa stringAddr) RuntimeID() circuit.RuntimeID {
+func (sa stringAddr) WorkerID() circuit.WorkerID {
 	return 0
 }

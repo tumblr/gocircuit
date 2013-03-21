@@ -9,7 +9,7 @@ func TestConn(t *testing.T) {
 	if err != nil {
 		t.Fatalf("dial (%s)", err)
 	}
-	if err = conn.Emit([]Message{ Message{"test-cat", "test-msg"} }...); err != nil {
+	if err = conn.Emit([]Message{Message{"test-cat", "test-msg"}}...); err != nil {
 		t.Errorf("emit (%s)", err)
 	}
 	if err = conn.Close(); err != nil {

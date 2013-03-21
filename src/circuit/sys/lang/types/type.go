@@ -9,7 +9,6 @@ import (
 	"unicode/utf8"
 )
 
-
 // TypeID is a handle for a type
 type TypeID uint64
 
@@ -57,10 +56,10 @@ func (tt *TypeTabl) TypeOf(x interface{}) *TypeChar {
 // TypeChar reflects on the methods of a Go type, and maintains exportable IDs
 // for its methods
 type TypeChar struct {
-	ID    TypeID
-	Type  reflect.Type      // Go type of the receiver
-	Func  map[FuncID]*funcChar  // Public methods
-	Proc  map[string]*funcChar
+	ID   TypeID
+	Type reflect.Type         // Go type of the receiver
+	Func map[FuncID]*funcChar // Public methods
+	Proc map[string]*funcChar
 }
 
 // makeType makes a new type structure for the receiver's value type
@@ -167,7 +166,7 @@ func makeFunc(m reflect.Method, parent *TypeChar) *funcChar {
 		}
 		p.OutTypes = append(p.OutTypes, rt)
 		sign = append(sign, rt.Name())
-		gobFlattenRegister(rt)	
+		gobFlattenRegister(rt)
 	}
 
 	// Precompute ID

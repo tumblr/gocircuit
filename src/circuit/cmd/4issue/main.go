@@ -2,10 +2,10 @@
 package main
 
 import (
+	_ "circuit/load"
+	"circuit/use/issuefs"
 	"fmt"
 	"os"
-	"circuit/use/issuefs"
-	_ "circuit/load"
 )
 
 func usage() {

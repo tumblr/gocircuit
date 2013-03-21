@@ -27,9 +27,9 @@ func VisitPkgTypeSpecs(fset *token.FileSet, pkg *ast.Package, typeSpecFunc func(
 	for x, file := range pkg.Files {
 		println(x)
 		fimp := util.CompileFileImports(file)
-		if err := visitFileTypeSpecs(fset, file, 
-			func(typeSpec *ast.TypeSpec) error { 
-				typeSpecFunc(fimp, typeSpec) 
+		if err := visitFileTypeSpecs(fset, file,
+			func(typeSpec *ast.TypeSpec) error {
+				typeSpecFunc(fimp, typeSpec)
 				return nil
 			}); err != nil {
 			return err
@@ -43,7 +43,7 @@ func visitFileTypeSpecs(fset *token.FileSet, f *ast.File, typeSpecFunc func(type
 	for _, decl := range f.Decls {
 		switch q := decl.(type) {
 		// GenDecl captures a single or multi-type declaration block, e.g.:
-		//	type T0 … 
+		//	type T0 …
 		//	type (
 		//		T1 …
 		//		T2 …

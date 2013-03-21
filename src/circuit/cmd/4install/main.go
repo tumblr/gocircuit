@@ -3,11 +3,11 @@ package main
 
 import (
 	"bufio"
+	"circuit/load/config"
 	"fmt"
 	"io"
 	"os"
 	"strings"
-	"circuit/load/config"
 )
 
 func main() {

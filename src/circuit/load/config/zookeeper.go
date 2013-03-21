@@ -12,15 +12,15 @@ import (
 
 // ZookeeperConfig holds configuration parameters regarding the zookeeper cluster for the circuit
 type ZookeeperConfig struct {
-	Workers []string  // Access points for the Zookeeper cluster
-	RootDir string    // Root directory for this circuit instance within Zookeeper
+	Workers []string // Access points for the Zookeeper cluster
+	RootDir string   // Root directory for this circuit instance within Zookeeper
 }
 
 func (z *ZookeeperConfig) Zookeepers() string {
 	var w bytes.Buffer
 	for i, u := range z.Workers {
 		w.WriteString(u)
-		if i + 1 < len(z.Workers) {
+		if i+1 < len(z.Workers) {
 			w.WriteByte(',')
 		}
 	}

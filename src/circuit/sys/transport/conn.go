@@ -1,9 +1,9 @@
 package transport
 
 import (
+	"circuit/use/circuit"
 	"math/rand"
 	"sync"
-	"circuit/use/circuit"
 )
 
 // Within a TCP connection, the connID distinguishes a unique logical session
@@ -19,9 +19,9 @@ type conn struct {
 	addr *Addr
 	ann  bool // If ann(ounced) is true, we need not set the First flag on outgoing messages
 
-	lk   sync.Mutex // conn.Close and link.readLoop are competing for send/close to ch
-	ch   chan interface{} // link.readLoop send msgs for this conn to conn.Read
-	l    *link
+	lk sync.Mutex       // conn.Close and link.readLoop are competing for send/close to ch
+	ch chan interface{} // link.readLoop send msgs for this conn to conn.Read
+	l  *link
 }
 
 func makeConn(id connID, l *link) *conn {
@@ -37,7 +37,7 @@ func (c *conn) Read() (interface{}, error) {
 }
 
 func (c *conn) sendRead(v interface{}) {
-	c.lk.Lock() // Lock ch to send payload to it
+	c.lk.Lock()     // Lock ch to send payload to it
 	if c.l != nil { // Implies c.ch not closed
 		c.ch <- v
 	}

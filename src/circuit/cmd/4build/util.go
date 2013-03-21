@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"circuit/kit/iomisc"
 	"fmt"
 	"io"
 	"math/rand"
@@ -11,7 +12,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"circuit/kit/iomisc"
 )
 
 func Printf(fmt_ string, arg_ ...interface{}) {
@@ -114,7 +114,7 @@ func OSEnv() Env {
 func (env Env) Environ() []string {
 	var r []string
 	for k, v := range env {
-		r = append(r, k + "=" + v)
+		r = append(r, k+"="+v)
 	}
 	return r
 }

@@ -7,7 +7,7 @@ import (
 func (r *Runtime) Export(val ...interface{}) interface{} {
 	expHalt, _ := r.exportValues(val, nil)
 	return &exportedMsg{
-		Value:  expHalt,
+		Value: expHalt,
 		Stack: string(debug.Stack()),
 	}
 }

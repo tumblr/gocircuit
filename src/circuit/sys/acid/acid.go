@@ -3,11 +3,11 @@ package acid
 
 import (
 	"bytes"
+	"circuit/use/circuit"
 	"log"
+	"runtime"
 	"runtime/pprof"
 	"time"
-	"circuit/use/circuit"
-	"runtime"
 )
 
 func New() *Acid {
@@ -50,7 +50,7 @@ func (s *Acid) CPUProfile(duration time.Duration) ([]byte, error) {
 	if err := pprof.StartCPUProfile(&w); err != nil {
 		return nil, err
 	}
-	log.Printf("cpu profiling for %d sec", duration / 1e9)
+	log.Printf("cpu profiling for %d sec", duration/1e9)
 	time.Sleep(duration)
 	pprof.StopCPUProfile()
 	return w.Bytes(), nil

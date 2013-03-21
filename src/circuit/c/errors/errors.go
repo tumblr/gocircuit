@@ -23,7 +23,7 @@ func (e *SourceError) Error() string {
 	if e.Pos > 0 {
 		pos := e.FileSet.Position(e.Pos)
 		return fmt.Sprintf("%s • %s", pos, e.Msg)
-	} 
+	}
 	return e.Msg
 }
 

@@ -2,8 +2,8 @@
 package posix
 
 import (
-	"os/exec"
 	"io/ioutil"
+	"os/exec"
 )
 
 func Exec(prog, dir string, stdin string, argv ...string) (stdout, stderr string, err error) {
@@ -52,13 +52,13 @@ func RemoteShell(remoteHost, remoteShellStdin string) (stdout, stderr string, er
 }
 
 func DownloadDir(remoteHost, remoteDir, sourceDir string) error {
-	_, _, err := Exec("rsync", "", "", "-acrv", "--rsh=ssh", remoteHost + ":" + remoteDir + "/", sourceDir + "/")
+	_, _, err := Exec("rsync", "", "", "-acrv", "--rsh=ssh", remoteHost+":"+remoteDir+"/", sourceDir+"/")
 	return err
 }
 
 // UploadDir copies the contents of sourceDir recursively into remoteDir.
 // remoteDir must be present on the remote host.
 func UploadDir(remoteHost, sourceDir, remoteDir string) error {
-	_, _, err := Exec("rsync", "", "", "-acrv", "--rsh=ssh", sourceDir + "/", remoteHost + ":" + remoteDir + "/")
+	_, _, err := Exec("rsync", "", "", "-acrv", "--rsh=ssh", sourceDir+"/", remoteHost+":"+remoteDir+"/")
 	return err
 }

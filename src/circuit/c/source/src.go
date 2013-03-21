@@ -12,7 +12,7 @@ import (
 type Source struct {
 	layout *Layout
 	jail   *Jail
-	pkg    map[string]*Pkg	// package path to package structure
+	pkg    map[string]*Pkg // package path to package structure
 }
 
 func New(l *Layout, writeDir string) (*Source, error) {
@@ -48,7 +48,7 @@ func (s *Source) FindPkg(pkgPath string) (srcDir string, inGoRoot bool, err erro
 func (s *Source) ParsePkg(pkgPath string, mode parser.Mode) (pkg *Pkg, inGoRoot bool, err error) {
 
 	pkgPath = path.Clean(pkgPath)
-	
+
 	// Find source root for pkgPath
 	var srcDir string
 	if srcDir, inGoRoot, err = s.layout.FindPkg(pkgPath); err != nil {

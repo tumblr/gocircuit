@@ -2,9 +2,9 @@
 package main
 
 import (
+	"circuit/load/config"
 	"flag"
 	"os"
-	"circuit/load/config"
 )
 
 var flagShow = flag.Bool("show", true, "Verbose mode")

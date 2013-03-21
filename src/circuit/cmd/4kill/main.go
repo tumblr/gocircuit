@@ -2,15 +2,15 @@
 package main
 
 import (
+	_ "circuit/load"
+	"circuit/use/anchorfs"
+	"circuit/use/circuit"
+	"circuit/use/worker"
 	"flag"
 	"log"
 	"os"
 	"path"
 	"strings"
-	"circuit/use/anchorfs"
-	"circuit/use/circuit"
-	"circuit/use/worker"
-	_ "circuit/load"
 )
 
 func usage() {
@@ -100,7 +100,7 @@ func parse(s string) (anchor string, file, recurse bool, err error) {
 		s = s[:len(s)-3]
 	}
 	_, leaf := path.Split(s)
-	if _, err := circuit.ParseRuntimeID(leaf); err == nil {
+	if _, err := circuit.ParseWorkerID(leaf); err == nil {
 		return s, true, false, nil
 	}
 	return s, false, recurse, nil

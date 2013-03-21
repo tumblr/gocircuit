@@ -15,11 +15,11 @@ import (
 // Ecosystem maintains a real-time record of the current Kafka broker
 // ecosystem, as read from Zookeeper
 type Ecosystem struct {
-	lk         sync.Mutex
-	zookeeper  *zookeeper.Conn
-	watch      *zutil.Watch
-	stat       *zookeeper.Stat
-	brokers    BrokersView
+	lk        sync.Mutex
+	zookeeper *zookeeper.Conn
+	watch     *zutil.Watch
+	stat      *zookeeper.Stat
+	brokers   BrokersView
 }
 
 // NewEcosystem returns a new ecosystem instance using the supplied Zookeeper connection
