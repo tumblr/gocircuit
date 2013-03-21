@@ -1,4 +1,5 @@
-package x
+// Package teleport implements an experimental transport layer that can overcome network outages without affecting upstream clients
+package teleport
 
 import (
 	"strconv"

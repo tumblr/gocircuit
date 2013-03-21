@@ -3,7 +3,7 @@ package tcp
 import (
 	"net/http"
 	"testing"
-	"tumblr/balkan/x"
+	x "circuit/exp/teleport"
 	_ "circuit/kit/debug/http/trace"
 	"sync"
 )

@@ -4,7 +4,7 @@ import (
 	"encoding/gob"
 	"io"
 	"net"
-	"tumblr/balkan/x"
+	x "circuit/exp/teleport"
 )
 
 type ReadWriter interface {

@@ -2,7 +2,7 @@ package tcp
 
 import (
 	"sync"
-	"tumblr/balkan/x"
+	x "circuit/exp/teleport"
 )
 
 type Dialer struct {

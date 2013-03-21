@@ -4,7 +4,7 @@ import (
 	"encoding/gob"
 	"math/rand"
 	"sync"
-	"tumblr/balkan/x"
+	x "circuit/exp/teleport"
 )
 
 type linkID int64

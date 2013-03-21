@@ -5,7 +5,7 @@ import (
 	"net"
 	"sync"
 	"time"
-	"tumblr/balkan/x"
+	x "circuit/exp/teleport"
 )
 
 type autoDialMsg struct {

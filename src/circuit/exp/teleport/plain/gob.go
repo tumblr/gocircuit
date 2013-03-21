@@ -3,7 +3,7 @@ package plain
 import (
 	"encoding/gob"
 	"io"
-	"tumblr/balkan/x"
+	x "circuit/exp/teleport"
 )
 
 type ReadWriter interface {

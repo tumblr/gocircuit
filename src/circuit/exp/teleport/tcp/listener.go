@@ -1,3 +1,4 @@
+// Package tcp implements a TCP-based teleport transport layer
 package tcp
 
 import (
@@ -5,7 +6,7 @@ import (
 	"net"
 	"strings"
 	"sync"
-	"tumblr/balkan/x"
+	x "circuit/exp/teleport"
 )
 
 type Listener struct {

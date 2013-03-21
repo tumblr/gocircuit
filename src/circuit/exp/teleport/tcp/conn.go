@@ -3,7 +3,7 @@ package tcp
 import (
 	"math/rand"
 	"sync"
-	"tumblr/balkan/x"
+	x "circuit/exp/teleport"
 )
 
 // Within a physical connection, the connID distinguishes a unique logical session

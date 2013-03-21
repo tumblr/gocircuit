@@ -1,9 +1,10 @@
+// Package plain is a debug-only implementation of the teleport transport interface
 package plain
 
 import (
 	"net"
 	"time"
-	"tumblr/balkan/x"
+	x "circuit/exp/teleport"
 )
 
 // Listener
