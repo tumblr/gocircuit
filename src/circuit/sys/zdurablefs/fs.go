@@ -1,4 +1,4 @@
-// Package zdurablefs implements a durable file system that meets the interface of circuit/use/durablefs
+// Package zdurablefs implements a durable file system using Apache Zookeeper
 package zdurablefs
 
 import (

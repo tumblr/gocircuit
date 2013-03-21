@@ -1,3 +1,4 @@
+// Package workers implements spawning and killing of circuit workers on local and remote hosts
 package worker
 
 import (

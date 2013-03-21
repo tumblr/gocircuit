@@ -1,3 +1,4 @@
+// Package types implements the runtime type system
 package types
 
 import (

@@ -1,3 +1,4 @@
+// Package zanchorfs implements an anchor file system using Apache Zookeeper
 package zanchorfs
 
 import (

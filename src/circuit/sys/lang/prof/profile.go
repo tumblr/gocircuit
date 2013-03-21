@@ -1,3 +1,4 @@
+// Package prof implements internal profiling data structures
 package prof
 
 import (

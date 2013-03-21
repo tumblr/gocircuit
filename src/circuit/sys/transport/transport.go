@@ -1,3 +1,4 @@
+// Package transport implements the communication abstraction that the language runtime rests on
 package transport
 
 import (

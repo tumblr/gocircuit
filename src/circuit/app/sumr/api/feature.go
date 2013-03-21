@@ -61,7 +61,7 @@ func (s *change) Key() sumr.Key {
 //
 //	{
 //		"t": 12345678,
-//		"f": { "fkey": "fvalue", ... },
+//		"k": { "fkey": "fvalue", ... },
 //		"v": 1.234
 //	}
 //
@@ -99,7 +99,7 @@ func makeChangeMap(b map[string]interface{}) (*change, error) {
 	}
 
 	// Read feature
-	feature_, ok := b["f"]
+	feature_, ok := b["k"]
 	if !ok {
 		return nil, ErrNoFeature
 	}

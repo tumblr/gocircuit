@@ -1,2 +1,2 @@
-// Package c implements a circuit compiler (EXPERIMENTAL)
+// Package c implements a circuit compiler (IN DEVELOPMENT)
 package c

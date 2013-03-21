@@ -14,14 +14,6 @@ type response struct {
 // ReadRequestBatchFunc reads a request batch
 type readRequestBatchFunc func(io.Reader) ([]interface{}, error)
 
-// Request to add a new change to a feature vector
-// On the wire, it looks like so
-//
-//	{
-//		"f": { "fkey": "fvalue", ... },
-//		"v": 1.234
-//	}
-//
 type addRequest struct {
 	change *change
 }
@@ -42,6 +34,12 @@ func readAddRequest(dec *json.Decoder) (interface{}, error) {
 	return &addRequest{change: change}, nil
 }
 
+// readAddRequestBatch parses the body of an HTTP request for a batch of ADD requests.
+// ADD requests are concatenated together, optionally separated by whitespace characters.
+// Each individual ADD request is of the form:
+//
+//	{"t":12345, "k":{"p":"q", "r":"s"}, "v":023}
+//
 func readAddRequestBatch(r io.Reader) ([]interface{}, error) {
 	dec := json.NewDecoder(r)
 	var bch []interface{}
@@ -62,7 +60,7 @@ func readAddRequestBatch(r io.Reader) ([]interface{}, error) {
 // On the wire, it looks like so
 //
 //	{
-//		"f": { "fkey": "fvalue", ... },
+//		"k": { "fkey": "fvalue", ... },
 //	}
 //
 type sumRequest struct {
@@ -81,6 +79,12 @@ func readSumRequest(dec *json.Decoder) (interface{}, error) {
 	return makeSumRequestMap(b)
 }
 
+// readAddRequestBatch parses the body of an HTTP request for a batch of SUM requests.
+// SUM requests are concatenated together, optionally separated by whitespace characters.
+// Each individual SUM request is of the form:
+//
+//	{ "k":{"p":"q", "r":"s"} }
+//
 func readSumRequestBatch(r io.Reader) ([]interface{}, error) {
 	dec := json.NewDecoder(r)
 	var bch []interface{}
@@ -99,7 +103,7 @@ func readSumRequestBatch(r io.Reader) ([]interface{}, error) {
 
 func makeSumRequestMap(b map[string]interface{}) (*sumRequest, error) {
 	// Read feature
-	feature_, ok := b["f"]
+	feature_, ok := b["k"]
 	if !ok {
 		return nil, ErrNoFeature
 	}

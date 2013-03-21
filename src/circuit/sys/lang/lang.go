@@ -1,3 +1,4 @@
+// Package lang implements the language runtime
 package lang
 
 import "circuit/use/circuit"

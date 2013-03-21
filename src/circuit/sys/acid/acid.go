@@ -1,3 +1,4 @@
+// Package acid implements a built-in API that exposes debugging, profiling, monitoring, and other worker facilities
 package acid
 
 import (
