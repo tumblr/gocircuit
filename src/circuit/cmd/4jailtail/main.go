@@ -1,6 +1,11 @@
 // 4jailtail redirects the output of running 'tail -f' on a file inside a worker's local file system jail
 package main
 
+// BUG: When 4jailtail quits, the remote tail process does not disappear (they get write error, in one case)
+// Can tail be made a child process so it dies when worker dies?
+//
+// BUG: When the remote tail process is killed prematurely, 4jailtail hangs waiting
+
 import (
 	teleio "circuit/kit/tele/io"
 	_ "circuit/load"

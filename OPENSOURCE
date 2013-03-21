@@ -3,7 +3,6 @@
 illustration that shows data flow in the lifecycle, with annotations for 4build, 4crossbuild, 4install, etc.
 
 generate-circuit-config.sh in tutorials
-resolve open issues in /src/circuit/TODO
 document cross-build environment requirements
 verify cross-build works with new modifications
 

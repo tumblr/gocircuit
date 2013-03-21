@@ -1,35 +1,25 @@
 separate config file for a crossbuild host
-
-finish language rules doc
 CONFIG FRICTION:
 	circuit configs are user specific since they contain hardcoded absolute paths
 
-A newly started worker would get its job from an incoming "Go" call. This 
-calls also defines the death semantics. If this call doesn't arrive for a network
-or type-mismatch reason, worker should die on its own after waiting for a "Go" a bit.
-
 ------------------------------------------
-4jailtail
-	bug: when 4jailtail quit the remote tail process does not disappear (they get write error, in one case)
-		garbage collection kicks in?
-	bug: when the remote tail process is killed, 4jailtail hangs waiting
-	can tail also be made child process so it dies when worker dies
-
 anchor graveyard
 	anchor file system graveyard
 	find dead workers in graveyard
 	use new worker to pass file
-
-____________________________________________________
-Ref -> Tele XVal (ExportValue)?
-4lsof (list registered listeners, etc. resources) and also dup the lsof of the unix process
 zombie detect/kill mechanism (procs not in anchor fs)
 	add hidden flat registration space for runtime IDS in anchor file system
 	add permanent flat registration space, where workers check in and out
-
-
+____________________________________________________
+Ref -> Tele XVal (ExportValue)?
+4lsof (list registered listeners, etc. resources) and also dup the lsof of the unix process
 __________________________________________
 POST OPEN-SOURCE
+
+A newly started worker would get its job from an incoming "Go" call. This call
+also defines the death semantics for this worker. If this call doesn't arrive
+for a network or type-mismatch reason, the worker should die on its own after
+waiting for a "Go" call for a bit.
 
 4build: optionally use existing go installation
 4crossbuild: takeover upload to hosts?

@@ -1,3 +1,4 @@
+// Package zissuesfs implements a sample system for tracking and reporting runtime issues
 package zissuefs
 
 import (
