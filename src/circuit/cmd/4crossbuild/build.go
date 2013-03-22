@@ -16,7 +16,7 @@ import (
 const build_sh_src = `{{.Tool}} ` +
 	`'-binary={{.Binary}}' '-jail={{.Jail}}' ` +
 	`'-app={{.AppRepo}}' '-appsrc={{.AppSrc}}' ` +
-	`'-pkg={{.Pkg}}' '-show={{.Show}}' '-rebuildgo={{.RebuildGo}}' ` +
+	`'-workerpkg={{.WorkerPkg}}' '-show={{.Show}}' '-rebuildgo={{.RebuildGo}}' ` +
 	`'-zinclude={{.ZookeeperInclude}}' '-zlib={{.ZookeeperLib}}' ` +
 	`'-cir={{.CircuitRepo}}' '-cirsrc={{.CircuitSrc}}' '-prefixpath={{.PrefixPath}}' `
 

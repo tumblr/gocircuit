@@ -1,4 +1,3 @@
-* 4dcat show contents of durable file (prettify cross interfaces)
 maybe 4build should not make autopkg, instead user makes it themselves?
 
 illustration that shows data flow in the lifecycle, with annotations for 4build, 4crossbuild, 4install, etc.

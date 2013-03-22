@@ -10,24 +10,18 @@ import (
 )
 
 var (
-	flagBinary = flag.String("binary", "4r", "Preferred name for the resulting runtime binary")
-	flagJail   = flag.String("jail", "", "Build jail directory")
-
-	flagAppRepo = flag.String("app", "", "App repository")
-	flagAppPath = flag.String("appsrc", "", "GOPATH relative to app repository")
-
-	flagPkg = flag.String("pkg", "", "Package to import for side-effects in circuit runtime binary")
-
-	flagShow      = flag.Bool("show", false, "Show output of underlying build commands")
-	flagRebuildGo = flag.Bool("rebuildgo", false, "Force fetch and rebuild of the Go compiler")
-
-	flagZInclude = flag.String("zinclude", "", "Zookeeper C headers directory")
-	flagZLib     = flag.String("zlib", "", "Zookeeper libraries directory")
-
-	flagCircuitRepo = flag.String("cir", "git@github.com:tumblr/gocircuit.git", "Circuit repository")
-	flagCircuitPath = flag.String("cirsrc", ".", "GOPATH relative to circuit repository")
-
-	flagPrefixPath = flag.String("prefixpath", "", "Prefix to add to default PATH environment")
+	flagBinary      = flag.String("binary",     "4r",  "Preferred name for the resulting runtime binary")
+	flagJail        = flag.String("jail",       "",    "Build jail directory")
+	flagAppRepo     = flag.String("app",        "",    "App repository")
+	flagAppPath     = flag.String("appsrc",     "",    "GOPATH relative to app repository")
+	flagWorkerPkg   = flag.String("workerpkg",  "",    "User program package to build as the worker executable")
+	flagZInclude    = flag.String("zinclude",   "",    "Zookeeper C headers directory")
+	flagZLib        = flag.String("zlib",       "",    "Zookeeper libraries directory")
+	flagCircuitRepo = flag.String("cir",        "",    "Circuit repository")
+	flagCircuitPath = flag.String("cirsrc",     ".",   "GOPATH relative to circuit repository")
+	flagPrefixPath  = flag.String("prefixpath", "",    "Prefix to add to default PATH environment")
+	flagShow        =   flag.Bool("show",       false, "Show output of underlying build commands")
+	flagRebuildGo   =   flag.Bool("rebuildgo",  false, "Force fetch and rebuild of the Go compiler")
 )
 
 // Flags is used to persist the state of command-line flags in the jail
@@ -36,7 +30,7 @@ type Flags struct {
 	Jail        string
 	AppRepo     string
 	AppPath     string
-	Pkg         string
+	WorkerPkg   string
 	Show        bool
 	RebuildGo   bool
 	ZInclude    string
@@ -56,7 +50,7 @@ type FlagsChanged struct {
 	Binary      bool
 	Jail        bool
 	AppRepo     bool
-	Pkg         bool
+	WorkerPkg   bool
 	CircuitRepo bool
 }
 
@@ -66,7 +60,7 @@ func getFlags() *Flags {
 		Jail:        strings.TrimSpace(*flagJail),
 		AppRepo:     strings.TrimSpace(*flagAppRepo),
 		AppPath:     strings.TrimSpace(*flagAppPath),
-		Pkg:         strings.TrimSpace(*flagPkg),
+		WorkerPkg:   strings.TrimSpace(*flagWorkerPkg),
 		Show:        *flagShow,
 		RebuildGo:   *flagRebuildGo,
 		ZInclude:    strings.TrimSpace(*flagZInclude),
@@ -99,7 +93,7 @@ __Diff:
 		Binary:      flags.Binary != oldFlags.Binary,
 		Jail:        flags.Jail != oldFlags.Jail,
 		AppRepo:     flags.AppRepo != oldFlags.AppRepo || flags.AppPath != oldFlags.AppPath,
-		Pkg:         flags.Pkg != oldFlags.Pkg,
+		WorkerPkg:   flags.WorkerPkg != oldFlags.WorkerPkg,
 		CircuitRepo: flags.CircuitRepo != oldFlags.CircuitRepo || flags.CircuitPath != oldFlags.CircuitPath,
 	}
 

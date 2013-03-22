@@ -2,12 +2,9 @@
 package main
 
 import (
-	"bytes"
-	"io/ioutil"
 	"os"
 	"path"
 	"strings"
-	"text/template"
 )
 
 /*
@@ -19,16 +16,16 @@ import (
 */
 
 var x struct {
-	env      Env
-	jail     string
-	appPkgs  []string
-	binary   string
-	zinclude string
-	zlib     string
-	goRoot   string
-	goBin    string
-	goCmd    string
-	goPath   map[string]string
+	env       Env
+	jail      string
+	workerPkg string
+	binary    string
+	zinclude  string
+	zlib      string
+	goRoot    string
+	goBin     string
+	goCmd     string
+	goPath    map[string]string
 }
 
 // Command-line tools to be built
@@ -49,7 +46,7 @@ func main() {
 	}
 	//println(fmt.Sprintf("%#v\n", x.env))
 	x.jail = flags.Jail
-	x.appPkgs = []string{flags.Pkg}
+	x.workerPkg = flags.WorkerPkg
 	x.zinclude = flags.ZInclude
 	x.zlib = flags.ZLib
 	x.goPath = make(map[string]string)
@@ -92,8 +89,9 @@ func shipCircuit() string {
 	// Copy worker binary over to shipping directory
 	println("--Packaging", x.binary)
 	binpkg := workerPkgPath()
-	shipFile := path.Join(tmpdir, x.binary)
-	if _, err = CopyFile(path.Join(binpkg, x.binary), shipFile); err != nil {
+	_, workerName := path.Split(binpkg)
+	shipFile := path.Join(tmpdir, x.binary)	// Destination binary location and name
+	if _, err = CopyFile(path.Join(binpkg, workerName), shipFile); err != nil {
 		Fatalf("Problem copying circuit worker binary (%s)\n", err)
 	}
 	if err = os.Chmod(shipFile, 0755); err != nil {
@@ -111,31 +109,21 @@ func shipCircuit() string {
 		}
 	}
 
-	// zookeeper lib
+	// Place the zookeeper dynamic libraries in the shipment
+	// Shipping Zookeeper is not necessary when static linking (currently enabled).
+	/*
 	println("--Packaging Zookeeper libraries")
 	if err = ShellCopyFile(path.Join(x.zlib, "libzookeeper*"), tmpdir+"/"); err != nil {
 		Fatalf("Problem copying Zookeeper library files (%s)\n", err)
 	}
+	*/
 
 	return tmpdir
 }
 
-// Source code of a circuit runtime executable
-const mainSrc = `
-package main
-import (
-	_ "circuit/load"
-	_ "circuit/kit/debug/kill"
-	{{range .}}_ "{{.}}"
-	{{end}}
-)
-func main() {
-	<-(chan struct{})(nil)
-}
-`
-
+// workerPkgPath returns the absolute path to the app package that should be compiled as a circuit worker binary
 func workerPkgPath() string {
-	return path.Join(x.goPath["circuit"], "src", "autopkg", x.binary)
+	return path.Join(x.goPath["app"], "src", x.workerPkg)
 }
 
 func helperPkgPath(helper string) string {
@@ -148,11 +136,12 @@ func buildCircuit() {
 	// TODO: Add Zookeeper build step. Don't rely on a prebuilt one.
 	x.env.Set("CGO_CFLAGS", "-I"+x.zinclude)
 
-	// Static link (not available in Go1.0.3, available later, in +4ad21a3b23a4, for example)
+	// Static linking (not available in Go1.0.3, available later, in +4ad21a3b23a4, for example)
 	x.env.Set("CGO_LDFLAGS", path.Join(x.zlib, "libzookeeper_mt.a"))
-	// Dynamic link
+	// Dynamic linking
 	// x.env.Set("CGO_LDFLAGS", x.zlib + " -lzookeeper_mt"))
 
+	// Cleanup set CGO_* flags at end
 	defer x.env.Unset("CGO_CFLAGS")
 	defer x.env.Unset("CGO_LDFLAGS")
 
@@ -173,23 +162,6 @@ func buildCircuit() {
 
 	// Create a package for the runtime executable
 	binpkg := workerPkgPath()
-	if err := os.RemoveAll(binpkg); err != nil {
-		Fatalf("Problem removing old autopkg directory %s (%s)\n", binpkg, err)
-	}
-	if err := os.MkdirAll(binpkg, 0700); err != nil {
-		Fatalf("Problem creating runtime package %s (%s)\n", binpkg, err)
-	}
-
-	// Write main.go
-	t := template.New("main")
-	template.Must(t.Parse(mainSrc))
-	var w bytes.Buffer
-	if err := t.Execute(&w, x.appPkgs); err != nil {
-		Fatalf("Problem preparing main.go (%s)\n", err)
-	}
-	if err := ioutil.WriteFile(path.Join(binpkg, "main.go"), w.Bytes(), 0664); err != nil {
-		Fatalf("Problem writing main.go (%s)\n", err)
-	}
 
 	// Build circuit runtime binary
 	println("--Building", x.binary)
@@ -199,7 +171,7 @@ func buildCircuit() {
 	// Understand what is going on. The flag should not be needed as the
 	// circuit should see the changes in the sources inside the build jail.
 	// Is this a file timestamp problem introduced by rsync?
-	if err := Shell(x.env, binpkg, x.goCmd+" build -a"); err != nil {
+	if err := Shell(x.env, binpkg, x.goCmd + " build -a"); err != nil {
 		Fatalf("Problem with ‘(working directory %s) %s build’ (%s)\n", binpkg, x.goCmd, err)
 	}
 }
@@ -300,11 +272,9 @@ func fetchRepo(namespace, repo, gopath string, fetchFresh bool) {
 }
 
 func buildGoCompiler(rebuild bool) {
-	// Oddly, On Linux the dynamic linker seems to need Zookeeper libs even to compile Go,
-	// likely in effect of an existing CGO_LDFLAGS.
-	x.env.Set("LD_LIBRARY_PATH", x.zlib)
-	// So, to be safe, we provision this for OSX as well.
-	x.env.Set("DYLD_LIBRARY_PATH", x.zlib)
+	// Unset lingering CGO_* flags as they mess with the build of the Go compiler
+	x.env.Unset("CGO_CFLAGS")
+	x.env.Unset("CGO_LDFLAGS")
 
 	// Check whether compiler subdirectory directory exists,
 	// $jail/go
