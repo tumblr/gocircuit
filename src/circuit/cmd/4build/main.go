@@ -195,6 +195,8 @@ __For:
 
 func repoSchema(s string) (schema, url string) {
 	switch {
+	case strings.HasPrefix(s, "{hg}"):
+		return "hg", s[len("{hg}"):]
 	case strings.HasPrefix(s, "{git}"):
 		return "git", s[len("{git}"):]
 	case strings.HasPrefix(s, "{rsync}"):
@@ -206,7 +208,7 @@ func repoSchema(s string) (schema, url string) {
 
 func cloneGitRepo(repo, parent string) {
 	// If not, clone the source tree
-	if err := Shell(x.env, parent, "git clone "+repo); err != nil {
+	if err := Shell(x.env, parent, "git clone " + repo); err != nil {
 		Fatalf("Problem cloning repo '%s' (%s)", repo, err)
 	}
 }
@@ -223,6 +225,7 @@ func rsyncRepo(src, dstparent string) {
 	}
 }
 
+??
 func fetchRepo(namespace, repo, gopath string, fetchFresh bool) {
 
 	schema, repo := repoSchema(repo)

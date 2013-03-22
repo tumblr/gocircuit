@@ -17,8 +17,9 @@ var (
 	flagWorkerPkg   = flag.String("workerpkg",  "",    "User program package to build as the worker executable")
 	flagZInclude    = flag.String("zinclude",   "",    "Zookeeper C headers directory")
 	flagZLib        = flag.String("zlib",       "",    "Zookeeper libraries directory")
+	flagGoRepo      = flag.String("go",         ?????"",    "Go compiler repository")
 	flagCircuitRepo = flag.String("cir",        "",    "Circuit repository")
-	flagCircuitPath = flag.String("cirsrc",     ".",   "GOPATH relative to circuit repository")
+	flagCircuitPath = flag.String("cirsrc",     "/",   "GOPATH relative to circuit repository")
 	flagPrefixPath  = flag.String("prefixpath", "",    "Prefix to add to default PATH environment")
 	flagShow        =   flag.Bool("show",       false, "Show output of underlying build commands")
 	flagRebuildGo   =   flag.Bool("rebuildgo",  false, "Force fetch and rebuild of the Go compiler")
@@ -33,6 +34,7 @@ type Flags struct {
 	WorkerPkg   string
 	Show        bool
 	RebuildGo   bool
+	GoRepo      string
 	ZInclude    string
 	ZLib        string
 	CircuitRepo string
