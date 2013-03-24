@@ -16,8 +16,8 @@ type BuildConfig struct {
 	AppSrc  string // App GOPATH relative to app repo; or empty string if app repo meant to be cloned inside a GOPATH
 
 	WorkerPkg string // User program package that should be built as the circuit worker executable
+	RebuildGo bool   // Rebuild Go even if a newer version is not available
 	Show      bool
-	RebuildGo bool // Rebuild Go even if a newer version is not available
 
 	ZookeeperInclude string // Path to Zookeeper include files on build host
 	ZookeeperLib     string // Path to Zookeeper library files on build host

@@ -197,6 +197,6 @@ func buildGoCompiler(goRepo string, rebuild bool) {
 	x.goRoot = path.Join(x.jail, "/go")
 	x.goBin = path.Join(x.goRoot, "/bin")
 	x.goCmd = path.Join(x.goBin, "go")
-	x.env.Set("PATH", x.goBin+":"+x.env.Get("PATH"))
+	x.env.Set("PATH", x.goBin + ":" + x.env.Get("PATH"))
 	x.env.Set("GOROOT", x.goRoot)
 }

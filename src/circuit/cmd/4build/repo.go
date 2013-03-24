@@ -121,13 +121,12 @@ func syncGitRepo(dir string) {
 	}
 }
 
-/*
-func rsyncRepo(src, dstparent string) {
-	if err := Shell(x.env, "", "rsync -acrv --delete --exclude .git --exclude .hg --exclude *.a " + src + " " + dstparent); err != nil {
-		Fatalf("Problem rsyncing dir '%s' to within '%s' (%s)", src, dstparent, err)
+func syncRsyncRepo(dir, url string) {
+	parent, _ := path.Split(dir)
+	if err := Shell(x.env, "", "rsync -acrv --delete --exclude .git --exclude .hg --exclude *.a " + url + " " + parent); err != nil {
+		Fatalf("Problem rsyncing dir '%s' to within '%s' (%s)", url, parent, err)
 	}
 }
-*/
 
 func SyncRepo(namespace, repo, relGoPath string, fetchFresh, updateGoPath bool) (clonePath string) {
 
@@ -160,6 +159,8 @@ func SyncRepo(namespace, repo, relGoPath string, fetchFresh, updateGoPath bool) 
 		} else {
 			syncGitRepo(clonePath)
 		}
+	case "rsync":
+		syncRsyncRepo(clonePath, url)
 	default:
 		Fatalf("Unrecognized repo schema: %s\n", schema)
 	}
