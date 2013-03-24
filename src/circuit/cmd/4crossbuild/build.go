@@ -26,7 +26,7 @@ func Build(cfg *config.BuildConfig) error {
 	template.Must(t.Parse(build_sh_src))
 	var w bytes.Buffer
 	if err := t.Execute(&w, cfg); err != nil {
-		panic("parse cross-build script")
+		panic(err.Error())
 	}
 	build_sh := string(w.Bytes())
 

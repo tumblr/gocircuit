@@ -122,9 +122,11 @@ func syncGitRepo(dir string) {
 }
 
 func syncRsyncRepo(dir, url string) {
-	parent, _ := path.Split(dir)
-	if err := Shell(x.env, "", "rsync -acrv --delete --exclude .git --exclude .hg --exclude *.a " + url + " " + parent); err != nil {
-		Fatalf("Problem rsyncing dir '%s' to within '%s' (%s)", url, parent, err)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		Fatalf("Problem creating repo directory (%s)\n", err)
+	}
+	if err := Shell(x.env, "", "rsync -acrv --delete --exclude .git --exclude .hg --exclude *.a " + url + "/* " + dir + "/"); err != nil {
+		Fatalf("Problem rsyncing dir '%s' to within '%s' (%s)", url, dir, err)
 	}
 }
 
