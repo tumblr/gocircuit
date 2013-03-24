@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"path"
+	"strings"
 )
 
 
@@ -18,7 +20,7 @@ func parseRepo(s string) (schema, key, value, url string) {
 		Fatalf("Repo '%s' has unrecognizable schema\n", s)
 	}
 	i := strings.Index(s, "}")
-	if len(s) > 1 && s[0] = '{' && i > 0 {
+	if len(s) > 1 && s[0] == '{' && i > 0 {
 		var arg string
 		arg, s = s[1:i], s[i+1:]
 		key, value = parseArg(arg)
@@ -47,7 +49,7 @@ func parseArg(arg string) (key, value string) {
 //	{hg}{tip}
 //	{hg}{branch:master}
 //
-func cloneMercurial(dir, key, value, url string) {
+func cloneMercurialRepo(dir, key, value, url string) {
 	var opt string
 	switch key {
 	case "changeset":
@@ -80,6 +82,14 @@ func syncMercurialRepo(dir string) {
 	}
 }
 
+//
+//	{git}{changeset:4ad21a3b23a4}
+//	{git}{id:4ad21a3b23a4}
+//	{git}{rev:3452}
+//	{git}{tag:weekly}
+//	{git}{tip}
+//	{git}{branch:master}
+//
 func cloneGitRepo(dir, key, value, url string) {
 	if err := Shell(x.env, "", fmt.Sprintf("git clone %s %s", url, dir)); err != nil {
 		Fatalf("Problem cloning repo '%s' (%s)", url, err)
@@ -87,10 +97,13 @@ func cloneGitRepo(dir, key, value, url string) {
 	var opt string
 	switch key {
 	case "changeset":
+		opt = "git checkout " + value
 	case "rev":
+		opt = "git checkout " + value
 	case "id":
+		opt = "git checkout " + value
 	case "tag":
-		opt = ??
+		opt = "git checkout " + value
 	case "branch":
 		opt = "git checkout " + value
 	case "tip", "":
@@ -103,19 +116,20 @@ func cloneGitRepo(dir, key, value, url string) {
 }
 
 func syncGitRepo(dir string) {
-	??
 	if err := Shell(x.env, dir, "git pull origin master"); err != nil {
 		Fatalf("Problem pulling repo in %s (%s)", dir, err)
 	}
 }
 
+/*
 func rsyncRepo(src, dstparent string) {
 	if err := Shell(x.env, "", "rsync -acrv --delete --exclude .git --exclude .hg --exclude *.a " + src + " " + dstparent); err != nil {
 		Fatalf("Problem rsyncing dir '%s' to within '%s' (%s)", src, dstparent, err)
 	}
 }
+*/
 
-func FetchRepo(namespace, repo, gopath string, fetchFresh bool) string {
+func SyncRepo(namespace, repo, relGoPath string, fetchFresh, updateGoPath bool) (clonePath string) {
 
 	schema, key, value, url := parseRepo(repo)
 
@@ -126,12 +140,7 @@ func FetchRepo(namespace, repo, gopath string, fetchFresh bool) string {
 		}
 	}
 
-	// Make jail/namespace/src
-	repoSrc := path.Join(x.jail, namespace, "src")
-	if err := os.MkdirAll(repoSrc, 0700); err != nil {
-		Fatalf("Problem creating app source path %s (%s)\n", repoSrc, err)
-	}
-	clonePath := path.Join(repoSrc, namespace)
+	clonePath = path.Join(x.jail, namespace)
 
 	// Check whether repo clone directory exists
 	ok, err := Exists(clonePath)
@@ -147,26 +156,20 @@ func FetchRepo(namespace, repo, gopath string, fetchFresh bool) string {
 		}
 	case "git":
 		if !ok {
-			??
-			cloneGitRepo(repo, repoSrc)
+			cloneGitRepo(clonePath, key, value, url)
 		} else {
 			syncGitRepo(clonePath)
 		}
-	case "rsync":
-		??
-		rsyncRepo(repo, repoSrc)
 	default:
 		Fatalf("Unrecognized repo schema: %s\n", schema)
 	}
 
 	// Create build environment for building in this repo
-	oldGoPath := x.env.Get("GOPATH")
-	var p string
-	if gopath == "" {
-		p = path.Join(x.jail, namespace)
-	} else {
-		p = path.Join(repoPath, gopath)
-	}
-	x.env.Set("GOPATH", p + ":" + oldGoPath)
+	p := path.Join(clonePath, relGoPath)
 	x.goPath[namespace] = p
+	if updateGoPath {
+		oldGoPath := x.env.Get("GOPATH")
+		x.env.Set("GOPATH", p + ":" + oldGoPath)
+	}
+	return
 }
