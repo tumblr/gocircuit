@@ -2,7 +2,6 @@ doc build
 	static link vs dynamic link, 4build does static, but requires higher go release; explain somewhere
 document cross-build environment requirements
 verify cross-build works with new modifications
-shuttr compiles
 
 fonts on typekit, delegate to default ones
 test everything against a release version of Go
