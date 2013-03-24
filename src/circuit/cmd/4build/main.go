@@ -134,7 +134,7 @@ func buildCircuit() {
 
 	// Prepare cgo environment for Zookeeper
 	// TODO: Add Zookeeper build step. Don't rely on a prebuilt one.
-	x.env.Set("CGO_CFLAGS", "-I"+x.zinclude)
+	x.env.Set("CGO_CFLAGS", "-I" + x.zinclude)
 
 	// Static linking (not available in Go1.0.3, available later, in +4ad21a3b23a4, for example)
 	x.env.Set("CGO_LDFLAGS", path.Join(x.zlib, "libzookeeper_mt.a"))
@@ -174,104 +174,6 @@ func buildCircuit() {
 	if err := Shell(x.env, binpkg, x.goCmd + " build -a"); err != nil {
 		Fatalf("Problem with ‘(working directory %s) %s build’ (%s)\n", binpkg, x.goCmd, err)
 	}
-}
-
-// repoName returns the top-level name of a GIT repository from its URL
-// E.g. git@github.com:tumblr/cirapp.git -> cirapp
-func repoName(repo string) string {
-	if strings.HasSuffix(repo, ".git") {
-		repo = repo[:len(repo)-len(".git")]
-	}
-__For:
-	for i := len(repo) - 1; i >= 0; i-- {
-		switch repo[i] {
-		case ':', '/', '@':
-			repo = repo[i+1:]
-			break __For
-		}
-	}
-	return repo
-}
-
-func repoSchema(s string) (schema, url string) {
-	switch {
-	case strings.HasPrefix(s, "{hg}"):
-		return "hg", s[len("{hg}"):]
-	case strings.HasPrefix(s, "{git}"):
-		return "git", s[len("{git}"):]
-	case strings.HasPrefix(s, "{rsync}"):
-		return "rsync", s[len("{rsync}"):]
-	}
-	Fatalf("Repo '%s' has unrecognizable schema\n", s)
-	panic("unr")
-}
-
-func cloneGitRepo(repo, parent string) {
-	// If not, clone the source tree
-	if err := Shell(x.env, parent, "git clone " + repo); err != nil {
-		Fatalf("Problem cloning repo '%s' (%s)", repo, err)
-	}
-}
-
-func pullGitRepo(dir string) {
-	if err := Shell(x.env, dir, "git pull origin master"); err != nil {
-		Fatalf("Problem pulling repo in %s (%s)", dir, err)
-	}
-}
-
-func rsyncRepo(src, dstparent string) {
-	if err := Shell(x.env, "", "rsync -acrv --delete --exclude .git --exclude .hg --exclude *.a "+src+" "+dstparent); err != nil {
-		Fatalf("Problem rsyncing dir '%s' to within '%s' (%s)", src, dstparent, err)
-	}
-}
-
-??
-func fetchRepo(namespace, repo, gopath string, fetchFresh bool) {
-
-	schema, repo := repoSchema(repo)
-
-	// If fetching fresh, remove pre-existing clones
-	if fetchFresh {
-		if err := os.RemoveAll(path.Join(x.jail, namespace)); err != nil {
-			Fatalf("Problem removing old repo clone (%s)\n", err)
-		}
-	}
-
-	// Make _build/namespace/src
-	repoSrc := path.Join(x.jail, namespace, "src")
-	if err := os.MkdirAll(repoSrc, 0700); err != nil {
-		Fatalf("Problem creating app source path %s (%s)\n", repoSrc, err)
-	}
-	repoPath := path.Join(repoSrc, repoName(repo))
-
-	// Check whether repo directory exists
-	ok, err := Exists(repoPath)
-	if err != nil {
-		Fatalf("Problem stat'ing %s (%s)", repoPath, err)
-	}
-	switch schema {
-	case "git":
-		if !ok {
-			cloneGitRepo(repo, repoSrc)
-		} else {
-			pullGitRepo(repoPath)
-		}
-	case "rsync":
-		rsyncRepo(repo, repoSrc)
-	default:
-		Fatalf("Unrecognized repo schema: %s\n", schema)
-	}
-
-	// Create build environment for building in this repo
-	oldGoPath := x.env.Get("GOPATH")
-	var p string
-	if gopath == "" {
-		p = path.Join(x.jail, namespace)
-	} else {
-		p = path.Join(repoPath, gopath)
-	}
-	x.env.Set("GOPATH", p+":"+oldGoPath)
-	x.goPath[namespace] = p
 }
 
 func buildGoCompiler(rebuild bool) {

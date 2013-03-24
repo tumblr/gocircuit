@@ -17,7 +17,7 @@ var (
 	flagWorkerPkg   = flag.String("workerpkg",  "",    "User program package to build as the worker executable")
 	flagZInclude    = flag.String("zinclude",   "",    "Zookeeper C headers directory")
 	flagZLib        = flag.String("zlib",       "",    "Zookeeper libraries directory")
-	flagGoRepo      = flag.String("go",         ?????"",    "Go compiler repository")
+	flagGoRepo      = flag.String("go",         "{hg}{-u tip}https://code.google.com/p/go",    "Go compiler repository")
 	flagCircuitRepo = flag.String("cir",        "",    "Circuit repository")
 	flagCircuitPath = flag.String("cirsrc",     "/",   "GOPATH relative to circuit repository")
 	flagPrefixPath  = flag.String("prefixpath", "",    "Prefix to add to default PATH environment")
@@ -64,6 +64,7 @@ func getFlags() *Flags {
 		AppPath:     strings.TrimSpace(*flagAppPath),
 		WorkerPkg:   strings.TrimSpace(*flagWorkerPkg),
 		Show:        *flagShow,
+		GoRepo:      strings.TrimSpace(*flagGoRepo),
 		RebuildGo:   *flagRebuildGo,
 		ZInclude:    strings.TrimSpace(*flagZInclude),
 		ZLib:        strings.TrimSpace(*flagZLib),
