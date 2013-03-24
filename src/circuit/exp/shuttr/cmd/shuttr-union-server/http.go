@@ -1,12 +1,12 @@
 package main
 
 import (
+	"circuit/exp/shuttr/proto"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
 	"time"
-	"tumblr/balkan/proto"
 )
 
 // Example dashboard HTTP API curls:
@@ -19,10 +19,10 @@ func StreamAPIRequests(port int) <-chan *request {
 		//mux := http.NewServeMux()
 		http.HandleFunc("/dash", func(w http.ResponseWriter, req *http.Request) { handleQuery(ch, w, req) })
 		s := &http.Server{
-			Addr:           ":" + strconv.Itoa(port),
+			Addr: ":" + strconv.Itoa(port),
 			//Handler:        mux,
 			ReadTimeout:    time.Second,
-			WriteTimeout:   10*time.Second,
+			WriteTimeout:   10 * time.Second,
 			MaxHeaderBytes: 1e4,
 		}
 		panic(s.ListenAndServe())
@@ -76,7 +76,7 @@ func handleQuery(ch chan<- *request, w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	println(fmt.Sprintf("XDashQuery DashID=%d UpperPostID=%d Limit=%d Follows=%#v", 
+	println(fmt.Sprintf("XDashQuery DashID=%d UpperPostID=%d Limit=%d Follows=%#v",
 		q.DashboardID, q.BeforePostID, q.Limit, q.Follows))
 
 	done := make(chan struct{})
@@ -85,12 +85,12 @@ func handleQuery(ch chan<- *request, w http.ResponseWriter, req *http.Request) {
 		ReturnResponse: func(posts []*proto.Post, err error) {
 			defer close(done)
 			if err != nil {
-				http.Error(w, "internal error: " + err.Error(), 500)
+				http.Error(w, "internal error: "+err.Error(), 500)
 				return
 			}
 			raw, err := json.Marshal(posts)
 			if err != nil {
-				http.Error(w, "encoding error: " + err.Error(), 500)
+				http.Error(w, "encoding error: "+err.Error(), 500)
 				return
 			}
 			w.Header().Set("Content-Type", "application/json; charset=utf-8")

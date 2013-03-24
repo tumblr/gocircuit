@@ -1,11 +1,11 @@
 package main
 
 import (
+	"circuit/exp/shuttr/proto"
 	"encoding/json"
 	"net/http"
 	"strconv"
 	"time"
-	"tumblr/balkan/proto"
 )
 
 // Example timeline HTTP debug curls:
@@ -19,10 +19,10 @@ func StreamHTTP(port int) (<-chan *createRequest, <-chan *queryRequest) {
 		http.HandleFunc("/create", func(w http.ResponseWriter, req *http.Request) { handleCreate(cch, w, req) })
 		http.HandleFunc("/time", func(w http.ResponseWriter, req *http.Request) { handleQuery(qch, w, req) })
 		s := &http.Server{
-			Addr:           ":" + strconv.Itoa(port),
+			Addr: ":" + strconv.Itoa(port),
 			//Handler:      mux,
 			ReadTimeout:    time.Second,
-			WriteTimeout:   5*time.Second,
+			WriteTimeout:   5 * time.Second,
 			MaxHeaderBytes: 1e4,
 		}
 		panic(s.ListenAndServe())
@@ -47,11 +47,11 @@ func handleCreate(ch chan<- *createRequest, w http.ResponseWriter, req *http.Req
 	done := make(chan struct{})
 	ch <- &createRequest{
 		Forwarded: false,
-		Post: q,
+		Post:      q,
 		ReturnResponse: func(err error) {
 			defer close(done)
 			if err != nil {
-				http.Error(w, "internal error: " + err.Error(), 500)
+				http.Error(w, "internal error: "+err.Error(), 500)
 				return
 			}
 			//w.WriteHeader(code)
@@ -91,12 +91,12 @@ func handleQuery(ch chan<- *queryRequest, w http.ResponseWriter, req *http.Reque
 		ReturnResponse: func(posts []int64, err error) {
 			defer close(done)
 			if err != nil {
-				http.Error(w, "internal error: " + err.Error(), 500)
+				http.Error(w, "internal error: "+err.Error(), 500)
 				return
 			}
 			raw, err := json.Marshal(posts)
 			if err != nil {
-				http.Error(w, "encoding error: " + err.Error(), 500)
+				http.Error(w, "encoding error: "+err.Error(), 500)
 				return
 			}
 			println(string(raw))

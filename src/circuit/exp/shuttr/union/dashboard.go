@@ -1,10 +1,10 @@
-package dashboard
+package union
 
 import (
 	"bytes"
-	"encoding/binary"
+	"circuit/exp/shuttr/proto"
 	"circuit/kit/xor"
-	"tumblr/balkan/proto"
+	"encoding/binary"
 )
 
 // RowKey represents the row keys in the dashboard table
@@ -31,7 +31,7 @@ func (rowKey *RowKey) ShardKey() xor.Key {
 func (rowKey *RowKey) Encode() []byte {
 	var w bytes.Buffer
 	sortKey := *rowKey
-	sortKey.PostID *= -1	// Flipping the sign results in flipping the LevelDB key order
+	sortKey.PostID *= -1 // Flipping the sign results in flipping the LevelDB key order
 	if err := binary.Write(&w, binary.BigEndian, sortKey); err != nil {
 		panic("leveldb dashboard row key encoding")
 	}

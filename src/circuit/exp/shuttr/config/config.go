@@ -1,23 +1,23 @@
 package config
 
 import (
+	"circuit/exp/shuttr/shard"
+	"circuit/exp/shuttr/x"
+	"circuit/kit/xor"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"strconv"
 	"strings"
 	"tumblr/firehose"
-	"tumblr/balkan/shard"
-	"tumblr/balkan/x"
-	"circuit/kit/xor"
 )
 
 type Config struct {
 	InstallDir string
-	Firehose   *firehose.Request	// Firehose credentials
+	Firehose   *firehose.Request // Firehose credentials
 	Timeline   []*shard.Shard
 	Dashboard  []*shard.Shard
-	PushMap    string		// File name of push map
+	PushMap    string // File name of push map
 }
 
 type configSource struct {
@@ -73,7 +73,7 @@ func makeShards(src []*shardSource) ([]*shard.Shard, error) {
 		out[i] = &shard.Shard{
 			Pivot: xor.Key(pivot),
 			Addr:  x.Addr(sh.Addr),
-			HTTP: sh.HTTP,
+			HTTP:  sh.HTTP,
 		}
 	}
 	return out, nil

@@ -1,10 +1,10 @@
-package timeline
+package series
 
 import (
 	"bytes"
-	"encoding/binary"
+	"circuit/exp/shuttr/proto"
 	"circuit/kit/xor"
-	"tumblr/balkan/proto"
+	"encoding/binary"
 )
 
 // Key represents the row key used for the timelines tables in LevelDB
@@ -33,7 +33,7 @@ func (rowKey *RowKey) ShardKey() xor.Key {
 func (rowKey *RowKey) Encode() []byte {
 	var w bytes.Buffer
 	sortKey := *rowKey
-	sortKey.PostID *= -1	// Flipping the sign results in flipping the LevelDB key order
+	sortKey.PostID *= -1 // Flipping the sign results in flipping the LevelDB key order
 	if err := binary.Write(&w, binary.BigEndian, sortKey); err != nil {
 		panic("leveldb timeline row key encoding")
 	}

@@ -1,16 +1,16 @@
 package main
 
 import (
+	"circuit/exp/shuttr/config"
+	"circuit/exp/shuttr/proto"
+	"circuit/exp/shuttr/series"
+	"circuit/exp/shuttr/x"
+	tcp "circuit/exp/shuttr/x/plain"
+	"circuit/kit/sched/limiter"
 	"flag"
 	"fmt"
 	"os"
-	"circuit/kit/sched/limiter"
 	"sync"
-	"tumblr/balkan/config"
-	"tumblr/balkan/proto"
-	"tumblr/balkan/timeline"
-	"tumblr/balkan/x"
-	tcp "tumblr/balkan/x/plain"
 	// _ "circuit/kit/debug/ctrlc"
 	_ "circuit/kit/debug/http/trace"
 )
@@ -56,7 +56,7 @@ func main() {
 	}
 
 	// Created embedded DB server
-	if t.srv, err = timeline.NewServer(*flagLevelDB, *flagCache * 1e6); err != nil {
+	if t.srv, err = timeline.NewServer(*flagLevelDB, *flagCache*1e6); err != nil {
 		panic(err)
 	}
 
@@ -73,8 +73,8 @@ func main() {
 }
 
 type worker struct {
-	srv      *timeline.TimelineServer
-	fwd      *forwarder
+	srv *timeline.TimelineServer
+	fwd *forwarder
 
 	fCreate <-chan *createRequest
 	hCreate <-chan *createRequest
@@ -108,8 +108,8 @@ func StreamX(x0 x.Listener) (<-chan *createRequest, <-chan *queryRequest) {
 			switch q := req.(type) {
 			case *proto.XCreatePost:
 				cch <- &createRequest{
-					Forwarded:      true,
-					Post:           q,
+					Forwarded: true,
+					Post:      q,
 					ReturnResponse: func(err error) {
 						if err != nil {
 							conn.Write(&proto.XError{err.Error()})
@@ -122,7 +122,7 @@ func StreamX(x0 x.Listener) (<-chan *createRequest, <-chan *queryRequest) {
 				}
 			case *proto.XTimelineQuery:
 				qch <- &queryRequest{
-					Query:          q,
+					Query: q,
 					ReturnResponse: func(posts []int64, err error) {
 						if err != nil {
 							conn.Write(&proto.XError{err.Error()})
@@ -182,7 +182,7 @@ func (t *worker) schedule() {
 			}
 			lk.Lock()
 			nxqe++
-			if nxqb % 1000 == 0 {
+			if nxqb%1000 == 0 {
 				println("+ Finished", nxqe, "/", nxqb)
 			}
 			lk.Unlock()

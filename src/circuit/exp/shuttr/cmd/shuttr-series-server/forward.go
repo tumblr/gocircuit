@@ -1,13 +1,13 @@
 package main
 
 import (
+	"circuit/exp/shuttr/proto"
+	"circuit/exp/shuttr/shard"
+	"circuit/exp/shuttr/series"
+	"circuit/exp/shuttr/x"
 	"errors"
 	"fmt"
 	"sync"
-	"tumblr/balkan/shard"
-	"tumblr/balkan/timeline"
-	"tumblr/balkan/proto"
-	"tumblr/balkan/x"
 )
 
 // forwarder is responsible for ...
@@ -18,10 +18,10 @@ type forwarder struct {
 	dialer    x.Dialer
 	srv       *timeline.TimelineServer
 	sync.Mutex
-	nreqfire  int64 // Requests coming from the firehose
-	nreqfwd   int64 // Requests coming from other timeline nodes
-	nsrv      int64 // Responses serviced by this node
-	nfwd      int64 // Responses serviced by forwarding to another node
+	nreqfire int64 // Requests coming from the firehose
+	nreqfwd  int64 // Requests coming from other timeline nodes
+	nsrv     int64 // Responses serviced by this node
+	nfwd     int64 // Responses serviced by forwarding to another node
 }
 
 func newForwarder(dialer x.Dialer, timelines []*shard.Shard, here *shard.Shard, srv *timeline.TimelineServer, filter Filter) *forwarder {
@@ -44,7 +44,7 @@ func (fwd *forwarder) IncReqFire() {
 	fwd.Lock()
 	defer fwd.Unlock()
 	fwd.nreqfire++
-	if fwd.nreqfire % logSpeed == 0 {
+	if fwd.nreqfire%logSpeed == 0 {
 		println("Received", fwd.nreqfire, "from firehose")
 	}
 }
@@ -53,7 +53,7 @@ func (fwd *forwarder) IncReqFwd() {
 	fwd.Lock()
 	defer fwd.Unlock()
 	fwd.nreqfwd++
-	if fwd.nreqfwd % logSpeed == 0 {
+	if fwd.nreqfwd%logSpeed == 0 {
 		println("Received", fwd.nreqfwd, "forwards")
 	}
 }
@@ -62,7 +62,7 @@ func (fwd *forwarder) IncServed() {
 	fwd.Lock()
 	defer fwd.Unlock()
 	fwd.nsrv++
-	if fwd.nsrv % logSpeed == 0 {
+	if fwd.nsrv%logSpeed == 0 {
 		println("Served", fwd.nsrv)
 	}
 }
@@ -71,7 +71,7 @@ func (fwd *forwarder) IncForwarded() {
 	fwd.Lock()
 	defer fwd.Unlock()
 	fwd.nfwd++
-	if fwd.nfwd % logSpeed == 0 {
+	if fwd.nfwd%logSpeed == 0 {
 		println("Forwarded", fwd.nfwd)
 	}
 }

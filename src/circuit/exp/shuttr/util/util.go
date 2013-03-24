@@ -5,7 +5,6 @@ import (
 	"tumblr/database/levigo"
 )
 
-
 type Server struct {
 	slk          sync.Mutex
 	cache        *levigo.Cache
@@ -35,7 +34,7 @@ func (srv *Server) Init(dbDir string, cacheSize int) error {
 
 	srv.WriteNoSync = levigo.NewWriteOptions()
 	srv.WriteSync.SetSync(false)
-	
+
 	return nil
 }
 
@@ -54,4 +53,3 @@ func (srv *Server) Close() error {
 	srv.WriteNoSync = nil
 	return nil
 }
-

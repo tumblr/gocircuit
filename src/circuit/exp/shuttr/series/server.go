@@ -1,10 +1,10 @@
-package timeline
+package series
 
 import (
+	"circuit/exp/shuttr/proto"
+	"circuit/exp/shuttr/util"
 	"errors"
 	"sync"
-	"tumblr/balkan/util"
-	"tumblr/balkan/proto"
 )
 
 type TimelineServer struct {
@@ -33,7 +33,7 @@ func (srv *TimelineServer) CreatePost(xmsg *proto.XCreatePost) error {
 	// point of truth. Syncing on every 100 requests means that in the event of failure,
 	// about a 100 users will lose one post.
 	//
-	if srv.nwrite % 100 == 0 {
+	if srv.nwrite%100 == 0 {
 		wopts = srv.WriteSync
 	}
 	srv.wlk.Unlock()

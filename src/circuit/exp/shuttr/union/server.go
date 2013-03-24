@@ -1,27 +1,27 @@
-package dashboard
+package union
 
 import (
+	"circuit/exp/shuttr/proto"
+	"circuit/exp/shuttr/shard"
+	"circuit/exp/shuttr/util"
+	"circuit/exp/shuttr/x"
 	"circuit/kit/sched/limiter"
 	"errors"
 	"fmt"
 	"sort"
 	"sync"
 	"time"
-	"tumblr/balkan/shard"
-	"tumblr/balkan/proto"
-	"tumblr/balkan/util"
-	"tumblr/balkan/x"
 )
 
 type DashboardServer struct {
 	util.Server
-	timelines *shard.Topo	// Table of timeline shards, for pull requests
+	timelines *shard.Topo // Table of timeline shards, for pull requests
 	dialer    x.Dialer
 
-	wlk, rlk  sync.Mutex
-	synced    time.Time
-	nwrite    int64
-	nread     int64		// Counts the timeline queries successfully answered by the local timeline cache
+	wlk, rlk sync.Mutex
+	synced   time.Time
+	nwrite   int64
+	nread    int64 // Counts the timeline queries successfully answered by the local timeline cache
 }
 
 func NewServer(dialer x.Dialer, timelines []*shard.Shard, dbDir string, cacheSize int) (*DashboardServer, error) {
@@ -65,7 +65,7 @@ func (srv *DashboardServer) Query(xq *proto.XDashboardQuery) ([]*proto.Post, err
 	// Put them in the results slice.
 	var rlk sync.Mutex
 	var err0 error
-	results := make([]*proto.Post, 0, xq.Limit * len(follows))
+	results := make([]*proto.Post, 0, xq.Limit*len(follows))
 	l := limiter.New(MaxConcurrentTimelineQueries)
 	for _, followedTimelineID := range follows {
 		followedID := followedTimelineID
@@ -173,7 +173,7 @@ func (srv *DashboardServer) queryTimelineDirectly(timelineID, beforePostID int64
 		&proto.XTimelineQuery{
 			TimelineID:   timelineID,
 			BeforePostID: beforePostID,
-			Limit:        limit + 1,  // Request one more than limit, so we can create limit cache rows
+			Limit:        limit + 1, // Request one more than limit, so we can create limit cache rows
 		},
 	)
 	if err != nil {
@@ -201,7 +201,7 @@ func (srv *DashboardServer) queryTimelineDirectly(timelineID, beforePostID int64
 				return nil, err
 			}
 		}
-		if len(q.Posts) < limit + 1 {
+		if len(q.Posts) < limit+1 {
 			// Fewer posts than requested were returned, implying that there are no posts prior to
 			// the last returned post. We cache that fact below.
 			if err := srv.cache(timelineID, q.Posts[len(q.Posts)-1], 0); err != nil {
@@ -214,7 +214,7 @@ func (srv *DashboardServer) queryTimelineDirectly(timelineID, beforePostID int64
 }
 
 // SyncInterval specifies how often to sync the dashboard tables to disk
-const SyncInterval = 30*time.Second
+const SyncInterval = 30 * time.Second
 
 // cache saves the fact that there are no post IDs between prevPostID and postID in the timeline.
 func (srv *DashboardServer) cache(timelineID, postID, prevPostID int64) error {

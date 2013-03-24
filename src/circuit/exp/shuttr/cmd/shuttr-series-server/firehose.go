@@ -2,10 +2,10 @@ package main
 
 import (
 	"bytes"
+	"circuit/exp/shuttr/proto"
 	"fmt"
 	"os/exec"
 	"tumblr/firehose"
-	"tumblr/balkan/proto"
 )
 
 func StreamFirehose(freq *firehose.Request) <-chan *createRequest {
@@ -19,8 +19,8 @@ func StreamFirehose(freq *firehose.Request) <-chan *createRequest {
 			}
 			println(fmt.Sprintf("CREATE blogID=%d postID=%d", q.TimelineID, q.PostID))
 			ch <- &createRequest{
-				Forwarded:      false,
-				Post:           q,
+				Forwarded: false,
+				Post:      q,
 				ReturnResponse: func(err error) {
 					if err != nil {
 						println("Firehose->XCreatePost error:", err.Error())

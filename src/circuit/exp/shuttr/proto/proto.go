@@ -1,10 +1,10 @@
 package proto
 
 import (
+	"circuit/kit/xor"
 	"encoding/binary"
 	"encoding/gob"
 	"hash/fnv"
-	"circuit/kit/xor"
 )
 
 // Messages

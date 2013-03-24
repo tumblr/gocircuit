@@ -1,8 +1,8 @@
 package shard
 
 import (
+	"circuit/exp/shuttr/x"
 	"circuit/kit/xor"
-	"tumblr/balkan/x"
 )
 
 type Shard struct {

@@ -1,15 +1,15 @@
 package main
 
 import (
+	"circuit/exp/shuttr/config"
+	"circuit/exp/shuttr/proto"
+	"circuit/exp/shuttr/union"
+	"circuit/exp/shuttr/x"
+	tcp "circuit/exp/shuttr/x/plain"
+	"circuit/kit/sched/limiter"
 	"flag"
 	"fmt"
 	"os"
-	"circuit/kit/sched/limiter"
-	"tumblr/balkan/config"
-	"tumblr/balkan/dashboard"
-	"tumblr/balkan/proto"
-	"tumblr/balkan/x"
-	tcp "tumblr/balkan/x/plain"
 	//_ "circuit/kit/debug/ctrlc"
 	_ "circuit/kit/debug/http/trace"
 )
@@ -48,7 +48,7 @@ func main() {
 
 	// Created embedded DB server
 	dialer := tcp.NewDialer()
-	if t.srv, err = dashboard.NewServer(dialer, config.Timeline, *flagLevelDB, *flagCache * 1e6); err != nil {
+	if t.srv, err = dashboard.NewServer(dialer, config.Timeline, *flagLevelDB, *flagCache*1e6); err != nil {
 		panic(err)
 	}
 
@@ -65,13 +65,13 @@ func main() {
 
 type worker struct {
 	srv   *dashboard.DashboardServer
-	fwd   *forwarder	// Forwards Query requests to the appropriate dashboard shard
-	apich <-chan *request	// Incoming API requests
-	fwdch <-chan *request	// ?
+	fwd   *forwarder      // Forwards Query requests to the appropriate dashboard shard
+	apich <-chan *request // Incoming API requests
+	fwdch <-chan *request // ?
 }
 
 type request struct {
-	Source         string	// "http" or "fwd"
+	Source         string // "http" or "fwd"
 	Query          *proto.XDashboardQuery
 	ReturnResponse func([]*proto.Post, error)
 }
@@ -95,7 +95,7 @@ func StreamForwardRequests(x0 x.Listener) <-chan *request {
 				continue
 			}
 			ch <- &request{
-				Query: fwdreq, 
+				Query: fwdreq,
 				ReturnResponse: func(posts []*proto.Post, err error) {
 					if err != nil {
 						conn.Write(&proto.XError{err.Error()})

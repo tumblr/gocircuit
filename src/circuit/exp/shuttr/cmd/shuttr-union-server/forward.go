@@ -1,12 +1,12 @@
 package main
 
 import (
+	"circuit/exp/shuttr/proto"
+	"circuit/exp/shuttr/shard"
+	"circuit/exp/shuttr/union"
+	"circuit/exp/shuttr/x"
 	"errors"
 	"fmt"
-	"tumblr/balkan/shard"
-	"tumblr/balkan/dashboard"
-	"tumblr/balkan/proto"
-	"tumblr/balkan/x"
 )
 
 // forwarder is responsible for ...
