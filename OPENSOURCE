@@ -1,7 +1,4 @@
-maybe 4build should not make autopkg, instead user makes it themselves?
-
-illustration that shows data flow in the lifecycle, with annotations for 4build, 4crossbuild, 4install, etc.
-
+remove rsync directive
 doc build
 	static link vs dynamic link, 4build does static, but requires higher go release; explain somewhere
 document cross-build environment requirements

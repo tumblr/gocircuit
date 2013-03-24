@@ -1,5 +1,10 @@
 package main
 
+import (
+	"fmt"
+	"path"
+)
+
 
 func parseRepo(s string) (schema, key, value, url string) {
 	switch {
@@ -22,16 +27,7 @@ func parseRepo(s string) (schema, key, value, url string) {
 	return
 }
 
-//
-//	{hg}{changeset:4ad21a3b23a4}
-//	{hg}{id:4ad21a3b23a4}
-//	{hg}{rev:3452}
-//	{hg}{tag:weekly}
-//	{hg}{tip}
-//	{hg}{branch:master}
-//
-//	{git}{rev:51e592253000600d586408f3e36a3f4692011086}
-//
+// {git}{rev:51e592253000600d586408f3e36a3f4692011086}
 func parseArg(arg string) (key, value string) {
 	part := strings.SplitN(arg, ":", 2)
 	if len(part) > 0 {
@@ -43,33 +39,83 @@ func parseArg(arg string) (key, value string) {
 	return
 }
 
-func cloneMercurialRepo(repo, arg, parent string) {
-	// If not, clone the source tree
-	if err := Shell(x.env, parent, "hg clone " + arg + " " + repo); err != nil {
-		Fatalf("Problem cloning repo '%s' (%s)", repo, err)
+//
+//	{hg}{changeset:4ad21a3b23a4}
+//	{hg}{id:4ad21a3b23a4}
+//	{hg}{rev:3452}
+//	{hg}{tag:weekly}
+//	{hg}{tip}
+//	{hg}{branch:master}
+//
+func cloneMercurial(dir, key, value, url string) {
+	var opt string
+	switch key {
+	case "changeset":
+		opt = "-u " + value
+	case "rev":
+		opt = "-u " + value
+	case "id":
+		opt = "-u " + value
+	case "tag":
+		opt = "-u " + value
+	case "branch":
+		opt = "-u " + value
+	case "tip":
+		opt = "-u tip"
+	case "":
+	default:
+		Fatalf("unknown hg option key '%s'", key)
+	}
+	if err := Shell(x.env, "", fmt.Sprintf("hg clone %s %s %s", opt, url, dir)); err != nil {
+		Fatalf("Problem cloning repository '%s' (%s)", url, err)
 	}
 }
 
-func cloneGitRepo(repo, arg, parent string) {
-	// If not, clone the source tree
-	if err := Shell(x.env, parent, "git clone " + repo); err != nil {
-		Fatalf("Problem cloning repo '%s' (%s)", repo, err)
+func syncMercurialRepo(dir string) {
+	if err := Shell(x.env, dir, "hg pull"); err != nil {
+		Fatalf("Problem pulling repo in %s (%s)", dir, err)
+	}
+	if err := Shell(x.env, dir, "hg update"); err != nil {
+		Fatalf("Problem pulling repo in %s (%s)", dir, err)
 	}
 }
 
-func pullGitRepo(dir string) {
+func cloneGitRepo(dir, key, value, url string) {
+	if err := Shell(x.env, "", fmt.Sprintf("git clone %s %s", url, dir)); err != nil {
+		Fatalf("Problem cloning repo '%s' (%s)", url, err)
+	}
+	var opt string
+	switch key {
+	case "changeset":
+	case "rev":
+	case "id":
+	case "tag":
+		opt = ??
+	case "branch":
+		opt = "git checkout " + value
+	case "tip", "":
+	default:
+		Fatalf("unknown git option key '%s'", key)
+	}
+	if err := Shell(x.env, dir, opt); err != nil {
+		Fatalf("Problem executing '%s' in repo '%s' (%s)", opt, url, err)
+	}
+}
+
+func syncGitRepo(dir string) {
+	??
 	if err := Shell(x.env, dir, "git pull origin master"); err != nil {
 		Fatalf("Problem pulling repo in %s (%s)", dir, err)
 	}
 }
 
 func rsyncRepo(src, dstparent string) {
-	if err := Shell(x.env, "", "rsync -acrv --delete --exclude .git --exclude .hg --exclude *.a "+src+" "+dstparent); err != nil {
+	if err := Shell(x.env, "", "rsync -acrv --delete --exclude .git --exclude .hg --exclude *.a " + src + " " + dstparent); err != nil {
 		Fatalf("Problem rsyncing dir '%s' to within '%s' (%s)", src, dstparent, err)
 	}
 }
 
-func fetchRepo(namespace, repo, gopath string, fetchFresh bool) {
+func FetchRepo(namespace, repo, gopath string, fetchFresh bool) string {
 
 	schema, key, value, url := parseRepo(repo)
 
@@ -85,22 +131,29 @@ func fetchRepo(namespace, repo, gopath string, fetchFresh bool) {
 	if err := os.MkdirAll(repoSrc, 0700); err != nil {
 		Fatalf("Problem creating app source path %s (%s)\n", repoSrc, err)
 	}
-	??
-	repoPath := path.Join(repoSrc, repoName(repo))
+	clonePath := path.Join(repoSrc, namespace)
 
-	// Check whether repo directory exists
-	ok, err := Exists(repoPath)
+	// Check whether repo clone directory exists
+	ok, err := Exists(clonePath)
 	if err != nil {
-		Fatalf("Problem stat'ing %s (%s)", repoPath, err)
+		Fatalf("Problem stat'ing %s (%s)", clonePath, err)
 	}
 	switch schema {
+	case "hg":
+		if !ok {
+			cloneMercurialRepo(clonePath, key, value, url)
+		} else {
+			syncMercurialRepo(clonePath)
+		}
 	case "git":
 		if !ok {
+			??
 			cloneGitRepo(repo, repoSrc)
 		} else {
-			pullGitRepo(repoPath)
+			syncGitRepo(clonePath)
 		}
 	case "rsync":
+		??
 		rsyncRepo(repo, repoSrc)
 	default:
 		Fatalf("Unrecognized repo schema: %s\n", schema)
@@ -114,7 +167,6 @@ func fetchRepo(namespace, repo, gopath string, fetchFresh bool) {
 	} else {
 		p = path.Join(repoPath, gopath)
 	}
-	x.env.Set("GOPATH", p+":"+oldGoPath)
+	x.env.Set("GOPATH", p + ":" + oldGoPath)
 	x.goPath[namespace] = p
 }
-
