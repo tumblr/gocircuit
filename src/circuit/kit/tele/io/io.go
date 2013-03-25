@@ -7,10 +7,12 @@ import (
 	"runtime"
 )
 
+// NewClient creates a new client around the cross-interface x.
 func NewClient(x circuit.X) *Client {
 	return &Client{X: x}
 }
 
+// Client is a convenience wrapper around a cross-interface to Server.
 type Client struct {
 	circuit.X
 }
@@ -35,12 +37,14 @@ func _recover(pe *error) {
 	}
 }
 
+// Close closes the stream.
 func (cli *Client) Close() (err error) {
 	defer _recover(&err)
 
 	return asError(cli.Call("Close")[0])
 }
 
+// Read reads a slice of bytes.
 func (cli *Client) Read(p []byte) (_ int, err error) {
 	defer _recover(&err)
 
@@ -53,6 +57,7 @@ func (cli *Client) Read(p []byte) (_ int, err error) {
 	return len(q), err
 }
 
+// Write writes a slice of bytes.
 func (cli *Client) Write(p []byte) (_ int, err error) {
 	defer _recover(&err)
 
@@ -60,6 +65,7 @@ func (cli *Client) Write(p []byte) (_ int, err error) {
 	return r[0].(int), asError(r[1])
 }
 
+// NewServer creates a new cross-worker exportable interface to f.
 func NewServer(f io.ReadWriteCloser) *Server {
 	srv := &Server{f: f}
 	runtime.SetFinalizer(srv, func(srv_ *Server) {
@@ -68,6 +74,7 @@ func NewServer(f io.ReadWriteCloser) *Server {
 	return srv
 }
 
+// Server is a cross-worker exportable object that exposes an underlying local io.ReadWriteCloser.
 type Server struct {
 	f io.ReadWriteCloser
 }
@@ -76,10 +83,12 @@ func init() {
 	circuit.RegisterValue(&Server{})
 }
 
+// Close closes the stream.
 func (srv *Server) Close() error {
 	return srv.f.Close()
 }
 
+// Read reads n bytes.
 func (srv *Server) Read(n int) ([]byte, error) {
 	p := make([]byte, min(n, 1e4))
 	m, err := srv.f.Read(p)
@@ -93,6 +102,7 @@ func min(x, y int) int {
 	return y
 }
 
+// Write writes a slice of bytes.
 func (srv *Server) Write(p []byte) (int, error) {
 	return srv.f.Write(p)
 }
