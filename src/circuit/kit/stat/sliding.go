@@ -4,18 +4,23 @@ import (
 	"time"
 )
 
+// Sliding moment is a composite sketch. It keeps track of a sliding window of time,
+// divided into slots where each slot is a moment sketch.
 type SlidingMoment struct {
 	slotdur int64
 	slots   []Moment
 	head    int64
 }
 
+// NewSlidingMoment creates a new sketch with resolution-many slots, and each slot being
+// responsible for a time interval of duration/resolution.
 func NewSlidingMoment(resolution int, duration time.Duration) *SlidingMoment {
 	x := &SlidingMoment{}
 	x.Init(resolution, duration)
 	return x
 }
 
+// Init initializes the sketch.
 func (x *SlidingMoment) Init(resolution int, duration time.Duration) {
 	slots := make([]Moment, resolution)
 	for i, _ := range slots {
@@ -25,11 +30,12 @@ func (x *SlidingMoment) Init(resolution int, duration time.Duration) {
 	x.slots = slots
 }
 
+// TimeSpan returns the length of time that is captured by this sketch.
 func (x *SlidingMoment) TimeSpan() time.Duration {
 	return time.Duration(x.slotdur * int64(len(x.slots)))
 }
 
-// Moment returns a pointer to the current moment structure corresponding to the time t
+// Moment returns a pointer to the current moment structure corresponding to time t.
 func (x *SlidingMoment) Slot(t time.Time) *Moment {
 	slot := t.UnixNano() / x.slotdur
 	if !x.spin(slot) {
@@ -38,14 +44,15 @@ func (x *SlidingMoment) Slot(t time.Time) *Moment {
 	return &x.slots[int(slot%int64(len(x.slots)))]
 }
 
+// Slots returns a slice of moment sketches, ordered from most recent to least recent.
 func (x *SlidingMoment) Slots() ([]*Moment, time.Time) {
 	result := make([]*Moment, len(x.slots))
-	j := int(x.head%int64(len(x.slots))) + len(x.slots)
+	j := int(x.head % int64(len(x.slots))) + len(x.slots)
 	for i := 0; i < len(result); i++ {
 		result[i] = &x.slots[j%len(x.slots)]
 		j--
 	}
-	return result, time.Unix(0, x.head*x.slotdur)
+	return result, time.Unix(0, x.head * x.slotdur)
 }
 
 // spin rotates the circular slot buffer forward to ensure that the requested
@@ -68,6 +75,7 @@ func (x *SlidingMoment) spin(slot int64) bool {
 	return true
 }
 
+// TailWeight returns the total sample weight in the tail least-recent time slots.
 func (x *SlidingMoment) TailWeight(tail int) float64 {
 	slots, _ := x.Slots()
 	var result float64
@@ -77,6 +85,7 @@ func (x *SlidingMoment) TailWeight(tail int) float64 {
 	return result
 }
 
+// Weight returns the total weight of all samples across all time slots.
 func (x *SlidingMoment) Weight() float64 {
 	var result float64
 	for i, _ := range x.slots {
@@ -85,6 +94,7 @@ func (x *SlidingMoment) Weight() float64 {
 	return result
 }
 
+// Mass returns the total mass across all time slot sketches.
 func (x *SlidingMoment) Mass() float64 {
 	var result float64
 	for i, _ := range x.slots {
