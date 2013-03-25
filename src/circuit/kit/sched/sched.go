@@ -1,2 +1,2 @@
-// Package sched contains primitives for various scheduling patterns
+// Package sched contains primitives for scheduling
 package sched

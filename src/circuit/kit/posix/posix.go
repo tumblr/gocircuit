@@ -6,6 +6,8 @@ import (
 	"os/exec"
 )
 
+// Exec executes prog with working directory dir, flags argv, and standard input stdin.
+// Exec returns the standard output and error streams as strings.
 func Exec(prog, dir string, stdin string, argv ...string) (stdout, stderr string, err error) {
 	cmd := exec.Command(prog, argv...)
 	cmd.Dir = dir
@@ -43,14 +45,17 @@ func Exec(prog, dir string, stdin string, argv ...string) (stdout, stderr string
 	return string(stdoutBuf), string(stderrBuf), cmd.Wait()
 }
 
+// Shell executes sh and feeds it standard input shellStdin.
 func Shell(shellStdin string) (stdout, stderr string, err error) {
 	return Exec("sh", "", shellStdin)
 }
 
+// RemoteShell executes sh on remoteHost via ssh and feeds it remoteShellStdin on the standard input.
 func RemoteShell(remoteHost, remoteShellStdin string) (stdout, stderr string, err error) {
 	return Exec("ssh", "", remoteShellStdin, remoteHost, "sh -il")
 }
 
+// DownloadDir copies the contents of remoteDir on remoteHost to local directory sourceDir, using rsync over ssh.
 func DownloadDir(remoteHost, remoteDir, sourceDir string) error {
 	_, _, err := Exec("rsync", "", "", "-acrv", "--rsh=ssh", remoteHost+":"+remoteDir+"/", sourceDir+"/")
 	return err

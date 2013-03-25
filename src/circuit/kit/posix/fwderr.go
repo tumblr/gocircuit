@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// ForwardStderrBatch reads all of stderr and then prints it on the standard error of this process.
 func ForwardStderrBatch(stderr io.ReadCloser) {
 	go func() {
 		all, _ := ioutil.ReadAll(stderr)
@@ -14,6 +15,7 @@ func ForwardStderrBatch(stderr io.ReadCloser) {
 	}()
 }
 
+// ForwardStderr forwards stderr to the standard error of this process, while prefixing each line with prefix.
 func ForwardStderr(prefix string, stderr io.ReadCloser) {
 	go func() {
 		r := bufio.NewReader(stderr)
