@@ -3,7 +3,7 @@ package zipfs
 
 import (
 	"archive/zip"
-	fspkg "circuit/kit/fs"
+	"circuit/kit/fs"
 	"io"
 	"os"
 	"path"
@@ -12,21 +12,23 @@ import (
 	"time"
 )
 
-// FS provides a read-only file system access to a local zip file
-type FS struct {
+// zipfs provides a read-only file system access to a local zip file
+type zipfs struct {
 	r    *zip.ReadCloser
-	root *Dir
+	root *zipdir
 }
 
-func Mount(zipfile string) (fs *FS, err error) {
-	fs = &FS{root: NewDir("")}
-	if fs.r, err = zip.OpenReader(zipfile); err != nil {
+// Mount creates a new file system interface to the contents of the ZIP file fromfile
+func Mount(fromfile string) (fs.FS, error) {
+	t := &zipfs{root: newZIPDir("")}
+	var err error
+	if t.r, err = zip.OpenReader(fromfile); err != nil {
 		return nil, err
 	}
-	for _, f := range fs.r.File {
-		fs.root.addFile(splitPath(f.Name), f)
+	for _, f := range t.r.File {
+		t.root.addFile(splitPath(f.Name), f)
 	}
-	return fs, nil
+	return t, nil
 }
 
 func splitPath(p string) []string {
@@ -37,59 +39,59 @@ func splitPath(p string) []string {
 	return parts
 }
 
-func (fs *FS) Close() error {
-	return fs.r.Close()
+func (s *zipfs) Close() error {
+	return s.r.Close()
 }
 
-func (fs *FS) Open(name string) (fspkg.File, error) {
-	return fs.root.openFile(splitPath(name))
+func (s *zipfs) Open(name string) (fs.File, error) {
+	return s.root.openFile(splitPath(name))
 }
 
-func (fs *FS) OpenFile(name string, flag int, perm os.FileMode) (fspkg.File, error) {
+func (s *zipfs) OpenFile(name string, flag int, perm os.FileMode) (fs.File, error) {
 	panic("not supported")
 }
 
-func (fs *FS) Create(name string) (fspkg.File, error) {
-	return nil, fspkg.ErrReadOnly
+func (s *zipfs) Create(name string) (fs.File, error) {
+	return nil, fs.ErrReadOnly
 }
 
-func (fs *FS) Remove(name string) error {
-	return fspkg.ErrReadOnly
+func (s *zipfs) Remove(name string) error {
+	return fs.ErrReadOnly
 }
 
-func (fs *FS) Rename(oldname, newname string) error {
-	return fspkg.ErrReadOnly
+func (s *zipfs) Rename(oldname, newname string) error {
+	return fs.ErrReadOnly
 }
 
-func (fs *FS) Stat(name string) (os.FileInfo, error) {
-	return fs.root.statFile(splitPath(name))
+func (s *zipfs) Stat(name string) (os.FileInfo, error) {
+	return s.root.statFile(splitPath(name))
 }
 
-func (fs *FS) Mkdir(name string) error {
-	return fspkg.ErrReadOnly
+func (s *zipfs) Mkdir(name string) error {
+	return fs.ErrReadOnly
 }
 
-func (fs *FS) MkdirAll(name string) error {
-	return fspkg.ErrReadOnly
+func (s *zipfs) MkdirAll(name string) error {
+	return fs.ErrReadOnly
 }
 
-// Dir is an open directory in a zip archive
-type Dir struct {
+// zipdir is an open directory in a zip archive
+type zipdir struct {
 	name  string
 	lk    sync.Mutex
-	dirs  map[string]*Dir
+	dirs  map[string]*zipdir
 	files map[string]*zip.File
 }
 
-func NewDir(name string) *Dir {
-	return &Dir{
+func newZIPDir(name string) *zipdir {
+	return &zipdir{
 		name:  name,
-		dirs:  make(map[string]*Dir),
+		dirs:  make(map[string]*zipdir),
 		files: make(map[string]*zip.File),
 	}
 }
 
-func (d *Dir) addFile(parts []string, file *zip.File) error {
+func (d *zipdir) addFile(parts []string, file *zip.File) error {
 	d.lk.Lock()
 	defer d.lk.Unlock()
 
@@ -99,54 +101,54 @@ func (d *Dir) addFile(parts []string, file *zip.File) error {
 	}
 	sub := d.dirs[parts[0]]
 	if sub == nil {
-		sub = NewDir(parts[0])
+		sub = newZIPDir(parts[0])
 		d.dirs[parts[0]] = sub
 	}
 	return sub.addFile(parts[1:], file)
 }
 
-func (d *Dir) openFile(parts []string) (fspkg.File, error) {
+func (d *zipdir) openFile(parts []string) (fs.File, error) {
 	d.lk.Lock()
 	defer d.lk.Unlock()
 
 	if len(parts) == 1 {
 		file := d.files[parts[0]]
 		if file == nil {
-			return nil, fspkg.ErrNotFound
+			return nil, fs.ErrNotFound
 		}
-		return OpenFile(file)
+		return openFile(file)
 	}
 	sub := d.dirs[parts[0]]
 	if sub == nil {
-		return nil, fspkg.ErrNotFound
+		return nil, fs.ErrNotFound
 	}
 	return sub.openFile(parts[1:])
 }
 
-func (d *Dir) statFile(parts []string) (os.FileInfo, error) {
+func (d *zipdir) statFile(parts []string) (os.FileInfo, error) {
 	d.lk.Lock()
 	defer d.lk.Unlock()
 
 	if len(parts) == 1 {
 		file := d.files[parts[0]]
 		if file == nil {
-			return nil, fspkg.ErrNotFound
+			return nil, fs.ErrNotFound
 		}
 		return file.FileInfo(), nil
 	}
 	sub := d.dirs[parts[0]]
 	if sub == nil {
-		return nil, fspkg.ErrNotFound
+		return nil, fs.ErrNotFound
 	}
 	return sub.statFile(parts[1:])
 }
 
-func (d *Dir) Close() error {
+func (d *zipdir) Close() error {
 	return nil
 }
 
-func (d *Dir) Stat() (os.FileInfo, error) {
-	return &fspkg.FileInfo{
+func (d *zipdir) Stat() (os.FileInfo, error) {
+	return &fs.FileInfo{
 		XName:    d.name,
 		XSize:    0,
 		XMode:    0700,
@@ -155,7 +157,7 @@ func (d *Dir) Stat() (os.FileInfo, error) {
 	}, nil
 }
 
-func (d *Dir) Readdir(count int) ([]os.FileInfo, error) {
+func (d *zipdir) Readdir(count int) ([]os.FileInfo, error) {
 	d.lk.Lock()
 	defer d.lk.Unlock()
 	ls := make([]os.FileInfo, 0, len(d.dirs)+len(d.files))
@@ -169,68 +171,68 @@ func (d *Dir) Readdir(count int) ([]os.FileInfo, error) {
 	return ls, nil
 }
 
-func (d *Dir) Read(p []byte) (int, error) {
-	return 0, fspkg.ErrOp
+func (d *zipdir) Read(p []byte) (int, error) {
+	return 0, fs.ErrOp
 }
 
-func (d *Dir) Seek(offset int64, whence int) (int64, error) {
-	return 0, fspkg.ErrOp
+func (d *zipdir) Seek(offset int64, whence int) (int64, error) {
+	return 0, fs.ErrOp
 }
 
-func (d *Dir) Truncate(size int64) error {
-	return fspkg.ErrOp
+func (d *zipdir) Truncate(size int64) error {
+	return fs.ErrOp
 }
 
-func (d *Dir) Write(q []byte) (int, error) {
-	return 0, fspkg.ErrOp
+func (d *zipdir) Write(q []byte) (int, error) {
+	return 0, fs.ErrOp
 }
 
-func (d *Dir) Sync() error {
-	return fspkg.ErrReadOnly
+func (d *zipdir) Sync() error {
+	return fs.ErrReadOnly
 }
 
 // File represents an open file from the zip archive fs
-type File struct {
+type zipfile struct {
 	file *zip.File
 	rc   io.ReadCloser
 }
 
-func OpenFile(file *zip.File) (fspkg.File, error) {
+func openFile(file *zip.File) (fs.File, error) {
 	rc, err := file.Open()
 	if err != nil {
 		return nil, err
 	}
-	return &File{file, rc}, nil
+	return &zipfile{file, rc}, nil
 }
 
-func (f *File) Close() error {
+func (f *zipfile) Close() error {
 	return f.rc.Close()
 }
 
-func (f *File) Stat() (os.FileInfo, error) {
+func (f *zipfile) Stat() (os.FileInfo, error) {
 	return f.file.FileInfo(), nil
 }
 
-func (f *File) Readdir(count int) ([]os.FileInfo, error) {
-	return nil, fspkg.ErrOp
+func (f *zipfile) Readdir(count int) ([]os.FileInfo, error) {
+	return nil, fs.ErrOp
 }
 
-func (f *File) Read(p []byte) (int, error) {
+func (f *zipfile) Read(p []byte) (int, error) {
 	return f.rc.Read(p)
 }
 
-func (f *File) Seek(offset int64, whence int) (int64, error) {
-	return 0, fspkg.ErrOp
+func (f *zipfile) Seek(offset int64, whence int) (int64, error) {
+	return 0, fs.ErrOp
 }
 
-func (f *File) Truncate(size int64) error {
-	return fspkg.ErrReadOnly
+func (f *zipfile) Truncate(size int64) error {
+	return fs.ErrReadOnly
 }
 
-func (f *File) Write(q []byte) (int, error) {
-	return 0, fspkg.ErrReadOnly
+func (f *zipfile) Write(q []byte) (int, error) {
+	return 0, fs.ErrReadOnly
 }
 
-func (f *File) Sync() error {
-	return fspkg.ErrReadOnly
+func (f *zipfile) Sync() error {
+	return fs.ErrReadOnly
 }
