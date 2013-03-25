@@ -2,7 +2,7 @@
 package diskfs
 
 import (
-	fspkg "circuit/kit/fs"
+	"circuit/kit/fs"
 	"errors"
 	"os"
 	"path"
@@ -11,12 +11,13 @@ import (
 var ErrNotDir = errors.New("not a directory")
 
 // FS is a proxy to an isolated subtree of the local file system
-type FS struct {
+type diskfs struct {
 	root     string
 	readonly bool
 }
 
-func Mount(root string, readonly bool) (*FS, error) {
+// Mount creates a new file system interface backed by a local file system directory named root
+func Mount(root string, readonly bool) (fs.FS, error) {
 	fi, err := os.Stat(root)
 	if err != nil {
 		return nil, err
@@ -24,127 +25,127 @@ func Mount(root string, readonly bool) (*FS, error) {
 	if !fi.IsDir() {
 		return nil, ErrNotDir
 	}
-	return &FS{
+	return &diskfs{
 		root:     root,
 		readonly: readonly,
 	}, nil
 }
 
-func (fs *FS) Open(name string) (fspkg.File, error) {
-	file, err := os.Open(fs.abs(name))
+func (s *diskfs) Open(name string) (fs.File, error) {
+	file, err := os.Open(s.abs(name))
 	if err != nil {
 		return nil, err
 	}
-	return newFile(fs, file), nil
+	return newFile(s, file), nil
 }
 
-func (fs *FS) OpenFile(name string, flag int, perm os.FileMode) (fspkg.File, error) {
+func (s *diskfs) OpenFile(name string, flag int, perm os.FileMode) (fs.File, error) {
 	// TODO: More rigorous mode and perm checking should happen here
-	file, err := os.OpenFile(fs.abs(name), flag, perm)
+	file, err := os.OpenFile(s.abs(name), flag, perm)
 	if err != nil {
 		return nil, err
 	}
-	return newFile(fs, file), nil
+	return newFile(s, file), nil
 }
 
-func (fs *FS) Create(name string) (fspkg.File, error) {
-	if fs.readonly {
-		return nil, fspkg.ErrReadOnly
+func (s *diskfs) Create(name string) (fs.File, error) {
+	if s.readonly {
+		return nil, fs.ErrReadOnly
 	}
-	file, err := os.Create(fs.abs(name))
+	file, err := os.Create(s.abs(name))
 	if err != nil {
 		return nil, err
 	}
-	return newFile(fs, file), nil
+	return newFile(s, file), nil
 }
 
-func (fs *FS) Remove(name string) error {
-	if fs.readonly {
-		return fspkg.ErrReadOnly
+func (s *diskfs) Remove(name string) error {
+	if s.readonly {
+		return fs.ErrReadOnly
 	}
-	return os.Remove(fs.abs(name))
+	return os.Remove(s.abs(name))
 }
 
-func (fs *FS) Rename(oldname, newname string) error {
-	if fs.readonly {
-		return fspkg.ErrReadOnly
+func (s *diskfs) Rename(oldname, newname string) error {
+	if s.readonly {
+		return fs.ErrReadOnly
 	}
-	return os.Rename(fs.abs(oldname), fs.abs(newname))
+	return os.Rename(s.abs(oldname), s.abs(newname))
 }
 
-func (fs *FS) Stat(name string) (os.FileInfo, error) {
-	return os.Stat(fs.abs(name))
+func (s *diskfs) Stat(name string) (os.FileInfo, error) {
+	return os.Stat(s.abs(name))
 }
 
-func (fs *FS) Mkdir(name string) error {
-	if fs.readonly {
-		return fspkg.ErrReadOnly
+func (s *diskfs) Mkdir(name string) error {
+	if s.readonly {
+		return fs.ErrReadOnly
 	}
-	return os.Mkdir(fs.abs(name), 0700)
+	return os.Mkdir(s.abs(name), 0700)
 }
 
-func (fs *FS) MkdirAll(name string) error {
-	if fs.readonly {
-		return fspkg.ErrReadOnly
+func (s *diskfs) MkdirAll(name string) error {
+	if s.readonly {
+		return fs.ErrReadOnly
 	}
-	return os.MkdirAll(fs.abs(name), 0700)
+	return os.MkdirAll(s.abs(name), 0700)
 }
 
-func (fs *FS) IsReadOnly() bool {
-	return fs.readonly
+func (s *diskfs) IsReadOnly() bool {
+	return s.readonly
 }
 
-func (fs *FS) abs(name string) string {
-	return path.Join(fs.root, name)
+func (s *diskfs) abs(name string) string {
+	return path.Join(s.root, name)
 }
 
 // File represents a proxy to a local file or directory
-type File struct {
-	fs   *FS
+type file struct {
+	fs   *diskfs
 	file *os.File
 }
 
-func newFile(fs *FS, file *os.File) *File {
-	return &File{fs, file}
+func newFile(s *diskfs, f *os.File) *file {
+	return &file{s, f}
 }
 
-func (f *File) Close() error {
+func (f *file) Close() error {
 	return f.file.Close()
 }
 
-func (f *File) Stat() (os.FileInfo, error) {
+func (f *file) Stat() (os.FileInfo, error) {
 	return f.file.Stat()
 }
 
-func (f *File) Readdir(count int) ([]os.FileInfo, error) {
+func (f *file) Readdir(count int) ([]os.FileInfo, error) {
 	return f.file.Readdir(count)
 }
 
-func (f *File) Read(p []byte) (int, error) {
+func (f *file) Read(p []byte) (int, error) {
 	return f.file.Read(p)
 }
 
-func (f *File) Seek(offset int64, whence int) (int64, error) {
+func (f *file) Seek(offset int64, whence int) (int64, error) {
 	return f.file.Seek(offset, whence)
 }
 
-func (f *File) Truncate(size int64) error {
+func (f *file) Truncate(size int64) error {
 	if f.fs.IsReadOnly() {
-		return fspkg.ErrReadOnly
+		return fs.ErrReadOnly
 	}
 	return f.file.Truncate(size)
 }
 
-func (f *File) Write(q []byte) (int, error) {
+func (f *file) Write(q []byte) (int, error) {
 	if f.fs.IsReadOnly() {
-		return 0, fspkg.ErrReadOnly
+		return 0, fs.ErrReadOnly
 	}
 	return f.file.Write(q)
 }
 
-func (f *File) Sync() error {
+func (f *file) Sync() error {
 	if f.fs.IsReadOnly() {
-		return fspkg.ErrReadOnly
+		return fs.ErrReadOnly
 	}
 	return f.file.Sync()
 }

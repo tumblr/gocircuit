@@ -8,6 +8,8 @@ import (
 	"reflect"
 )
 
+// Deep prints the value v to w, while recursing into struct fields, map key and values, array and slice elements.
+// Deep may fall in an infinite loop if v has cycles.
 func Deep(w io.Writer, v interface{}) {
 	shown := make(shownMap)
 	deep(shown, bufio.NewWriter(w), reflect.ValueOf(v), "")
