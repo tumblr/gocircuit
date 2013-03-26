@@ -1,4 +1,4 @@
-// Package waterfill implements an algorithm for greedy even job assignment
+// Package waterfill implements an algorithm for greedy job allocation
 package waterfill
 
 import (
@@ -7,32 +7,38 @@ import (
 	"sort"
 )
 
-// Bin represents a bin carying integral load
-type Bin interface {
+// Worker is an object that can be assigned integral workload
+type Worker interface {
+
+	// Add assigns one more unit of work to this worker
 	Add()
-	Less(Bin) bool
+
+	// Less returns true if this worker's workload is smaller than the argument worker
+	Less(Worker) bool
 }
 
-// Fill represents an integral load distribution over a set of bins
-type Fill struct {
-	bin   []Bin
+// Allocator is a greedy algorithm for assigning work to workers with aim for even allocation
+type Allocator struct {
+	bin   []Worker
 	i     int
-	water Bin // Bin holding the high water mark load
+	water Worker // Worker holding the high water mark load
 }
 
-func NewFill(bin []Bin) *Fill {
+// New creates a new allocator
+func New(bin []Worker) *Allocator {
 	if len(bin) == 0 {
 		return nil
 	}
-	sort.Sort(sortBins(bin))
-	return &Fill{
+	sort.Sort(sortWorkers(bin))
+	return &Allocator{
 		bin:   bin,
 		i:     0,
 		water: bin[0],
 	}
 }
 
-func (f *Fill) String() string {
+// String returns a textual representation of the state of this allocator
+func (f *Allocator) String() string {
 	var w bytes.Buffer
 	for _, fb := range f.bin {
 		s := fb.(fmt.Stringer)
@@ -42,8 +48,8 @@ func (f *Fill) String() string {
 	return string(w.Bytes())
 }
 
-// Add assigns a unit of work to a bin and returns that bin
-func (f *Fill) Add() Bin {
+// Add assigns a unit of work to a worker and returns that worker
+func (f *Allocator) Add() Worker {
 	// Part I
 	if f.i == len(f.bin) {
 		f.i = 1
@@ -67,17 +73,20 @@ func (f *Fill) Add() Bin {
 	return r
 }
 
-// sortBins sorts a slice of Bins according to their order
-type sortBins []Bin
+// sortWorkers sorts a slice of Workers according to their order
+type sortWorkers []Worker
 
-func (sb sortBins) Len() int {
+// Len implements sort.Interface.Len
+func (sb sortWorkers) Len() int {
 	return len(sb)
 }
 
-func (sb sortBins) Less(i, j int) bool {
+// Less implements sort.Interface.Less
+func (sb sortWorkers) Less(i, j int) bool {
 	return sb[i].Less(sb[j])
 }
 
-func (sb sortBins) Swap(i, j int) {
+// Swap implements sort.Interface.Swap
+func (sb sortWorkers) Swap(i, j int) {
 	sb[i], sb[j] = sb[j], sb[i]
 }

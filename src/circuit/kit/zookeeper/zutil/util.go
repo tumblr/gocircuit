@@ -63,6 +63,7 @@ func IsNodeExists(err error) bool {
 	return ze.Code == zookeeper.ZNODEEXISTS
 }
 
+// ZookeeperString returns the list of Zookeeper hosts ss in the form of a single string in Zookeeper config format
 func ZookeeperString(ss []string) string {
 	var w bytes.Buffer
 	for i, z := range ss {

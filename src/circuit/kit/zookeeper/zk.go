@@ -1,4 +1,4 @@
-// Package zookeeper is a client for Apache Zookeeper, it is a copy of gozk
+// Package zookeeper is a client for Apache Zookeeper. This package is a copy of launchpad.net/gozk
 package zookeeper
 
 // gozk - ZooKeeper support for the Go language

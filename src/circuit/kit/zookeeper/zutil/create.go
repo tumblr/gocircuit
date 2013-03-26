@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// CreateRecursive creates the directory leafPath and any parent subdirectories if necessary
 func CreateRecursive(z *zookeeper.Conn, leafPath string, aclv []zookeeper.ACL) error {
 	leafPath = path.Clean(leafPath)
 	if len(leafPath) == 0 || leafPath[0] != '/' {

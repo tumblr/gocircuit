@@ -1,4 +1,4 @@
-// Package config provides access the circuit configuration of this worker process
+// Package config provides access to the circuit configuration of this worker process
 package config
 
 import (
@@ -78,6 +78,7 @@ type WorkerConfig struct {
 	Build     *BuildConfig
 }
 
+// Config holds the worker configuration of this process
 var Config *WorkerConfig
 
 func parseBag(r io.Reader) {

@@ -15,22 +15,27 @@ type InstallConfig struct {
 	Binary  string // Desired name for the circuit runtime binary
 }
 
+// BinDir returns the binary install directory
 func (i *InstallConfig) BinDir() string {
 	return path.Join(i.RootDir, "bin")
 }
 
+// JailDir returns the jail install directory
 func (i *InstallConfig) JailDir() string {
 	return path.Join(i.RootDir, "jail")
 }
 
+// VarDir returns the var install directory
 func (i *InstallConfig) VarDir() string {
 	return path.Join(i.RootDir, "var")
 }
 
+// BinaryPath returns the absolute path to the worker binary
 func (i *InstallConfig) BinaryPath() string {
 	return path.Join(i.BinDir(), i.Binary)
 }
 
+// ClearHelperPath returns the absolute path to the clear-tool helper binary
 func (i *InstallConfig) ClearHelperPath() string {
 	return path.Join(i.BinDir(), "4clear-helper")
 }

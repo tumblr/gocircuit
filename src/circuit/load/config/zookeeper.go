@@ -16,6 +16,7 @@ type ZookeeperConfig struct {
 	RootDir string   // Root directory for this circuit instance within Zookeeper
 }
 
+// Zookeepers returns the set of Zookeeper workers in Zookeeper config format as a single string.
 func (z *ZookeeperConfig) Zookeepers() string {
 	var w bytes.Buffer
 	for i, u := range z.Workers {
@@ -27,14 +28,17 @@ func (z *ZookeeperConfig) Zookeepers() string {
 	return string(w.Bytes())
 }
 
+// AnchorDir returns the Zookeeper node rooting the anchor file system
 func (z *ZookeeperConfig) AnchorDir() string {
 	return path.Join(z.RootDir, "anchor")
 }
 
+// IssueDir returns the Zookeeper node rooting the issue file system
 func (z *ZookeeperConfig) IssueDir() string {
 	return path.Join(z.RootDir, "issue")
 }
 
+// DurableDir returns the Zookeeper node rooting the durable file system
 func (z *ZookeeperConfig) DurableDir() string {
 	return path.Join(z.RootDir, "durable")
 }

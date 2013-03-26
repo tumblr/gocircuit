@@ -11,6 +11,7 @@ import (
 // Key represents a point in the XOR-space
 type Key uint64
 
+// Key implements interface Item
 func (id Key) Key() Key {
 	return id
 }
@@ -46,6 +47,7 @@ type Metric struct {
 
 var ErrDup = errors.New("duplicate point")
 
+// Iterate calls f on each node of the XOR-tree.
 func (m *Metric) Iterate(f func(Item)) {
 	f(m.Item)
 	if m.sub[0] != nil {
