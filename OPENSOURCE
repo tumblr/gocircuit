@@ -1,5 +1,3 @@
-doc build
-	static link vs dynamic link, 4build does static, but requires higher go release; explain somewhere
 document cross-build environment requirements
 verify cross-build works with new modifications
 
@@ -9,3 +7,4 @@ test against linux
 wipe repo
 repo release/master branches
 license
+gofmt all

@@ -11,27 +11,43 @@ import (
 	"time"
 )
 
+// Issue represents a description of an issue
 type Issue struct {
-	ID       int64
-	Time     time.Time
+	// ID is a unique issue UD
+	ID int64
+
+	// Time is the time the issue was created
+	Time time.Time
+
+	// Reported is the address of the circuit worker that created the issue
 	Reporter circuit.Addr
+
+	// Affected is the address of the circuit worker that is affected by the issue
 	Affected circuit.Addr
-	Anchor   []string
-	Msg      string
+
+	// Anchor lists the anchor directories that the reporting worker is registered with
+	Anchor []string
+
+	// Message is a human-readable description of the issue
+	Msg string
 }
 
+// ChooseID returns a random issue ID.
 func ChooseID() int64 {
 	return rand.Int63()
 }
 
+// IDString return the textual representation of the id.
 func IDString(id int64) string {
 	return strconv.FormatInt(id, 10)
 }
 
+// ParseID tries to parse the string s as an issue ID.
 func ParseID(s string) (int64, error) {
 	return strconv.ParseInt(s, 10, 64)
 }
 
+// String returns a human-readable representation of this issue.
 func (i *Issue) String() string {
 	if i == nil {
 		return "nil issue"
@@ -62,10 +78,10 @@ type fs interface {
 	Subscribers() ([]string, error)
 }
 
-// Bindings
 var link = join.SetThenGet{Name: "issue file system"}
 
-func Bind(v fs) {
+// Bind is used internally to bind an implementation of this package to the public methods of this package
+func Bind(v interface{}) {
 	link.Set(v)
 }
 
@@ -73,26 +89,32 @@ func get() fs {
 	return link.Get().(fs)
 }
 
+// Add files a new issue with the issue tracking system.
 func Add(msg string) int64 {
 	return get().Add(msg)
 }
 
+// List returns a list of currently unresolved issues.
 func List() []*Issue {
 	return get().List()
 }
 
+// Resolve marks the issue with the given id as resolved.
 func Resolve(id int64) error {
 	return get().Resolve(id)
 }
 
+// Subscribers lists all emails that are subscribed to receive notifications about new issues.
 func Subscribers() ([]string, error) {
 	return get().Subscribers()
 }
 
+// Subscribe subscribes the given email to receive notifications when new issues are added.
 func Subscribe(email string) error {
 	return get().Subscribe(email)
 }
 
+// Unsubscribe removes the given email from the emails receiving notifications when new issues are added.
 func Unsubscribe(email string) error {
 	return get().Unsubscribe(email)
 }
