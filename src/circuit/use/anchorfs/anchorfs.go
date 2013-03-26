@@ -23,19 +23,35 @@ type fs interface {
 
 // Dir is the interface for a directory of workers in the anchor file system
 type Dir interface {
+
+	// Name returns the name of the directory
 	Name() string
+
+	// Dir returns a slice of subdirectories
 	Dirs() ([]string, error)
 
+	// Files returns a the workers who have created files in this directory and their respective files.
+	// Files also returns a revision number of the directory contents. 
 	Files() (rev int64, workers map[circuit.WorkerID]File, err error)
+
+	// Change blocks until the contents of this directory changes relative to its contents at revision sinceRev.
+	// It then returns the new revision number and contents.
 	Change(sinceRev int64) (rev int64, workers map[circuit.WorkerID]File, err error)
+
+	// ChangeExpire is similar to Change, except it timeouts if a change does not occur within an expire interval.
 	ChangeExpire(sinceRev int64, expire time.Duration) (rev int64, workers map[circuit.WorkerID]File, err error)
 
+	// OpenFile opens the file, registered by the given worker ID, if it exists
 	OpenFile(circuit.WorkerID) (File, error)
+
+	// OpenDir opens a subdirectory 
 	OpenDir(string) (Dir, error)
 }
 
-// File ...
+// File is the interface of an anchor file system file
 type File interface {
+
+	// Owner returns the worker address of the worker who created this file
 	Owner() circuit.Addr
 }
 

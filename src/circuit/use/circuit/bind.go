@@ -8,8 +8,8 @@ import (
 
 var link = join.SetThenGet{Name: "circuit language runtime"}
 
-// Bind is used internally.
-func Bind(v runtime) {
+// Bind is used internally to bind an implementation of this package to the public methods of this package
+func Bind(v interface{}) {
 	link.Set(v)
 }
 
@@ -19,23 +19,30 @@ func get() runtime {
 
 // Operators
 
-// RegisterValue regiseters the type of v so that cross-worker pointers to local values of the same type as v
-// can be passed as arguments or return values of cross-worker function invokations. RegisterValue should
-// typically be invoked within the init function of the package that defines the type.
+// RegisterValue registers the type of v with the circuit runtime type system.
+// As a result this program becomes able to send and receive cross-interfaces pointing to objects of this type.
+// By convention, RegisterValue should be invoked from a dedicated init
+// function within of the package that defines the type of v.
 func RegisterValue(v interface{}) {
 	types.RegisterValue(v)
 }
 
+// RegisterFunc registers the worker function type fn with the circuit runtime type system.
+// fn must be of a not-necessarily public type having a single public method.
+// As a result, this program is able to spawn fn on remote hosts, as well as to host
+// remote invokations of fn.
+// By convention, RegisterFunc should be invoked from a dedicated init
+// function within of the package that defines the type of fn.
 func RegisterFunc(fn Func) {
 	types.RegisterFunc(fn)
 }
 
-// Runtime-relative funcs
-
+// Ref returns a cross-interface to the local value v.
 func Ref(v interface{}) X {
 	return get().Ref(v)
 }
 
+// PermRef returns a permanent cross-interface to the local value v.
 func PermRef(v interface{}) XPerm {
 	return get().PermRef(v)
 }
@@ -49,20 +56,24 @@ func setBoot(v interface{}) {
 	get().SetBoot(v)
 }
 
-// Spawn starts a new worker process on host; the worker is registered under
-// all directories in the anchor file system named by anchor; the worker
-// function fn is executed on the newly spawned worker with arguments in.
-// Unless Daemonized is called during the execution of fn, the worker will be
-// killed as soon as fn completes.
-// Unless an error occurs, err equals nil, addr is the address of the newly
-// spawened worker and retrn holds the values returned by fn.
+// Spawn starts a new worker process on host. 
+// The worker is registered under all directories in the anchor file system named by anchor.
+// The worker function fn, whose type must have previously been registered with RegisterFunc, 
+// is executed on the newly spawned worker with arguments given by in.
+// Spawn blocks until the execution of fn completes. 
+// Spawn returns the return values of fn's invokation in the slice retrn.
+// The types of the elements of retrn exactly match the declared return types of fn's singleton public method.
+// Spawn also returns the address of the spawned worker in addr.
+// The new worker will be killed as soon as fn completes, unless an extension of its life is
+// explicitly requested during the execution of fn via a call to Daemonize.
+// Spawn does not panic. It returns any error conditions in err, in which case retrn and addr are undefined.
 func Spawn(host string, anchor []string, fn Func, in ...interface{}) (retrn []interface{}, addr Addr, err error) {
 	return get().Spawn(host, anchor, fn, in...)
 }
 
-// Daemonize instructs the circuit runtime that this worker should not exit until fn completes,
-// in addition to any other functions that might be daemonized already.
-// Daemonize can be called only from within a worker function.
+// Daemonize can only be called during the execution of a worker function, invoked with Spawn, and can only be called once.
+// Daemonize instructs the circuit runtime that the hosting worker should not be killed until fn completes,
+// even if the invoking worker function completes prior to that.
 func Daemonize(fn func()) {
 	get().Daemonize(fn)
 }
@@ -73,31 +84,43 @@ func Kill(addr Addr) error {
 }
 
 // Dial contacts the worker specified by addr and requests a cross-worker
-// pointer to service. If service is not being listened to at addr, nil is
-// returned. Physical failures to contact the worker result in a panic.
+// interface to the named service. 
+// If service is not being listened to at this worker, nil is returned.
+// Failures to contact the worker for external/physical reasons result in a
+// panic.
 func Dial(addr Addr, service string) X {
 	return get().Dial(addr, service)
 }
 
+// DialSelf works similarly to Dial, except it dials into the calling worker
+// itself and instead of returning a cross-interface to the service receiver,
+// it returns a native Go interface. DialSelf never fails.
 func DialSelf(service string) interface{} {
 	return get().DialSelf(service)
 }
 
-// Listen registers receiver as a ..
+// Listen registers the receiver object as a receiver for the named service.
+// Subsequent calls to Dial from other works, addressing this worker and the
+// same service name, will return a cross-interface to receiver.
 func Listen(service string, receiver interface{}) {
 	get().Listen(service, receiver)
 }
 
-// TryDial behaves like Dial, with the exception that instead of panicking
-// in the event of physical issues, an error is returned instead.
+// TryDial behaves like Dial, with the difference that instead of panicking in
+// the event of external/physical issues, an error is returned instead.
 func TryDial(addr Addr, service string) (X, error) {
 	return get().TryDial(addr, service)
 }
 
+// Export recursively rewrites the values val into a Go type that can be
+// serialiazed with package encoding/gob. The values val can contain permanent
+// cross-interfaces (but no non-permanent ones).
 func Export(val ...interface{}) interface{} {
 	return get().Export(val...)
 }
 
+// Import converts the exported value, that was produced as a result of Export,
+// back into its original form.
 func Import(exported interface{}) ([]interface{}, string, error) {
 	return get().Import(exported)
 }

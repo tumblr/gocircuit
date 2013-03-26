@@ -1,8 +1,9 @@
 package circuit
 
-// Addr is a unique representation of the identity of a remote runtime.
-// The implementing type must be registered with gob.
+// Addr is a unique representation of the identity of a remote worker/runtime.
+// The implementing type must be registered with package encoding/gob.
 type Addr interface {
+
 	// String returns a textual representation of the address
 	String() string
 
@@ -10,13 +11,13 @@ type Addr interface {
 	// that is running the worker identified by this address
 	Host() string
 
-	// WorkerID is tentatively part of the transport address so that, if
-	// needed, we can verify the identity of the runtime we are talking to.
+	// WorkerID returns the worker ID of the underlying worker.
 	WorkerID() WorkerID
 }
 
-// Conn is a connection to a remote runtime.
+// Conn is a connection to a remote endpoint.
 type Conn interface {
+
 	// The language runtime does not itself utilize timeouts on read/write
 	// operations. Instead, it requires that calls to Read and Write be blocking
 	// until success or irrecoverable failure is reached.
@@ -46,25 +47,40 @@ type Conn interface {
 	//
 	// Read/Write must be re-entrant.
 
+	// Read reads the next value from the connection.
 	Read() (interface{}, error)
+
+	// Write writes the given value to the connection.
 	Write(interface{}) error
+
+	// Close closes the connection.
 	Close() error
 
+	// Addr returns the address of the remote endpoint.
 	Addr() Addr
 }
 
 // Listener is a device for accepting incoming connections.
 type Listener interface {
+
+	// Accept returns the next incoming connection.
 	Accept() Conn
+
+	// Close closes the listening device.
 	Close()
+	
+	// Addr returns the address of this endpoint.
 	Addr() Addr
 }
 
 // Dialer is a device for initating connections to addressed remote endpoints.
 type Dialer interface {
+
+	// Dial connects to the endpoint specified by addr and returns a respective connection object.
 	Dial(addr Addr) (Conn, error)
 }
 
+// Transport cumulatively represents the ability to listen for connections and dial into remote endpoints.
 type Transport interface {
 	Dialer
 	Listener
