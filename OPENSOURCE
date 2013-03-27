@@ -1,6 +1,8 @@
 document cross-build environment requirements
 verify cross-build works with new modifications
 
+add read order cues
+
 test everything against a release version of Go
 test against linux
 wipe repo
