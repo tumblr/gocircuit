@@ -7,5 +7,4 @@ test everything against a release version of Go
 test against linux
 wipe repo
 repo release/master branches
-license all source files
 gofmt all
