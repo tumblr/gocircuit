@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// 4install installs locally-available circuit binaries to a cluster of hosts supplied to standard input, one host per line
+// 4deploy installs locally-available circuit binaries to a cluster of hosts supplied to standard input, one host per line
 package main
 
 import (
