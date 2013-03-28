@@ -29,6 +29,7 @@ var (
 	flagAppRepo     = flag.String("app",        "",    "App repository")
 	flagAppPath     = flag.String("appsrc",     "",    "GOPATH relative to app repository")
 	flagWorkerPkg   = flag.String("workerpkg",  "",    "User program package to build as the worker executable")
+	flagCmdPkgs     = flag.String("cmdpkgs",    "",    "Comma-separated list of additional program packages to build")
 	flagZInclude    = flag.String("zinclude",   "",    "Zookeeper C headers directory")
 	flagZLib        = flag.String("zlib",       "",    "Zookeeper libraries directory")
 	flagGoRepo      = flag.String("go",         "{hg}{tip}https://code.google.com/p/go", "Go compiler repository")
@@ -46,6 +47,7 @@ type Flags struct {
 	AppRepo     string
 	AppPath     string
 	WorkerPkg   string
+	CmdPkgs     []string
 	Show        bool
 	RebuildGo   bool
 	GoRepo      string
@@ -70,6 +72,17 @@ type FlagsChanged struct {
 	CircuitRepo bool
 }
 
+func parseCmds(cmds string) []string {
+	pkgs := strings.Split(cmds, ",")
+	if len(pkgs) == 0 {
+		return
+	}
+	if strings.TimSpace(pkgs[len(pkgs)-1]) == "" {
+		pkgs = pkgs[:len(pkgs)-1]
+	}
+	return pkgs
+}
+
 func getFlags() *Flags {
 	return &Flags{
 		Binary:      strings.TrimSpace(*flagBinary),
@@ -77,6 +90,7 @@ func getFlags() *Flags {
 		AppRepo:     strings.TrimSpace(*flagAppRepo),
 		AppPath:     strings.TrimSpace(*flagAppPath),
 		WorkerPkg:   strings.TrimSpace(*flagWorkerPkg),
+		CmdPkgs:     parseCmds(*flagCmdPkgs),
 		Show:        *flagShow,
 		GoRepo:      strings.TrimSpace(*flagGoRepo),
 		RebuildGo:   *flagRebuildGo,

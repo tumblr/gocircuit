@@ -33,6 +33,7 @@ var x struct {
 	env       Env
 	jail      string
 	workerPkg string
+	cmdPkgs   []string
 	binary    string
 	zinclude  string
 	zlib      string
@@ -61,6 +62,7 @@ func main() {
 	//println(fmt.Sprintf("%#v\n", x.env))
 	x.jail = flags.Jail
 	x.workerPkg = flags.WorkerPkg
+	x.cmdPkgs   = flags.CmdPkgs
 	x.zinclude = flags.ZInclude
 	x.zlib = flags.ZLib
 	x.goPath = make(map[string]string)
@@ -101,7 +103,7 @@ func shipCircuit() string {
 	}
 
 	// Copy worker binary over to shipping directory
-	println("--Packaging", x.binary)
+	println("--Packaging worker", x.binary)
 	binpkg := workerPkgPath()
 	_, workerName := path.Split(binpkg)
 	shipFile := path.Join(tmpdir, x.binary)	// Destination binary location and name
@@ -114,12 +116,26 @@ func shipCircuit() string {
 
 	// Copy command-line helper tools over to shipping directory
 	for _, cpkg := range cmdPkg {
+		println("--Packaging helper", cpkg)
 		shipHelper := path.Join(tmpdir, cpkg)
 		if _, err = CopyFile(path.Join(helperPkgPath(cpkg), cpkg), shipHelper); err != nil {
 			Fatalf("Problem copying circuit helper binary (%s)\n", err)
 		}
 		if err = os.Chmod(shipHelper, 0755); err != nil {
 			Fatalf("Problem chmod'ing circuit helper binary (%s)\n", err)
+		}
+	}
+
+	// Copy additional user commands to shipping directory
+	for _, cmdpkg := range x.cmdPkgs {
+		println("--Packaging command", cmdpkg)
+		_, cmd := path.Split(cmdpkg)
+		shipCommand := path.Join(tmpdir, cmd)
+		if _, err = CopyFile(path.Join(cmdPkgPath(cmdpkg), cmd), shipCommand); err != nil {
+			Fatalf("Problem copying command binary (%s)\n", err)
+		}
+		if err = os.Chmod(shipCommand, 0755); err != nil {
+			Fatalf("Problem chmod'ing command binary (%s)\n", err)
 		}
 	}
 
@@ -142,6 +158,10 @@ func workerPkgPath() string {
 
 func helperPkgPath(helper string) string {
 	return path.Join(x.goPath["circuit"], "src/circuit/cmd", helper)
+}
+
+func cmdPkgPath(cmdpkg string) string {
+	return path.Join(x.goPath["app"], "src", cmdpkg)
 }
 
 func buildCircuit() {
@@ -169,7 +189,8 @@ func buildCircuit() {
 
 	// Re-build command-line tools
 	for _, cpkg := range cmdPkg {
-		if err := Shell(x.env, path.Join(x.goPath["circuit"], "src/circuit/cmd", cpkg), x.goCmd+" build -a"); err != nil {
+		println("--Building helper", cpkg)
+		if err := Shell(x.env, helperPkgPath(cpkg), x.goCmd + " build -a"); err != nil {
 			Fatalf("Problem compiling %s (%s)\n", cpkg, err)
 		}
 	}
@@ -178,7 +199,7 @@ func buildCircuit() {
 	binpkg := workerPkgPath()
 
 	// Build circuit runtime binary
-	println("--Building", x.binary)
+	println("--Building worker", x.binary)
 	// TODO: The -a flag here seems necessary. Otherwise changes in
 	// circuit/sys do not seem to be reflected in recompiled tutorials when
 	// the synchronization method for all repositories is rsync.
@@ -187,6 +208,14 @@ func buildCircuit() {
 	// Is this a file timestamp problem introduced by rsync?
 	if err := Shell(x.env, binpkg, x.goCmd + " build -a"); err != nil {
 		Fatalf("Problem with ‘(working directory %s) %s build’ (%s)\n", binpkg, x.goCmd, err)
+	}
+
+	// Build additional program packages
+	for _, cmdpkg := range x.cmdPkgs {
+		println("--Building command", cmdpkg)
+		if err := Shell(x.env, cmdPkgPath(cmdpkg), x.goCmd + " build -a"); err != nil {
+			Fatalf("Problem compiling %s (%s)\n", cmdpkg, err)
+		}
 	}
 }
 
