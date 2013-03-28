@@ -75,9 +75,9 @@ type FlagsChanged struct {
 func parseCmds(cmds string) []string {
 	pkgs := strings.Split(cmds, ",")
 	if len(pkgs) == 0 {
-		return
+		return nil
 	}
-	if strings.TimSpace(pkgs[len(pkgs)-1]) == "" {
+	if strings.TrimSpace(pkgs[len(pkgs)-1]) == "" {
 		pkgs = pkgs[:len(pkgs)-1]
 	}
 	return pkgs
