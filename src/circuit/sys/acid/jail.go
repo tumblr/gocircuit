@@ -26,7 +26,7 @@ import (
 // JailTail opens a file within this worker's jail directory and prepares a
 // cross-circuit pointer to the open file
 func (a *Acid) JailTail(jailFile string) (circuit.X, error) {
-	abs := path.Join(config.Config.Install.JailDir(), circuit.WorkerAddr().WorkerID().String(), jailFile)
+	abs := path.Join(config.Config.Deploy.JailDir(), circuit.WorkerAddr().WorkerID().String(), jailFile)
 
 	cmd := exec.Command("/bin/sh", "-c", "tail -f "+abs)
 

@@ -88,7 +88,7 @@ func readAsDaemonizerOrWorker() {
 type WorkerConfig struct {
 	Spark     *SparkConfig
 	Zookeeper *ZookeeperConfig
-	Install   *InstallConfig
+	Deploy    *InstallConfig
 	Build     *BuildConfig
 }
 
@@ -101,7 +101,7 @@ func parseBag(r io.Reader) {
 		fmt.Fprintf(os.Stderr, "Problem parsing config (%s)", err)
 		os.Exit(1)
 	}
-	if Config.Install == nil {
-		Config.Install = &InstallConfig{}
+	if Config.Deploy == nil {
+		Config.Deploy = &InstallConfig{}
 	}
 }

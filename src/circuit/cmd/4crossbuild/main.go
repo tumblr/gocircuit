@@ -26,7 +26,7 @@ var flagShow = flag.Bool("show", true, "Verbose mode")
 func main() {
 	flag.Parse()
 	c := config.Config.Build
-	c.Binary = config.Config.Install.Worker
+	c.Binary = config.Config.Deploy.Worker
 	if c == nil {
 		println("Circuit build configuration not specified in environment")
 		os.Exit(1)

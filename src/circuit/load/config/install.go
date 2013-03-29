@@ -55,20 +55,20 @@ func (i *InstallConfig) ClearHelperPath() string {
 }
 
 func parseInstall() {
-	Config.Install = &InstallConfig{}
+	Config.Deploy = &InstallConfig{}
 
 	// Try parsing install config from environment
-	Config.Install.Dir = os.Getenv("_CIR_IR")
-	Config.Install.LibPath = os.Getenv("_CIR_IL")
-	Config.Install.Worker = os.Getenv("_CIR_IB")
-	if Config.Install.Dir != "" {
+	Config.Deploy.Dir = os.Getenv("_CIR_IR")
+	Config.Deploy.LibPath = os.Getenv("_CIR_IL")
+	Config.Deploy.Worker = os.Getenv("_CIR_IB")
+	if Config.Deploy.Dir != "" {
 		return
 	}
 
 	// Try parsing the install config from a file
 	ifile := os.Getenv("CIR_INSTALL")
 	if ifile == "" {
-		Config.Install = nil
+		Config.Deploy = nil
 		return
 	}
 	data, err := ioutil.ReadFile(ifile)
@@ -76,7 +76,7 @@ func parseInstall() {
 		fmt.Fprintf(os.Stderr, "Problem reading install config file (%s)", err)
 		os.Exit(1)
 	}
-	if err := json.Unmarshal(data, Config.Install); err != nil {
+	if err := json.Unmarshal(data, Config.Deploy); err != nil {
 		fmt.Fprintf(os.Stderr, "Problem parsing install config file (%s)", err)
 		os.Exit(1)
 	}

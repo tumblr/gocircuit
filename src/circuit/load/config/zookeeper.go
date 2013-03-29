@@ -79,7 +79,7 @@ func parseZookeeper() {
 		fmt.Fprintf(os.Stderr, "Problem reading install file (%s)", err)
 		os.Exit(1)
 	}
-	if err := json.Unmarshal(data, Config.Install); err != nil {
+	if err := json.Unmarshal(data, Config.Deploy); err != nil {
 		fmt.Fprintf(os.Stderr, "Problem parsing install file (%s)", err)
 		os.Exit(1)
 	}

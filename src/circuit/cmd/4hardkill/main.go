@@ -92,7 +92,7 @@ func main() {
 		if withID {
 			killSh = fmt.Sprintf("ps ax | grep -i %s | grep -v grep | awk '{print $1}' | xargs kill -KILL\n", id.String())
 		} else {
-			killSh = fmt.Sprintf("ps ax | grep -i %s | grep -v grep | awk '{print $1}' | xargs kill -KILL\n", config.Config.Install.Worker)
+			killSh = fmt.Sprintf("ps ax | grep -i %s | grep -v grep | awk '{print $1}' | xargs kill -KILL\n", config.Config.Deploy.Worker)
 		}
 		_, stderr, err := posix.Exec("ssh", "", killSh, h, "sh")
 		if err != nil {

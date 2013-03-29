@@ -64,7 +64,7 @@ func main() {
 	// Log into each host and kill pertinent workers, using POSIX kill
 	for _, h := range hosts {
 		println("Clearing dead worker jails on", h)
-		clearSh := fmt.Sprintf("%s %s\n", config.Config.Install.ClearHelperPath(), config.Config.Install.JailDir())
+		clearSh := fmt.Sprintf("%s %s\n", config.Config.Deploy.ClearHelperPath(), config.Config.Deploy.JailDir())
 		_, stderr, err := posix.Exec("ssh", "", clearSh, h, "sh")
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Problem while clearing jails on %s (%s)\n", h, err)

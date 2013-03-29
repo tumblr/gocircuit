@@ -21,7 +21,6 @@ import (
 	"strings"
 )
 
-
 func parseRepo(s string) (schema, key, value, url string) {
 	switch {
 	case strings.HasPrefix(s, "{hg}"):
@@ -139,7 +138,7 @@ func syncRsyncRepo(dir, url string) {
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		Fatalf("Problem creating repo directory (%s)\n", err)
 	}
-	if err := Shell(x.env, "", "rsync -acrv --delete --exclude .git --exclude .hg --exclude *.a " + url + "/* " + dir + "/"); err != nil {
+	if err := Shell(x.env, "", "rsync -acrv --delete --exclude .git --exclude .hg --exclude *.a "+url+"/* "+dir+"/"); err != nil {
 		Fatalf("Problem rsyncing dir '%s' to within '%s' (%s)", url, dir, err)
 	}
 }
@@ -186,7 +185,7 @@ func SyncRepo(namespace, repo, relGoPath string, fetchFresh, updateGoPath bool) 
 	x.goPath[namespace] = p
 	if updateGoPath {
 		oldGoPath := x.env.Get("GOPATH")
-		x.env.Set("GOPATH", p + ":" + oldGoPath)
+		x.env.Set("GOPATH", p+":"+oldGoPath)
 	}
 	return
 }

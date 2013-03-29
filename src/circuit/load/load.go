@@ -48,9 +48,9 @@ func init() {
 
 	switch config.Role {
 	case config.Main:
-		start(false, config.Config.Zookeeper, config.Config.Install, config.Config.Spark)
+		start(false, config.Config.Zookeeper, config.Config.Deploy, config.Config.Spark)
 	case config.Worker:
-		start(true, config.Config.Zookeeper, config.Config.Install, config.Config.Spark)
+		start(true, config.Config.Zookeeper, config.Config.Deploy, config.Config.Spark)
 	case config.Daemonizer:
 		workerBackend.Daemonize(config.Config)
 	default:

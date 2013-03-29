@@ -99,7 +99,7 @@ func (c *Config) Spawn(host string, anchors ...string) (circuit.Addr, error) {
 			Anchor:   append(anchors, fmt.Sprintf("/host/%s", host)),
 		},
 		Zookeeper: config.Config.Zookeeper,
-		Install:   config.Config.Install,
+		Deploy:    config.Config.Deploy,
 	}
 	if err := json.NewEncoder(stdin).Encode(wc); err != nil {
 		return nil, err

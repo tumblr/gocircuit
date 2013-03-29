@@ -62,7 +62,7 @@ func main() {
 	//println(fmt.Sprintf("%#v\n", x.env))
 	x.jail = flags.Jail
 	x.workerPkg = flags.WorkerPkg
-	x.cmdPkgs   = flags.CmdPkgs
+	x.cmdPkgs = flags.CmdPkgs
 	x.zinclude = flags.ZInclude
 	x.zlib = flags.ZLib
 	x.goPath = make(map[string]string)
@@ -106,7 +106,7 @@ func shipCircuit() string {
 	println("--Packaging worker", x.binary)
 	binpkg := workerPkgPath()
 	_, workerName := path.Split(binpkg)
-	shipFile := path.Join(tmpdir, x.binary)	// Destination binary location and name
+	shipFile := path.Join(tmpdir, x.binary) // Destination binary location and name
 	if _, err = CopyFile(path.Join(binpkg, workerName), shipFile); err != nil {
 		Fatalf("Problem copying circuit worker binary (%s)\n", err)
 	}
@@ -142,10 +142,10 @@ func shipCircuit() string {
 	// Place the zookeeper dynamic libraries in the shipment
 	// Shipping Zookeeper is not necessary when static linking (currently enabled).
 	/*
-	println("--Packaging Zookeeper libraries")
-	if err = ShellCopyFile(path.Join(x.zlib, "libzookeeper*"), tmpdir+"/"); err != nil {
-		Fatalf("Problem copying Zookeeper library files (%s)\n", err)
-	}
+		println("--Packaging Zookeeper libraries")
+		if err = ShellCopyFile(path.Join(x.zlib, "libzookeeper*"), tmpdir+"/"); err != nil {
+			Fatalf("Problem copying Zookeeper library files (%s)\n", err)
+		}
 	*/
 
 	return tmpdir
@@ -168,7 +168,7 @@ func buildCircuit() {
 
 	// Prepare cgo environment for Zookeeper
 	// TODO: Add Zookeeper build step. Don't rely on a prebuilt one.
-	x.env.Set("CGO_CFLAGS", "-I" + x.zinclude)
+	x.env.Set("CGO_CFLAGS", "-I"+x.zinclude)
 
 	// Static linking (not available in Go1.0.3, available later, in code.google.com/p/go changeset +4ad21a3b23a4, for example)
 	x.env.Set("CGO_LDFLAGS", path.Join(x.zlib, "libzookeeper_mt.a"))
@@ -190,7 +190,7 @@ func buildCircuit() {
 	// Re-build command-line tools
 	for _, cpkg := range cmdPkg {
 		println("--Building helper", cpkg)
-		if err := Shell(x.env, helperPkgPath(cpkg), x.goCmd + " build -a"); err != nil {
+		if err := Shell(x.env, helperPkgPath(cpkg), x.goCmd+" build -a"); err != nil {
 			Fatalf("Problem compiling %s (%s)\n", cpkg, err)
 		}
 	}
@@ -206,14 +206,14 @@ func buildCircuit() {
 	// Understand what is going on. The flag should not be needed as the
 	// circuit should see the changes in the sources inside the build jail.
 	// Is this a file timestamp problem introduced by rsync?
-	if err := Shell(x.env, binpkg, x.goCmd + " build -a"); err != nil {
+	if err := Shell(x.env, binpkg, x.goCmd+" build -a"); err != nil {
 		Fatalf("Problem with ‘(working directory %s) %s build’ (%s)\n", binpkg, x.goCmd, err)
 	}
 
 	// Build additional program packages
 	for _, cmdpkg := range x.cmdPkgs {
 		println("--Building command", cmdpkg)
-		if err := Shell(x.env, cmdPkgPath(cmdpkg), x.goCmd + " build -a"); err != nil {
+		if err := Shell(x.env, cmdPkgPath(cmdpkg), x.goCmd+" build -a"); err != nil {
 			Fatalf("Problem compiling %s (%s)\n", cmdpkg, err)
 		}
 	}
@@ -240,6 +240,6 @@ func buildGoCompiler(goRepo string, rebuild bool) {
 	x.goRoot = path.Join(x.jail, "/go")
 	x.goBin = path.Join(x.goRoot, "/bin")
 	x.goCmd = path.Join(x.goBin, "go")
-	x.env.Set("PATH", x.goBin + ":" + x.env.Get("PATH"))
+	x.env.Set("PATH", x.goBin+":"+x.env.Get("PATH"))
 	x.env.Set("GOROOT", x.goRoot)
 }

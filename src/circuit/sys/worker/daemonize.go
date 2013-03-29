@@ -86,7 +86,7 @@ func environLib() []string {
 func Daemonize(wc *config.WorkerConfig) {
 
 	// Make jail directory
-	jail := path.Join(wc.Install.JailDir(), wc.Spark.ID.String())
+	jail := path.Join(wc.Deploy.JailDir(), wc.Spark.ID.String())
 	pie(os.MkdirAll(jail, 0700))
 
 	// Prepare exec
