@@ -31,7 +31,7 @@ syntactically identical to Go while also:
 As a result, distributed application code becomes orders of magnitude shorter,
 as compared to using traditional alternatives. For isntance, we have been able
 to write large real-world cloud applications — e.g. streaming multi-stage
-MapReduce pipelines — in as many as 200 lines of code.
+MapReduce pipelines — in as many as 200 lines of code _from the ground up_.
 
 For lifecycle maintenance, the circuit provides a powerful toolkit that can
 introspect into, control and modify various dynamic aspects of a live circuit
