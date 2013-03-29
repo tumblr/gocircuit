@@ -67,7 +67,7 @@ func (c *Config) Spawn(host string, anchors ...string) (circuit.Addr, error) {
 	id := circuit.ChooseWorkerID()
 
 	// Forward the stderr of the ssh process to this process' stderr
-	posix.ForwardStderr(fmt.Sprintf("%s.dmnzr/err: ", id), stderr)
+	posix.ForwardStderr(fmt.Sprintf("%s:kicker/err| ", id), stderr)
 
 	// Start process
 	if err := cmd.Start(); err != nil {
