@@ -31,7 +31,7 @@ const build_sh_src = `{{.Tool}} ` +
 	`'-binary={{.Binary}}' '-jail={{.Jail}}' ` +
 	`'-app={{.AppRepo}}' '-appsrc={{.AppSrc}}' ` +
 	`'-workerpkg={{.WorkerPkg}}' '-show={{.Show}}' '-go={{.GoRepo}}' '-rebuildgo={{.RebuildGo}}' ` +
-	`'-cmdpkgs={{range .CmdPkgs}}{{.}},{{end}'` +
+	`'-cmdpkgs={{range .CmdPkgs}}{{.}},{{end}}' ` +
 	`'-zinclude={{.ZookeeperInclude}}' '-zlib={{.ZookeeperLib}}' ` +
 	`'-cir={{.CircuitRepo}}' '-cirsrc={{.CircuitSrc}}' '-prefixpath={{.PrefixPath}}' `
 

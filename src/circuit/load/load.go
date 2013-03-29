@@ -81,7 +81,7 @@ func start(isWorker bool, z *config.ZookeeperConfig, i *config.InstallConfig, s 
 	issuefs.Bind(zissuefs.New(iconn, z.IssueDir()))
 
 	// Initialize the networking module
-	worker.Bind(workerBackend.New(i.LibPath, path.Join(i.BinDir(), i.Binary), i.JailDir()))
+	worker.Bind(workerBackend.New(i.LibPath, path.Join(i.BinDir(), i.Worker), i.JailDir()))
 
 	// Initialize transport module
 	t := transport.New(s.ID, s.BindAddr, s.Host)

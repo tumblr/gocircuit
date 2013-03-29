@@ -27,7 +27,7 @@ import (
 // ZookeeperConfig holds configuration parameters regarding the zookeeper cluster for the circuit
 type ZookeeperConfig struct {
 	Workers []string // Access points for the Zookeeper cluster
-	RootDir string   // Root directory for this circuit instance within Zookeeper
+	Dir     string   // Root directory for this circuit instance within Zookeeper
 }
 
 // Zookeepers returns the set of Zookeeper workers in Zookeeper config format as a single string.
@@ -44,17 +44,17 @@ func (z *ZookeeperConfig) Zookeepers() string {
 
 // AnchorDir returns the Zookeeper node rooting the anchor file system
 func (z *ZookeeperConfig) AnchorDir() string {
-	return path.Join(z.RootDir, "anchor")
+	return path.Join(z.Dir, "anchor")
 }
 
 // IssueDir returns the Zookeeper node rooting the issue file system
 func (z *ZookeeperConfig) IssueDir() string {
-	return path.Join(z.RootDir, "issue")
+	return path.Join(z.Dir, "issue")
 }
 
 // DurableDir returns the Zookeeper node rooting the durable file system
 func (z *ZookeeperConfig) DurableDir() string {
-	return path.Join(z.RootDir, "durable")
+	return path.Join(z.Dir, "durable")
 }
 
 func parseZookeeper() {
@@ -64,8 +64,8 @@ func parseZookeeper() {
 	zw := os.Getenv("_CIR_ZW")
 	if zw != "" {
 		Config.Zookeeper.Workers = strings.Split(zw, ",")
-		Config.Zookeeper.RootDir = os.Getenv("_CIR_ZR")
-		if Config.Zookeeper.RootDir == "" {
+		Config.Zookeeper.Dir = os.Getenv("_CIR_ZR")
+		if Config.Zookeeper.Dir == "" {
 			fmt.Fprintf(os.Stderr, "No Zookeeper root directory in $_CIR_ZR")
 			Config.Zookeeper = nil
 		}

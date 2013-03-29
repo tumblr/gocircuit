@@ -24,29 +24,29 @@ import (
 
 // InstallConfig holds configuration parameters regarding circuit installation on host machines
 type InstallConfig struct {
-	RootDir string // Root directory of circuit installation on
+	Dir     string // Root directory of circuit installation on
 	LibPath string // Any additions to the library path for execution time
-	Binary  string // Desired name for the circuit runtime binary
+	Worker  string // Desired name for the circuit runtime binary
 }
 
 // BinDir returns the binary install directory
 func (i *InstallConfig) BinDir() string {
-	return path.Join(i.RootDir, "bin")
+	return path.Join(i.Dir, "bin")
 }
 
 // JailDir returns the jail install directory
 func (i *InstallConfig) JailDir() string {
-	return path.Join(i.RootDir, "jail")
+	return path.Join(i.Dir, "jail")
 }
 
 // VarDir returns the var install directory
 func (i *InstallConfig) VarDir() string {
-	return path.Join(i.RootDir, "var")
+	return path.Join(i.Dir, "var")
 }
 
 // BinaryPath returns the absolute path to the worker binary
 func (i *InstallConfig) BinaryPath() string {
-	return path.Join(i.BinDir(), i.Binary)
+	return path.Join(i.BinDir(), i.Worker)
 }
 
 // ClearHelperPath returns the absolute path to the clear-tool helper binary
@@ -58,10 +58,10 @@ func parseInstall() {
 	Config.Install = &InstallConfig{}
 
 	// Try parsing install config from environment
-	Config.Install.RootDir = os.Getenv("_CIR_IR")
+	Config.Install.Dir = os.Getenv("_CIR_IR")
 	Config.Install.LibPath = os.Getenv("_CIR_IL")
-	Config.Install.Binary = os.Getenv("_CIR_IB")
-	if Config.Install.RootDir != "" {
+	Config.Install.Worker = os.Getenv("_CIR_IB")
+	if Config.Install.Dir != "" {
 		return
 	}
 
