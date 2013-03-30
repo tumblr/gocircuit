@@ -16,7 +16,7 @@ package util
 
 import (
 	"sync"
-	"circuit/kit/levigo"
+	"circuit/kit/database/levigo"
 )
 
 type Server struct {

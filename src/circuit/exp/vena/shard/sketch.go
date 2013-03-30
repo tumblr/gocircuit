@@ -21,10 +21,41 @@ import (
 	"encoding/binary"
 )
 
+// TagID is the type of integral IDs that string tag key values are hashed to
+type TagID uint32
+
+// ValueID is the type of integral IDs that string tag values are hashed to
+type ValueID uint32
+
+// RowValue represents the row value used for the sketch tables in LevelDB
+type RowValue struct {
+	Tags  map[TagID]ValueID
+	Sum   float64
+	SumSq float64
+	Count uint32
+}
+
+func DecodeRowValue(raw []byte) (*RowValue, error) {
+	rowValue := &RowValue{}
+	if err := binary.Read(bytes.NewBuffer(raw), binary.BigEndian, rowValue); err != nil {
+		return nil, err
+	}
+	return rowValue, nil
+}
+
+// Encode returns the raw LevelDB representation of this row value
+func (rowValue *RowValue) Encode() []byte {
+	var w bytes.Buffer
+	if err := binary.Write(&w, binary.BigEndian, rowValue); err != nil {
+		panic("leveldb row value encoding")
+	}
+	return w.Bytes()
+}
+
 // RowKey represents the row key used for the sketch tables in LevelDB
 type RowKey struct {
-	MetricID int64 // Metric ID is a hash of the metric name
-	Time     int64 // Time in nanoseconds since epoch
+	MetricID proto.MetricID // Metric ID is a hash of the metric name
+	Time     int64          // Time in nanoseconds since epoch
 }
 
 func DecodeRowKey(raw []byte) (*RowKey, error) {
@@ -45,7 +76,7 @@ func (rowKey *RowKey) Encode() []byte {
 	var w bytes.Buffer
 	sortKey := *rowKey
 	if err := binary.Write(&w, binary.BigEndian, sortKey); err != nil {
-		panic("leveldb timeline row key encoding")
+		panic("leveldb row key encoding")
 	}
 	return w.Bytes()
 }
