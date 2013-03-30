@@ -32,13 +32,10 @@ func usage() {
 	os.Exit(1)
 }
 
-var (
-	flagDir     = flag.Bool("d", false, "Kill all workers in a directory")
-	flagRecurse = flag.Bool("r", false, "Kill all workers descendant to a directory")
-)
-
 func main() {
+	flag.Usage = usage
 	flag.Parse()
+
 	anchor, file, recurse, err := parse(flag.Arg(0))
 	if err != nil {
 		usage()
