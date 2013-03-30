@@ -1,6 +1,6 @@
 package levigo
 
-// #cgo LDFLAGS: -lleveldb
+// // #cgo LDFLAGS: -lleveldb (comment out in favor of static linking thru CGO_LDFLAGS)
 // #include "leveldb/c.h"
 import "C"
 

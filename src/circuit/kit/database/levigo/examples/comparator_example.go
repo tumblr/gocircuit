@@ -1,7 +1,7 @@
 package main
 
 /*
-#cgo LDFLAGS: -lleveldb
+// has_cgo LDFLAGS: -lleveldb
 #include <string.h>
 #include <leveldb/c.h>
 
