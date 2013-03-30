@@ -2,9 +2,6 @@ no CIR error msg
 Zookeeper->Runtime
 containers for code blocks
 
-add read order cues
-
-test everything against a release version of Go
 test against linux
 wipe repo
 repo release/master branches
