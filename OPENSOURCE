@@ -6,3 +6,4 @@ test against linux
 wipe repo
 repo release/master branches
 gofmt all
+clear /petar

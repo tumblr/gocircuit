@@ -1,3 +1,5 @@
+Find comprehensive documentation in `/doc/index.html`
+
 A new abstraction for developing and maintaining Big Data applications
 ======================================================================
 
