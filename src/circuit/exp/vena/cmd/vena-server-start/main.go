@@ -20,7 +20,6 @@ import (
 	_ "circuit/load"
 	"encoding/json"
 	"flag"
-	"fmt"
 	"io/ioutil"
 	"os"
 )
@@ -47,11 +46,6 @@ func main() {
 	}
 
 	println("Starting VENA shard servers")
-	??
-	chk := server.Spawn(*flagDurable, config)
-	for _, wchk := range chk.Workers {
-		fmt.Printf("––Started server: worker=%s key=%s\n", w.Addr.WorkerID(), w.ShardKey)
-	}
-
+	server.Spawn(config)
 	println("VENA servers started successfully.")
 }
