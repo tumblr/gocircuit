@@ -21,12 +21,38 @@ import (
 	"encoding/binary"
 )
 
+// RowKey represents the row key used for the sketch tables in LevelDB
+type RowKey struct {
+	SpaceID proto.SpaceID // Metric ID is a hash of the metric name
+	Time    int64         // Time in nanoseconds since epoch
+}
+
+func DecodeRowKey(raw []byte) (*RowKey, error) {
+	rowKey := &RowKey{}
+	if err := binary.Read(bytes.NewBuffer(raw), binary.BigEndian, rowKey); err != nil {
+		return nil, err
+	}
+	return rowKey, nil
+}
+
+// ShardKey returns an xor.Key which determines in which shard this row belongs.
+func (rowKey *RowKey) ShardKey() xor.Key {
+	return rowKey.SpaceID.ShardKey()
+}
+
+// Encode returns the raw LevelDB representation of this row key
+func (rowKey *RowKey) Encode() []byte {
+	var w bytes.Buffer
+	sortKey := *rowKey
+	if err := binary.Write(&w, binary.BigEndian, sortKey); err != nil {
+		panic("leveldb row key encoding")
+	}
+	return w.Bytes()
+}
+
 // RowValue represents the row value used for the sketch tables in LevelDB
 type RowValue struct {
-	Tags  map[TagID]ValueID
-	Sum   float64
-	SumSq float64
-	Count uint32
+	Value float64
 }
 
 func DecodeRowValue(raw []byte) (*RowValue, error) {
@@ -42,35 +68,6 @@ func (rowValue *RowValue) Encode() []byte {
 	var w bytes.Buffer
 	if err := binary.Write(&w, binary.BigEndian, rowValue); err != nil {
 		panic("leveldb row value encoding")
-	}
-	return w.Bytes()
-}
-
-// RowKey represents the row key used for the sketch tables in LevelDB
-type RowKey struct {
-	MetricID proto.MetricID // Metric ID is a hash of the metric name
-	Time     int64          // Time in nanoseconds since epoch
-}
-
-func DecodeRowKey(raw []byte) (*RowKey, error) {
-	rowKey := &RowKey{}
-	if err := binary.Read(bytes.NewBuffer(raw), binary.BigEndian, rowKey); err != nil {
-		return nil, err
-	}
-	return rowKey, nil
-}
-
-// ShardKey returns an xor.Key which determines in which shard this row belongs.
-func (rowKey *RowKey) ShardKey() xor.Key {
-	return proto.ShardKeyOf(rowKey.MetricID)
-}
-
-// Encode returns the raw LevelDB representation of this row key
-func (rowKey *RowKey) Encode() []byte {
-	var w bytes.Buffer
-	sortKey := *rowKey
-	if err := binary.Write(&w, binary.BigEndian, sortKey); err != nil {
-		panic("leveldb row key encoding")
 	}
 	return w.Bytes()
 }

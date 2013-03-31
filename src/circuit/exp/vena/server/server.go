@@ -16,9 +16,8 @@
 package server
 
 import (
-	"circuit/exp/shuttr/proto"
-	"circuit/exp/shuttr/util"
-	"errors"
+	"circuit/exp/vena/proto"
+	"circuit/exp/vena/util"
 	"sync"
 )
 
@@ -26,7 +25,7 @@ type Server struct {
 	util.Server
 	wlk, rlk sync.Mutex
 	nwrite   int64
-	nread    int64
+	nquery   int64
 }
 
 func NewServer(dbDir string, cacheSize int) (*Server, error) {
@@ -37,23 +36,16 @@ func NewServer(dbDir string, cacheSize int) (*Server, error) {
 	return t, nil
 }
 
-func (srv *Server) Add(xadd *proto.XAdd) error {
-	?
-	rowKey := &RowKey{
-		TimelineID: xmsg.TimelineID,
-		PostID:     xmsg.PostID,
-	}
+func (srv *Server) Add(time int64, spaceID proto.SpaceID, value float64) error {
+	rowKey := &RowKey{SpaceID: spaceID, Time: time}
+	rowValue := &RowValue{Value: value}
 	srv.wlk.Lock()
 	wopts := srv.WriteNoSync
-	// Post creations may even have to be synced on each write, because the timeline is the
-	// point of truth. Syncing on every 100 requests means that in the event of failure,
-	// about a 100 users will lose one post.
-	//
-	if srv.nwrite%100 == 0 {
+	if srv.nwrite % 100 == 0 {
 		wopts = srv.WriteSync
 	}
 	srv.wlk.Unlock()
-	if err := srv.DB.Put(wopts, rowKey.Encode(), nil); err != nil {
+	if err := srv.DB.Put(wopts, rowKey.Encode(), rowValue.Encode()); err != nil {
 		return err
 	}
 	srv.wlk.Lock()
@@ -62,36 +54,45 @@ func (srv *Server) Add(xadd *proto.XAdd) error {
 	return nil
 }
 
-func (srv *Server) Query(xq *proto.XTimelineQuery) ([]int64, error) {
-	if xq.BeforePostID <= 0 {
-		return nil, errors.New("non-positive post ID is not a valid post")
+type Point struct {
+	Time  int64
+	Value float64
+}
+
+func (srv *Server) Query(spaceID proto.SpaceID, minTime, maxTime int64, stat proto.Stat, velocity bool) ([]*Point, error) {
+	if minTime >= maxTime {
+		return nil, nil
 	}
-	copyKey := &RowKey{
-		TimelineID: xq.TimelineID,
-		PostID:     xq.BeforePostID - 1,
-	}
+	pivot := &RowKey{SpaceID: spaceID, Time: minTime}
 
 	iter := srv.Server.DB.NewIterator(srv.Server.ReadAndCache)
 	defer iter.Close()
 
-	iter.Seek(copyKey.Encode())
+	iter.Seek(pivot.Encode())
 	if !iter.Valid() {
 		return nil, nil
 	}
-	result := make([]int64, 0, xq.Limit)
-	for len(result) < xq.Limit && iter.Valid() {
-		g, err := DecodeRowKey(iter.Key())
+
+	const limit = 1e4 // Maximum number of result points
+	result := make([]*Point, 0, limit)
+
+	for len(result) < limit && iter.Valid() {
+		key, err := DecodeRowKey(iter.Key())
 		if err != nil {
 			return nil, err
 		}
-		if g.TimelineID != xq.TimelineID {
+		if key.SpaceID != spaceID || key.Time >= maxTime {
 			break
 		}
-		result = append(result, g.PostID)
+		value, err := DecodeRowValue(iter.Value())
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, &Point{Time: key.Time, Value: value.Value})
 		iter.Next()
 	}
 	srv.rlk.Lock()
-	srv.nread++
+	srv.nquery++
 	srv.rlk.Unlock()
 	return result, nil
 }

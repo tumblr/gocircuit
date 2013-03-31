@@ -18,6 +18,7 @@ import (
 	"circuit/kit/xor"
 	"encoding/binary"
 	"hash/fnv"
+	"sort"
 )
 
 type tagValue struct {
@@ -27,18 +28,18 @@ type tagValue struct {
 
 type sortTagValues []tagValue
 
-func (stv sortTagValue) Len() int {
+func (stv sortTagValues) Len() int {
 	return len(stv)
 }
 
-func (stv sortTagValue) Less(i, j int) bool {
+func (stv sortTagValues) Less(i, j int) bool {
 	if stv[i].TagID == stv[j].TagID {
 		return stv[i].ValueID < stv[j].ValueID
 	}
 	return stv[i].TagID < stv[j].TagID
 }
 
-func (stv sortTagValue) Swap(i, j int) {
+func (stv sortTagValues) Swap(i, j int) {
 	stv[i], stv[j] = stv[j], stv[i]
 }
 
@@ -56,27 +57,27 @@ func HashSpace(m MetricID, t map[TagID]ValueID) SpaceID {
 		tags = append(tags, tagValue{k, v})
 	}
 	sort.Sort(tags)
-	for _, tv := range tags {
-		??
+	if err := binary.Write(h, binary.BigEndian, tags); err != nil {
+		panic(err.Error())
 	}
-	return ValueID(h.Sum64())
+	return SpaceID(h.Sum64())
 }
 
 // MetricID is a unique identifier for a metric name
 type MetricID uint32
 
-func HashMetric(m string) MetricID {
+func HashMetric(s string) MetricID {
 	h := fnv.New32a()
-	h.Write(m)
+	h.Write([]byte(s))
 	return MetricID(h.Sum32())
 }
 
 // TagID is the type of integral IDs that string tag key values are hashed to
 type TagID uint32
 
-func HashTag(t string) TagID {
+func HashTag(s string) TagID {
 	h := fnv.New32a()
-	h.Write(t)
+	h.Write([]byte(s))
 	return TagID(h.Sum32())
 }
 
@@ -84,26 +85,14 @@ func HashTag(t string) TagID {
 // The zero value represents a wildcard tag value in a query context.
 type ValueID uint32
 
-func HashValue(t string) ValueID {
+func HashValue(s string) ValueID {
 	h := fnv.New32a()
-	h.Write(t)
+	h.Write([]byte(s))
 	return ValueID(h.Sum32())
 }
 
-type XAdd struct {
-	MetricID MetricID
-	Time     int64
-	Tags     map[TagID]ValueID
-	Value    float64
-}
-
-type XQuery struct {
-	MetricID         MetricID
-	MinTime, MaxTime int64
-	Tags             map[TagID]ValueID
-	Stat             Stat			// Statistic SUM or AVG
-	Velocity         bool                   // Output first derivative of statistic
-}
+// Stat identifies the type of a statistic
+type Stat byte
 
 const (
 	Sum Stat = iota
