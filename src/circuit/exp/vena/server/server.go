@@ -28,14 +28,14 @@ func init() {
 	circuit.RegisterFunc(start{})
 }
 
-func (start) Start(dbDir string, cacheSize int) (circuit.XPerm, error) {
+func (start) Start(dbDir string, cacheSize int) circuit.XPerm {
 	srv, err := New(dbDir, cacheSize)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 	circuit.Listen("vena", srv)
 	circuit.Daemonize(func() { <-(chan int)(nil) })
-	return circuit.PermRef(srv), nil
+	return circuit.PermRef(srv)
 }
 
 type Server struct {

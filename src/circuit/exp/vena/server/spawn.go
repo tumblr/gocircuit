@@ -17,33 +17,22 @@ package server
 import (
 	"circuit/exp/vena"
 	"circuit/kit/sched/limiter"
-	"circuit/kit/xor"
 	"circuit/use/circuit"
 )
 
 func Spawn(config *vena.Config) {
-	lmtr.Init(20)
-	for i_, sh_ := range config.Shard {
-		i, sh := i_, sh_
-		lmtr.Go(
-			func() {
-				x, addr, err := spawn(sh, anchor)
-				if err != nil {
-					println("VENA shard %s spawn error (%s)", sh.Host, err)
-					return
-				}
-			},
-		)
+	lmtr := limiter.New(20)
+	for _, sh_ := range config.Shard {
+		sh := sh_
+		lmtr.Go(func() { spawn(sh, config.ShardAnchor(sh.Key)) })
 	}
 	lmtr.Wait()
 }
 
 func spawn(config *vena.ShardConfig, anchor string) {
-	retrn, addr, err := circuit.Spawn(sh.Host, []string{anchor}, main{}, sh.DiskPath, sh.Forget)
-	if retrn[1] != nil {
-		err = retrn[1].(error)
-		return nil, nil, err
+	_, addr, err := circuit.Spawn(config.Host, []string{anchor}, start{}, config.Dir, config.Cache)
+	if err != nil {
+		panic(err)
 	}
-
-	return retrn[0].(circuit.XPerm), addr, nil
+	println("Shard started", addr.String())
 }

@@ -12,6 +12,7 @@ type Config struct {
 
 type ShardConfig struct {
 	Key   xor.Key
+	Host  string
 	Dir   string
 	Cache int
 }
