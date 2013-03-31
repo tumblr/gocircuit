@@ -72,7 +72,7 @@ func (cli *Client) addServer(shardKey xor.Key) {
 	panic("found no shard workers")
 }
 
-func (cli *Client) Add(time int64, metric string, tags map[string]string, value float64) error {
+func (cli *Client) Add(time vena.Time, metric string, tags map[string]string, value float64) error {
 	cli.almtr.Open()
 	defer cli.almtr.Close()
 

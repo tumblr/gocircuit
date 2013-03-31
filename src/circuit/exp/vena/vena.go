@@ -22,6 +22,8 @@ import (
 	"strings"
 )
 
+type Time int32
+
 type tagValue struct {
 	TagID
 	ValueID

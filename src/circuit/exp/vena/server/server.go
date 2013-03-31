@@ -37,7 +37,7 @@ func NewServer(dbDir string, cacheSize int) (*Server, error) {
 	return t, nil
 }
 
-func (srv *Server) Add(time int64, spaceID vena.SpaceID, value float64) error {
+func (srv *Server) Add(time vena.Time, spaceID vena.SpaceID, value float64) error {
 	rowKey := &RowKey{SpaceID: spaceID, Time: time}
 	rowValue := &RowValue{Value: value}
 	srv.wlk.Lock()
@@ -56,11 +56,11 @@ func (srv *Server) Add(time int64, spaceID vena.SpaceID, value float64) error {
 }
 
 type Point struct {
-	Time  int64
+	Time  vena.Time
 	Value float64
 }
 
-func (srv *Server) Query(spaceID vena.SpaceID, minTime, maxTime int64, stat vena.Stat, velocity bool) ([]*Point, error) {
+func (srv *Server) Query(spaceID vena.SpaceID, minTime, maxTime vena.Time, stat vena.Stat, velocity bool) ([]*Point, error) {
 	if minTime >= maxTime {
 		return nil, nil
 	}

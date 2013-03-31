@@ -24,7 +24,7 @@ import (
 // RowKey represents the row key used for the sketch tables in LevelDB
 type RowKey struct {
 	SpaceID vena.SpaceID // Metric ID is a hash of the metric name
-	Time    int64        // Time in nanoseconds since epoch
+	Time    vena.Time    // Time in seconds since epoch
 }
 
 func DecodeRowKey(raw []byte) (*RowKey, error) {
