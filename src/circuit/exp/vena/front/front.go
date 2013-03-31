@@ -23,13 +23,6 @@ import (
 
 var (
 	ErrMode      = circuit.NewError("write operation on read-only API")
-	ErrBackend   = circuit.NewError("backend")
-	ErrFormat    = circuit.NewError("format")
-	ErrFields    = circuit.NewError("bad fields")
-	ErrNoValue   = circuit.NewError("missing value")
-	ErrNoFeature = circuit.NewError("missing feature")
-	ErrFieldType = circuit.NewError("field type not string")
-	ErrTime      = circuit.NewError("time format")
 )
 
 type Front struct {

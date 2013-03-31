@@ -23,30 +23,28 @@ import (
 	"sync"
 )
 
-// Replenished holds the return values of a call to Replenish.
-type Replenished struct {
-	Config      *WorkerConfig // Config specifies a worker configuration passed to Replenish.
-	Addr        circuit.Addr
-	Replenished bool  // Replenished is true if the API worker on this host needed replenishing.
-	Err         error // Err is non-nil if the operation failed.
+type ReplenishResult struct {
+	Config  *WorkerConfig // Config specifies a worker configuration passed to Replenish.
+	Addr    circuit.Addr
+	Re      bool  // Re is true if the front worker on this host needed replenishing.
+	Err     error // Err is non-nil if the operation failed.
 }
 
-// durableFile is the name of the durable file describing the SUMR server cluster
-func Replenish(durableFile string, c *Config) []*Replenished {
+func Replenish(c *vena.Config, f *Config) []*ReplenishResult {
 	var (
 		lk   sync.Mutex
 		lmtr limiter.Limiter
 	)
-	r := make([]*Replenished, len(c.Workers))
+	r := make([]*ReplenishResult, len(f.Workers))
 	lmtr.Init(20)
-	for i_, wcfg_ := range c.Workers {
-		i, wcfg := i_, wcfg_
+	for i_, w_ := range f.Workers {
+		i, w := i_, w_
 		lmtr.Go(
 			func() {
-				re, addr, err := replenishWorker(durableFile, c, i)
+				re, addr, err := replenish(c, c.Worker(i))
 				lk.Lock()
 				defer lk.Unlock()
-				r[i] = &Replenished{Config: wcfg, Addr: addr, Replenished: re, Err: err}
+				r[i] = &ReplenishResult{Config: w, Addr: addr, Replenished: re, Err: err}
 			},
 		)
 	}
@@ -54,10 +52,9 @@ func Replenish(durableFile string, c *Config) []*Replenished {
 	return r
 }
 
-func replenishWorker(durableFile string, c *Config, i int) (replenished bool, addr circuit.Addr, err error) {
+func replenish(c *vena.Config, w *WorkerConfig, anchor string) (re bool, addr circuit.Addr, err error) {
 
 	// Check if worker already running
-	anchor := path.Join(c.Anchor, strconv.Itoa(i))
 	dir, e := anchorfs.OpenDir(anchor)
 	if e != nil {
 		return false, nil, e
@@ -71,13 +68,9 @@ func replenishWorker(durableFile string, c *Config, i int) (replenished bool, ad
 	}
 
 	// If not, start a new worker
-	retrn, addr, err := circuit.Spawn(c.Workers[i].Host, []string{anchor}, start{}, durableFile, c.Workers[i].Port, c.ReadOnly)
+	_, addr, err := circuit.Spawn(w.Host, []string{anchor}, start{}, c, w.HTTPPort, w.TSDBPort)
 	if err != nil {
 		return false, nil, err
-	}
-	if retrn[1] != nil {
-		err = retrn[1].(error)
-		return false, addr, err
 	}
 
 	return true, addr, nil
@@ -86,13 +79,12 @@ func replenishWorker(durableFile string, c *Config, i int) (replenished bool, ad
 // start is a worker function for starting an API worker
 type start struct{}
 
-func (start) Start(durableFile string, port int, readOnly bool) (circuit.XPerm, error) {
-	a, err := New(durableFile, port, readOnly)
-	if err != nil {
-		return nil, err
-	}
-	circuit.Daemonize(func() { <-(chan int)(nil) }) // Daemonize this worker forever, i.e. worker should never die
-	return circuit.PermRef(a), nil
+func (start) Start(c *vena.Config, httpPort, tsdbPort int) circuit.XPerm {
+	front := New(c, httpPort, tsdbPort)
+	circuit.Daemonize(func() { 
+		<-(chan int)(nil) 
+	})
+	return circuit.PermRef(front)
 }
 
 func init() {

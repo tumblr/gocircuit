@@ -16,23 +16,25 @@
 package main
 
 import (
-	"circuit/app/sumr/api"
+	"circuit/exp/vena/front"
 	"encoding/json"
 	"fmt"
 )
 
 func main() {
 	raw, _ := json.MarshalIndent(
-		&api.Config{
+		&front.Config{
 			Anchor: "",
-			Workers: []*api.WorkerConfig{
-				&api.WorkerConfig{
-					Host: "host3.datacenter.net",
-					Port: 4000,
+			Workers: []*front.WorkerConfig{
+				&front.WorkerConfig{
+					Host:     "host3.datacenter.net",
+					HTTPPort: 4001,
+					TSDBPort: 4002,
 				},
-				&api.WorkerConfig{
-					Host: "host4.datacenter.net",
-					Port: 4000,
+				&front.WorkerConfig{
+					Host:     "host4.datacenter.net",
+					HTTPPort: 4001,
+					TSDBPort: 4002,
 				},
 			},
 		},

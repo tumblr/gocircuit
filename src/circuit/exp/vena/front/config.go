@@ -14,22 +14,32 @@
 
 package front
 
-import "encoding/gob"
+import (
+	"encoding/gob"
+	"fmt"
+	"path"
+)
 
 func init() {
 	gob.Register(&Config{})
 	gob.Register(&WorkerConfig{})
 }
 
-// Config specifies a cluster of HTTP API servers
 type Config struct {
-	Anchor   string          // Anchor for the sumr API workers
-	ReadOnly bool            // Reject requests resulting in change
-	Workers  []*WorkerConfig // Specification of service workers
+	Anchor   string // Anchor for the front workers
+	Workers  []*WorkerConfig
 }
 
-// WorkerConfig specifies an individual API server
+func (c *Config) Anchor(i int) string {
+	return path.Join(c.Anchor, fmt.Sprintf("%s:(%d,%d)", c.Workers[i].Host, c.Workers[i].HTTPPort, c.Workers[i].TSDBPort))
+}
+
+func (c *Config) Worker(i int) (*WorkerConfig, string) {
+	return c.Workers[i], c.Anchor(i)
+}
+
 type WorkerConfig struct {
-	Host string // Host is the circuit hostname where the worker is to be deployed
-	Port int    // Port is the port number when the HTTP API server is to listen
+	Host string   // Host is the circuit hostname where the worker is to be deployed
+	HTTPPort int
+	TSDBPort int
 }
