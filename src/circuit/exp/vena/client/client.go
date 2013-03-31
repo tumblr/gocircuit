@@ -84,7 +84,7 @@ func (cli *Client) Put(time vena.Time, metric string, tags map[string]string, va
 
 	// Don't recover from dead shard panic, since we need to re-discover a different shard worker
 
-	retrn := x.Call("Add", time, spaceID, value)
+	retrn := x.Call("Put", time, spaceID, value)
 	if retrn[0] != nil {
 		return retrn[0].(error)
 	}

@@ -6,8 +6,14 @@ import (
 )
 
 type Config struct {
-	Shard  []xor.Key
+	Shard  []*ShardConfig
 	Anchor string // Root anchor for the shards
+}
+
+type ShardConfig struct {
+	Key   xor.Key
+	Dir   string
+	Cache int
 }
 
 func (c *Config) ShardAnchor(key xor.Key) string {

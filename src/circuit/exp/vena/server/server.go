@@ -22,6 +22,22 @@ import (
 	"sync"
 )
 
+type start struct{}
+
+func init() {
+	circuit.RegisterFunc(start{})
+}
+
+func (start) Start(dbDir string, cacheSize int) (circuit.XPerm, error) {
+	srv, err := New(dbDir, cacheSize)
+	if err != nil {
+		return nil, err
+	}
+	circuit.Listen("vena", srv)
+	circuit.Daemonize(func() { <-(chan int)(nil) })
+	return circuit.PermRef(srv), nil
+}
+
 type Server struct {
 	util.Server
 	wlk, rlk sync.Mutex
@@ -29,7 +45,7 @@ type Server struct {
 	nquery   int64
 }
 
-func NewServer(dbDir string, cacheSize int) (*Server, error) {
+func New(dbDir string, cacheSize int) (*Server, error) {
 	t := &Server{}
 	if err := t.Server.Init(dbDir, cacheSize); err != nil {
 		return nil, err
@@ -37,7 +53,7 @@ func NewServer(dbDir string, cacheSize int) (*Server, error) {
 	return t, nil
 }
 
-func (srv *Server) Add(time vena.Time, spaceID vena.SpaceID, value float64) error {
+func (srv *Server) Put(time vena.Time, spaceID vena.SpaceID, value float64) error {
 	rowKey := &RowKey{SpaceID: spaceID, Time: time}
 	rowValue := &RowValue{Value: value}
 	srv.wlk.Lock()
