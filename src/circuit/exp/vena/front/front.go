@@ -26,8 +26,8 @@ var (
 )
 
 type Front struct {
-	http   *httpServer
-	tsdb   *tsdbServer
+	//http   *httpServer
+	//tsdb   *tsdbServer
 	client *client.Client
 	lmtr   limiter.Limiter
 }
@@ -37,12 +37,14 @@ func init() {
 }
 
 func New(c *vena.Config, httpPort, tsdbPort int) *Front {
+	var err error
 	front := &Front{}
 	front.client, err = client.New(c)
 	if err != nil {
 		panic(err)
 	}
 	front.lmtr.Init(200)
+	/*
 	front.http, err = startHTTP(httpPort)
 	if err != nil {
 		panic(err)
@@ -51,12 +53,12 @@ func New(c *vena.Config, httpPort, tsdbPort int) *Front {
 	if err != nil {
 		panic(err)
 	}
+	*/
 	return front
 }
 
-// Given slice of AddRequests, fire a batch query to client and fetch responses as slice of Response
-// respondAdd will panic if the underlying sumr client panics.
-func (api *API) respondAdd(req []interface{}) []interface{} {
+/*
+func (front *API) respondAdd(req []interface{}) []interface{} {
 	api.lmtr.Open()
 	defer api.lmtr.Close()
 
@@ -91,3 +93,4 @@ func (api *API) respondSum(req []interface{}) []interface{} {
 	}
 	return s
 }
+*/

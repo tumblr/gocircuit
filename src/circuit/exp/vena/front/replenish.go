@@ -15,11 +15,10 @@
 package front
 
 import (
+	"circuit/exp/vena"
 	"circuit/kit/sched/limiter"
 	"circuit/use/anchorfs"
 	"circuit/use/circuit"
-	"path"
-	"strconv"
 	"sync"
 )
 
@@ -41,10 +40,10 @@ func Replenish(c *vena.Config, f *Config) []*ReplenishResult {
 		i, w := i_, w_
 		lmtr.Go(
 			func() {
-				re, addr, err := replenish(c, c.Worker(i))
+				re, addr, err := replenish(c, f.Workers[i], f.WorkerAnchor(i))
 				lk.Lock()
 				defer lk.Unlock()
-				r[i] = &ReplenishResult{Config: w, Addr: addr, Replenished: re, Err: err}
+				r[i] = &ReplenishResult{Config: w, Addr: addr, Re: re, Err: err}
 			},
 		)
 	}
@@ -68,8 +67,7 @@ func replenish(c *vena.Config, w *WorkerConfig, anchor string) (re bool, addr ci
 	}
 
 	// If not, start a new worker
-	_, addr, err := circuit.Spawn(w.Host, []string{anchor}, start{}, c, w.HTTPPort, w.TSDBPort)
-	if err != nil {
+	if _, addr, err = circuit.Spawn(w.Host, []string{anchor}, start{}, c, w.HTTPPort, w.TSDBPort); err != nil {
 		return false, nil, err
 	}
 

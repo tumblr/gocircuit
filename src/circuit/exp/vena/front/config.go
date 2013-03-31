@@ -30,12 +30,12 @@ type Config struct {
 	Workers  []*WorkerConfig
 }
 
-func (c *Config) Anchor(i int) string {
+func (c *Config) WorkerAnchor(i int) string {
 	return path.Join(c.Anchor, fmt.Sprintf("%s:(%d,%d)", c.Workers[i].Host, c.Workers[i].HTTPPort, c.Workers[i].TSDBPort))
 }
 
 func (c *Config) Worker(i int) (*WorkerConfig, string) {
-	return c.Workers[i], c.Anchor(i)
+	return c.Workers[i], c.WorkerAnchor(i)
 }
 
 type WorkerConfig struct {
