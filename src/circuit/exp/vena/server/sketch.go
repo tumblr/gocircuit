@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package shard
+package server
 
 import (
 	"bytes"
@@ -20,12 +20,6 @@ import (
 	"circuit/kit/xor"
 	"encoding/binary"
 )
-
-// TagID is the type of integral IDs that string tag key values are hashed to
-type TagID uint32
-
-// ValueID is the type of integral IDs that string tag values are hashed to
-type ValueID uint32
 
 // RowValue represents the row value used for the sketch tables in LevelDB
 type RowValue struct {

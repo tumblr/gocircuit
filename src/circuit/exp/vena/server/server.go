@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package shard implements the logic of a vena shard
-package shard
+// Package server implements the logic of a vena shard
+package server
 
 import (
 	"circuit/exp/shuttr/proto"
@@ -29,15 +29,16 @@ type Server struct {
 	nread    int64
 }
 
-func NewServer(dbDir string, cacheSize int) (*TimelineServer, error) {
-	t := &TimelineServer{}
+func NewServer(dbDir string, cacheSize int) (*Server, error) {
+	t := &Server{}
 	if err := t.Server.Init(dbDir, cacheSize); err != nil {
 		return nil, err
 	}
 	return t, nil
 }
 
-func (srv *TimelineServer) CreatePost(xmsg *proto.XCreatePost) error {
+func (srv *Server) Add(xadd *proto.XAdd) error {
+	?
 	rowKey := &RowKey{
 		TimelineID: xmsg.TimelineID,
 		PostID:     xmsg.PostID,
@@ -61,7 +62,7 @@ func (srv *TimelineServer) CreatePost(xmsg *proto.XCreatePost) error {
 	return nil
 }
 
-func (srv *TimelineServer) Query(xq *proto.XTimelineQuery) ([]int64, error) {
+func (srv *Server) Query(xq *proto.XTimelineQuery) ([]int64, error) {
 	if xq.BeforePostID <= 0 {
 		return nil, errors.New("non-positive post ID is not a valid post")
 	}
