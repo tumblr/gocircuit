@@ -1,14 +1,18 @@
 package front
 
 import (
+	"bufio"
+	"circuit/exp/vena"
 	"circuit/kit/sched/limiter"
+	"errors"
 	"net"
 	"strconv"
 	"strings"
 )
 
 type Replier interface {
-	Reply(??)
+	Put(string, vena.Time, []*tag, float64)
+	Quit()
 }
 
 func listenTSDB(addr string, reply Replier) {
@@ -18,7 +22,7 @@ func listenTSDB(addr string, reply Replier) {
 	}
 	// Accept incoming requests
 	go func() {
-		lmtr := l.New(100)	// At most 100 concurrent connections
+		lmtr := limiter.New(100)	// At most 100 concurrent connections
 		for {
 			lmtr.Open()
 			conn, err := l.Accept()
@@ -29,10 +33,11 @@ func listenTSDB(addr string, reply Replier) {
 			go func() {
 				defer lmtr.Close()
 				defer conn.Close()
+				defer recover()	// Recover from panics in reply logic
 				// Read request, send reply
 				r := bufio.NewReader(conn)
 				for {
-					line, err := bufio.ReadString("\n")
+					line, err := r.ReadString('\n')
 					if err != nil {
 						println("read line", err.Error())
 						break
@@ -45,13 +50,12 @@ func listenTSDB(addr string, reply Replier) {
 					if cmd == nil {
 						continue
 					}
-					switch cmd.(type) {
+					switch p := cmd.(type) {
 					case quit:
-						??
-					case put:
-						??
+						reply.Quit()
+					case *put:
+						reply.Put(p.Metric, p.Time, p.Tags, p.Value)
 					}
-					reply.Reply()
 				}
 			}()
 		}
@@ -60,10 +64,15 @@ func listenTSDB(addr string, reply Replier) {
 
 type quit struct{}
 
+type tag struct {
+	Name  string
+	Value string
+}
+
 type put struct{
 	Metric string
 	Time   vena.Time
-	Tags   []*struct{Tag, Value string}
+	Tags   []*tag
 	Value  float64
 }
 
@@ -99,7 +108,10 @@ func parse(l string) (interface{}, error) {
 	// Tags
 	for _, tv := range t {
 		q := strings.SplitN(tv, ":", 2)
-		a.Tags = append(a.Tags, &struct{Tag, Value string}{Tag: , Value: })
+		if len(q) != 2 {
+			return nil, errors.New("parse tag")
+		}
+		a.Tags = append(a.Tags, &tag{Name: q[0], Value: q[1]})
 	}
 	return a, nil
 }
