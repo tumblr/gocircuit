@@ -16,8 +16,9 @@
 package server
 
 import (
-	"circuit/exp/vena/proto"
+	"circuit/exp/vena"
 	"circuit/exp/vena/util"
+	"circuit/use/circuit"
 	"sync"
 )
 
@@ -36,7 +37,7 @@ func NewServer(dbDir string, cacheSize int) (*Server, error) {
 	return t, nil
 }
 
-func (srv *Server) Add(time int64, spaceID proto.SpaceID, value float64) error {
+func (srv *Server) Add(time int64, spaceID vena.SpaceID, value float64) error {
 	rowKey := &RowKey{SpaceID: spaceID, Time: time}
 	rowValue := &RowValue{Value: value}
 	srv.wlk.Lock()
@@ -46,7 +47,7 @@ func (srv *Server) Add(time int64, spaceID proto.SpaceID, value float64) error {
 	}
 	srv.wlk.Unlock()
 	if err := srv.DB.Put(wopts, rowKey.Encode(), rowValue.Encode()); err != nil {
-		return err
+		return circuit.FlattenError(err)
 	}
 	srv.wlk.Lock()
 	srv.nwrite++
@@ -59,7 +60,7 @@ type Point struct {
 	Value float64
 }
 
-func (srv *Server) Query(spaceID proto.SpaceID, minTime, maxTime int64, stat proto.Stat, velocity bool) ([]*Point, error) {
+func (srv *Server) Query(spaceID vena.SpaceID, minTime, maxTime int64, stat vena.Stat, velocity bool) ([]*Point, error) {
 	if minTime >= maxTime {
 		return nil, nil
 	}
@@ -79,14 +80,14 @@ func (srv *Server) Query(spaceID proto.SpaceID, minTime, maxTime int64, stat pro
 	for len(result) < limit && iter.Valid() {
 		key, err := DecodeRowKey(iter.Key())
 		if err != nil {
-			return nil, err
+			return nil, circuit.FlattenError(err)
 		}
 		if key.SpaceID != spaceID || key.Time >= maxTime {
 			break
 		}
 		value, err := DecodeRowValue(iter.Value())
 		if err != nil {
-			return nil, err
+			return nil, circuit.FlattenError(err)
 		}
 		result = append(result, &Point{Time: key.Time, Value: value.Value})
 		iter.Next()

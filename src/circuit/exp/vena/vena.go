@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package proto
+package vena
 
 import (
 	"circuit/kit/xor"
 	"encoding/binary"
 	"hash/fnv"
 	"sort"
+	"strings"
 )
 
 type tagValue struct {
@@ -89,6 +90,15 @@ func HashValue(s string) ValueID {
 	h := fnv.New32a()
 	h.Write([]byte(s))
 	return ValueID(h.Sum32())
+}
+
+func Hash(metric string, tags map[string]string) SpaceID {
+	metricID := HashMetric(metric)
+	tagID := make(map[TagID]ValueID)
+	for t, v := range tags {
+		tagID[HashTag(strings.TrimSpace(t))] = HashValue(strings.TrimSpace(v))
+	}
+	return HashSpace(metricID, tagID)
 }
 
 // Stat identifies the type of a statistic

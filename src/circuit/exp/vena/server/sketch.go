@@ -16,15 +16,15 @@ package server
 
 import (
 	"bytes"
-	"circuit/exp/vena/proto"
+	"circuit/exp/vena"
 	"circuit/kit/xor"
 	"encoding/binary"
 )
 
 // RowKey represents the row key used for the sketch tables in LevelDB
 type RowKey struct {
-	SpaceID proto.SpaceID // Metric ID is a hash of the metric name
-	Time    int64         // Time in nanoseconds since epoch
+	SpaceID vena.SpaceID // Metric ID is a hash of the metric name
+	Time    int64        // Time in nanoseconds since epoch
 }
 
 func DecodeRowKey(raw []byte) (*RowKey, error) {
