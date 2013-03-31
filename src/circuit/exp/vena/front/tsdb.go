@@ -11,8 +11,8 @@ import (
 )
 
 type Replier interface {
-	Put(string, vena.Time, []*tag, float64)
-	Quit()
+	Put(vena.Time, string, map[string]string, float64)
+	DieDieDie()
 }
 
 func listenTSDB(addr string, reply Replier) {
@@ -51,10 +51,10 @@ func listenTSDB(addr string, reply Replier) {
 						continue
 					}
 					switch p := cmd.(type) {
-					case quit:
-						reply.Quit()
+					case diediedie:
+						reply.DieDieDie()
 					case *put:
-						reply.Put(p.Metric, p.Time, p.Tags, p.Value)
+						reply.Put(p.Time, p.Metric, p.Tags, p.Value)
 					}
 				}
 			}()
@@ -62,17 +62,12 @@ func listenTSDB(addr string, reply Replier) {
 	}()
 }
 
-type quit struct{}
-
-type tag struct {
-	Name  string
-	Value string
-}
+type diediedie struct{}
 
 type put struct{
-	Metric string
 	Time   vena.Time
-	Tags   []*tag
+	Metric string
+	Tags   map[string]string
 	Value  float64
 }
 
@@ -83,7 +78,7 @@ func parse(l string) (interface{}, error) {
 		return nil, nil
 	}
 	if t[0] == "diediedie" {
-		return quit{}, nil
+		return diediedie{}, nil
 	}
 	if t[0] != "put" {
 		return nil, errors.New("unrecognized command")
@@ -106,12 +101,13 @@ func parse(l string) (interface{}, error) {
 	}
 	t = t[3:]
 	// Tags
+	a.Tags = make(map[string]string)
 	for _, tv := range t {
 		q := strings.SplitN(tv, ":", 2)
 		if len(q) != 2 {
 			return nil, errors.New("parse tag")
 		}
-		a.Tags = append(a.Tags, &tag{Name: q[0], Value: q[1]})
+		a.Tags[q[0]] = q[1]
 	}
 	return a, nil
 }

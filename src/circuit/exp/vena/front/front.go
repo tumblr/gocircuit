@@ -19,15 +19,10 @@ import (
 	"circuit/exp/vena/client"
 	"circuit/kit/sched/limiter"
 	"circuit/use/circuit"
-)
-
-var (
-	ErrMode      = circuit.NewError("write operation on read-only API")
+	"fmt"
 )
 
 type Front struct {
-	//http   *httpServer
-	//tsdb   *tsdbServer
 	client *client.Client
 	lmtr   limiter.Limiter
 }
@@ -44,53 +39,14 @@ func New(c *vena.Config, httpPort, tsdbPort int) *Front {
 		panic(err)
 	}
 	front.lmtr.Init(200)
-	/*
-	front.http, err = startHTTP(httpPort)
-	if err != nil {
-		panic(err)
-	}
-	front.tsdb, err = startTSDB(tsdbPort)
-	if err != nil {
-		panic(err)
-	}
-	*/
+	listenTSDB(fmt.Sprintf(":%d", tsdbPort), front)
 	return front
 }
 
-/*
-func (front *API) respondAdd(req []interface{}) []interface{} {
-	api.lmtr.Open()
-	defer api.lmtr.Close()
-
-	q := make([]client.AddRequest, len(req))
-	for i, a_ := range req {
-		a := a_.(*addRequest)
-		q[i].UpdateTime = a.change.Time
-		q[i].Key = a.Key()
-		q[i].Value = a.change.Value
-	}
-	r := api.client.AddBatch(q)
-	s := make([]interface{}, len(req))
-	for i, _ := range s {
-		s[i] = &response{Sum: r[i]}
-	}
-	return s
+func (front *Front) Put(time vena.Time, metric string, tags map[string]string, value float64) {
+	front.lmtr.Open()
+	defer front.lmtr.Close()
+	front.client.Put(time, metric, tags, value)
 }
 
-func (api *API) respondSum(req []interface{}) []interface{} {
-	api.lmtr.Open()
-	defer api.lmtr.Close()
-
-	q := make([]client.SumRequest, len(req))
-	for i, a_ := range req {
-		a := a_.(*sumRequest)
-		q[i].Key = a.Key()
-	}
-	r := api.client.SumBatch(q)
-	s := make([]interface{}, len(req))
-	for i, _ := range s {
-		s[i] = &response{Sum: r[i]}
-	}
-	return s
-}
-*/
+func (front *Front) DieDieDie() {}
