@@ -47,7 +47,7 @@ func (bec *BestEffortConn) Write(category, payload string) error {
 		return ErrRedialing
 	}
 
-	err := bec.conn.E(category, payload)
+	err := bec.conn.Write(category, payload)
 	if err != nil {
 		// If we are dealing with a network error, than spawn a redial
 		bec.conn = nil
@@ -65,7 +65,7 @@ func (bec *BestEffortConn) WriteMany(msgs ...Message) error {
 		return ErrRedialing
 	}
 
-	err := bec.conn.Emit(msgs...)
+	err := bec.conn.WriteMany(msgs...)
 	if err != nil {
 		// If we are dealing with a network error, than spawn a redial
 		bec.conn = nil

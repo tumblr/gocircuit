@@ -57,7 +57,7 @@ type Message struct {
 
 // Write sends a single message write request to the Scribe node.
 func (conn *Conn) Write(category, payload string) error {
-	return conn.Emit(Message{category, payload})
+	return conn.WriteMany(Message{category, payload})
 }
 
 // WriteMany sends a batch of multiple message write requests to the scribe node.
