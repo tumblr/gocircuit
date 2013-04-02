@@ -16,6 +16,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"strings"
@@ -164,10 +165,10 @@ func buildCircuit() {
 
 	// Prepare cgo environment for Zookeeper
 	// TODO: Add Zookeeper build step. Don't rely on a prebuilt one.
-	x.env.Set("CGO_CFLAGS", "-I" + x.zinclude + " " + x.cflags)
+	x.env.Set("CGO_CFLAGS", fmt.Sprintf(`"-I%s %s"`, x.zinclude, x.cflags))
 
 	// Static linking (not available in Go1.0.3, available later, in code.google.com/p/go changeset +4ad21a3b23a4, for example)
-	x.env.Set("CGO_LDFLAGS", path.Join(x.zlib, "libzookeeper_mt.a") + " " + x.ldflags)
+	x.env.Set("CGO_LDFLAGS", fmt.Sprintf(`"%s %s"`, path.Join(x.zlib, "libzookeeper_mt.a"), x.ldflags))
 	// Dynamic linking
 	// x.env.Set("CGO_LDFLAGS", x.zlib + " -lzookeeper_mt"))
 
