@@ -33,6 +33,7 @@ const build_sh_src = `{{.Tool}} ` +
 	`'-workerpkg={{.WorkerPkg}}' '-show={{.Show}}' '-go={{.GoRepo}}' '-rebuildgo={{.RebuildGo}}' ` +
 	`'-cmdpkgs={{range .CmdPkgs}}{{.}},{{end}}' ` +
 	`'-zinclude={{.ZookeeperInclude}}' '-zlib={{.ZookeeperLib}}' ` +
+	`'-CFLAGS={{.CFLAGS}}' '-LDFLAGS={{.LDFLAGS}}' ` +
 	`'-cir={{.CircuitRepo}}' '-cirsrc={{.CircuitSrc}}' '-prefixpath={{.PrefixPath}}' `
 
 func Build(cfg *config.BuildConfig) error {

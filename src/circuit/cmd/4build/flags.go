@@ -32,6 +32,8 @@ var (
 	flagCmdPkgs     = flag.String("cmdpkgs", "", "Comma-separated list of additional program packages to build")
 	flagZInclude    = flag.String("zinclude", "", "Zookeeper C headers directory")
 	flagZLib        = flag.String("zlib", "", "Zookeeper libraries directory")
+	flagCFLAGS      = flag.String("CFLAGS", "", "CGO_CFLAGS to use during app build")
+	flagLDFLAGS     = flag.String("LDFLAGS", "", "CGO_LDFLAGS to use during app build")
 	flagGoRepo      = flag.String("go", "{hg}{tip}https://code.google.com/p/go", "Go compiler repository")
 	flagCircuitRepo = flag.String("cir", "", "Circuit repository")
 	flagCircuitPath = flag.String("cirsrc", "/", "GOPATH relative to circuit repository")
@@ -53,6 +55,8 @@ type Flags struct {
 	GoRepo      string
 	ZInclude    string
 	ZLib        string
+	CFLAGS      string
+	LDFLAGS     string
 	CircuitRepo string
 	CircuitPath string
 	PrefixPath  string
@@ -96,6 +100,8 @@ func getFlags() *Flags {
 		RebuildGo:   *flagRebuildGo,
 		ZInclude:    strings.TrimSpace(*flagZInclude),
 		ZLib:        strings.TrimSpace(*flagZLib),
+		CFLAGS:      strings.TrimSpace(*flagCFLAGS),
+		LDFLAGS:     strings.TrimSpace(*flagLDFLAGS),
 		CircuitRepo: strings.TrimSpace(*flagCircuitRepo),
 		CircuitPath: strings.TrimSpace(*flagCircuitPath),
 		PrefixPath:  strings.TrimSpace(*flagPrefixPath),

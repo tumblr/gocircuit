@@ -21,14 +21,6 @@ import (
 	"strings"
 )
 
-/*
-	Build jail layout:
-		/flags
-		/go
-		/app/src
-		/circuit/src
-*/
-
 var x struct {
 	env       Env
 	jail      string
@@ -37,6 +29,8 @@ var x struct {
 	binary    string
 	zinclude  string
 	zlib      string
+	cflags    string
+	ldflags   string
 	goRoot    string
 	goBin     string
 	goCmd     string
@@ -65,6 +59,8 @@ func main() {
 	x.cmdPkgs = flags.CmdPkgs
 	x.zinclude = flags.ZInclude
 	x.zlib = flags.ZLib
+	x.cflags = flags.CFLAGS
+	x.ldflags = flags.LDFLAGS
 	x.goPath = make(map[string]string)
 
 	// Make jail if not present
@@ -168,10 +164,10 @@ func buildCircuit() {
 
 	// Prepare cgo environment for Zookeeper
 	// TODO: Add Zookeeper build step. Don't rely on a prebuilt one.
-	x.env.Set("CGO_CFLAGS", "-I"+x.zinclude)
+	x.env.Set("CGO_CFLAGS", "-I" + x.zinclude + " " + x.cflags)
 
 	// Static linking (not available in Go1.0.3, available later, in code.google.com/p/go changeset +4ad21a3b23a4, for example)
-	x.env.Set("CGO_LDFLAGS", path.Join(x.zlib, "libzookeeper_mt.a"))
+	x.env.Set("CGO_LDFLAGS", path.Join(x.zlib, "libzookeeper_mt.a") + " " + x.ldflags)
 	// Dynamic linking
 	// x.env.Set("CGO_LDFLAGS", x.zlib + " -lzookeeper_mt"))
 

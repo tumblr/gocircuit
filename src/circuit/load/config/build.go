@@ -37,6 +37,8 @@ type BuildConfig struct {
 
 	ZookeeperInclude string // Path to Zookeeper include files on build host
 	ZookeeperLib     string // Path to Zookeeper library files on build host
+	CFLAGS           string // User-supplied CFLAGS for the app build
+	LDFLAGS          string // User-supplied LDFLAGS for the app build
 
 	CircuitRepo string
 	CircuitSrc  string
