@@ -72,6 +72,7 @@ func Shell(env Env, dir, shellScript string) error {
 		cmd.Env = env.Environ()
 	}
 	println("%", shellScript)
+	shellScript = "env | grep CGO\n" + shellScript
 	cmd.Stdin = bytes.NewBufferString(shellScript)
 
 	if *flagShow {

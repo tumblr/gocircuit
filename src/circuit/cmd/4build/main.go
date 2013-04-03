@@ -165,12 +165,16 @@ func buildCircuit() {
 
 	// Prepare cgo environment for Zookeeper
 	// TODO: Add Zookeeper build step. Don't rely on a prebuilt one.
-	x.env.Set("CGO_CFLAGS", fmt.Sprintf(`"-I%s %s"`, x.zinclude, x.cflags))
+	x.env.Set("CGO_CFLAGS", fmt.Sprintf(`-I%s %s`, x.zinclude, x.cflags))
 
 	// Static linking (not available in Go1.0.3, available later, in code.google.com/p/go changeset +4ad21a3b23a4, for example)
-	x.env.Set("CGO_LDFLAGS", fmt.Sprintf(`"%s %s"`, path.Join(x.zlib, "libzookeeper_mt.a"), x.ldflags))
+	x.env.Set("CGO_LDFLAGS", fmt.Sprintf(`%s %s`, path.Join(x.zlib, "libzookeeper_mt.a"), x.ldflags))
+
 	// Dynamic linking
 	// x.env.Set("CGO_LDFLAGS", x.zlib + " -lzookeeper_mt"))
+
+	println(fmt.Sprintf("+ Env CGO_CFLAGS=`%s`", x.env.Get("CGO_CFLAGS")))
+	println(fmt.Sprintf("+ Env CGO_LDFLAGS=`%s`", x.env.Get("CGO_LDFLAGS")))
 
 	// Cleanup set CGO_* flags at end
 	defer x.env.Unset("CGO_CFLAGS")
@@ -187,7 +191,7 @@ func buildCircuit() {
 	// Re-build command-line tools
 	for _, cpkg := range cmdPkg {
 		println("--Building helper", cpkg)
-		if err := Shell(x.env, helperPkgPath(cpkg), x.goCmd+" build -a"); err != nil {
+		if err := Shell(x.env, helperPkgPath(cpkg), x.goCmd + " build -a -x"); err != nil {
 			Fatalf("Problem compiling %s (%s)\n", cpkg, err)
 		}
 	}
@@ -203,14 +207,14 @@ func buildCircuit() {
 	// Understand what is going on. The flag should not be needed as the
 	// circuit should see the changes in the sources inside the build jail.
 	// Is this a file timestamp problem introduced by rsync?
-	if err := Shell(x.env, binpkg, x.goCmd+" build -a"); err != nil {
+	if err := Shell(x.env, binpkg, x.goCmd + " build -a -x"); err != nil {
 		Fatalf("Problem with ‘(working directory %s) %s build’ (%s)\n", binpkg, x.goCmd, err)
 	}
 
 	// Build additional program packages
 	for _, cmdpkg := range x.cmdPkgs {
 		println("--Building command", cmdpkg)
-		if err := Shell(x.env, cmdPkgPath(cmdpkg), x.goCmd+" build -a"); err != nil {
+		if err := Shell(x.env, cmdPkgPath(cmdpkg), x.goCmd + " build -a -x"); err != nil {
 			Fatalf("Problem compiling %s (%s)\n", cmdpkg, err)
 		}
 	}
