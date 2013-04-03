@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// 4build automates the process of building a circuit application locally
+/*
+4build automates the process of building a circuit application locally.
+This tool is used internally by 4crossbuild.
+*/
 package main
 
 import (
