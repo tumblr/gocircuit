@@ -12,7 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// 4stk locates a worker through the anchor file system and prints its current stack trace
+/*
+
+4stk locates a worker through the anchor file system and prints its current stack trace.
+
+	% CIR=app.config 4stk {AnchorFile}
+
+Print out the stack trace of the worker that owns the anchor file.
+
+*/
 package main
 
 import (

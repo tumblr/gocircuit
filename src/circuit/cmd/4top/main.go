@@ -12,7 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// 4top displays real-time vitals (cpu, mem, io) of circuit deployments at various anchor granularities (file, directory, subtree)
+/*
+
+4top displays real-time vitals (cpu, mem, io) of circuit deployments at various anchor granularities (file, directory, subtree).
+
+	% CIR=app.config 4top {AnchorFile} | {AnchorDIR} | {AnchorDir}...
+
+Print out vitals for all workers captured by the anchor selector.
+
+*/
 package main
 
 import (

@@ -12,7 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// 4kill locates a circuit worker through the anchor file system and kills it
+/*
+
+4kill locates a circuit worker through the anchor file system and kills it.
+
+	% CIR=app.config 4kill {AnchorFile}
+
+Kill the individual worker that owns AnchorFile.
+
+	% CIR=app.config 4kill {AnchorDir}
+
+Kill all workers owning files in inside AnchorDir.
+
+	% CIR=app.config 4kill {AnchorDir/...}
+
+Kill all workers owning files descendant to AnchorDir.
+
+*/
 package main
 
 import (

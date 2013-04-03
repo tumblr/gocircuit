@@ -17,9 +17,12 @@
 
 Invocation:
 
-	% 4hardkill {WorkerID}? < host_list
+	% CIR=app.config 4hardkill {WorkerID}? < host_list
 
-??
+4hardkill expects a list of host names, separated by new lines, on its standard input.
+It logs into each host, using ssh, and kills workers pertaining to the contextual app.
+If WorkerID is specified, the tool will kill only the worker with that ID if present.
+Otherwise, it will kill all workers pertaining to the app.
 */
 package main
 

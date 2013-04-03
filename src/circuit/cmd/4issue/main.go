@@ -12,7 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// 4issue is a command-line interface to the sample issue notification system
+/*
+4issue is a command-line interface to the sample issue notification system.
+
+	% 4issue ls
+
+Lists current unresolved issues.
+
+	% 4issue resolve {IssueID}
+
+Marks the issue as resolved.
+
+	% 4issue subscribers
+
+List all emails subscribed to receive issue notifications.
+
+	% 4issue subscribe {Email}
+
+Subscribe the given email to receive new issue notifications.
+
+	% 4issue unsubscribe {Email}
+
+Unsubscribe the given email from issue notifications.
+
+*/
 package main
 
 import (

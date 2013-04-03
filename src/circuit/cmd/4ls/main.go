@@ -12,7 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// 4ls lists the contents of the anchor file system
+/*
+
+4ls lists the contents of the anchor file system.
+
+	% 4ls {AnchorDir}
+
+List the contents of the anchor directory.
+
+	% 4ls {AnchorDir}...
+
+List all descendants of the anchor directory.
+
+*/
 package main
 
 import (
