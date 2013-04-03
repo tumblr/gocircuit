@@ -12,7 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// 4clear deletes the jails of workers that are no longer alive, on a list of hosts specified one per-line on standard input
+/*
+4clear deletes the jails of workers that are no longer alive, on a list of hosts specified one per-line on standard input.
+
+??
+*/
 package main
 
 import (

@@ -12,7 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// 4deploy installs locally-available circuit binaries to a cluster of hosts supplied to standard input, one host per line
+/*
+4deploy installs locally-available circuit binaries to a cluster of hosts
+supplied to standard input, one host per line.
+
+Invokation:
+	
+	% CIR=app.config 4deploy < host_list
+
+4deploy expects an app configuration file name in the CIR environment variable.
+The deploy tool looks at the Deploy and Build sections of the config (so other
+sections need not be present).  From the Deploy section it determines where on
+the remote hosts to install the circuit application.  From the Build section it
+determines where to find the shipping directory on the local host, which holds
+the result of a preceding cross-build.
+
+The tool also reads a list of host names from standard input, one per line, and
+installs the app binaries to each given host in parallel.
+*/
 package main
 
 import (
