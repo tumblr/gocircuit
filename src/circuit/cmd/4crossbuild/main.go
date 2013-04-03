@@ -12,7 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// 4crossbuild automates the process of cross-building a circuit application remotely
+/*
+4crossbuild automates the process of cross-building a circuit application remotely.
+
+Invocation:
+
+	% CIR=app.config 4crossbuild [-show]
+
+4crossbuild considers the app configuration supplied and builds the circuit application
+on a remote build host, specified in app.config.
+
+When show is enabled, the standard error of all command execution involved in the remote build process are 
+forwarded to local standard error.
+*/
 package main
 
 import (

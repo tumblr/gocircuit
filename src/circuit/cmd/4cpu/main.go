@@ -12,7 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// 4cpu causes a running worker to start CPU profiling for a specified interval, after which it writes the pprof file locally
+/*
+4cpu causes a running worker to start CPU profiling for a specified interval, after which it writes the pprof file locally.
+
+Invocation:
+	% CIR=app.config 4cpu {AnchorPath} {DurationSec}
+
+AnchorPath specifies a worker file in the nchor file system. DurationSec specifies a time duration in seconds.
+
+The tool contacts the desired worker, dynamically enables CPU profiling for the
+desired duration, and eventually printsout the corresponding pprof file to its
+standard output. Typically, the user will redirect the profilig information to
+a file which can be used in conjunction with the GNU profiling toolchain.
+
+*/
 package main
 
 import (

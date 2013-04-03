@@ -12,7 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// 4hardkill kills worker processes on a given host using out-of-band UNIX-level facilities
+/*
+4hardkill kills worker processes on a given host using out-of-band UNIX-level facilities.
+
+Invocation:
+
+	% 4hardkill {WorkerID}? < host_list
+
+??
+*/
 package main
 
 import (

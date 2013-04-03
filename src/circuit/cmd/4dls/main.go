@@ -12,7 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// 4dls lists the contents of the durable file system
+/*
+4dls lists the contents of the durable file system.
+
+Invocation:
+
+	% CIR=app.config 4dls {PathQuery}
+
+Here PathQuery is either a directory path or a directory path with a follow on ellipsis, for instnce: 
+/myapp or /myapp/...
+
+In the former case, the tool lists all files in the durable file system residing in directory /myapp.
+In the latter case, the tool lists all files descendant to the given directory in the durable file system.
+*/
 package main
 
 import (

@@ -16,7 +16,7 @@
 4deploy installs locally-available circuit binaries to a cluster of hosts
 supplied to standard input, one host per line.
 
-Invokation:
+Invocation:
 	
 	% CIR=app.config 4deploy < host_list
 

@@ -15,7 +15,15 @@
 /*
 4clear deletes the jails of workers that are no longer alive, on a list of hosts specified one per-line on standard input.
 
-??
+Invocation:
+
+	% CIR=app.config 4clear < host_list
+
+4clear considers the Deploy section from the app configuration, in order to determine the installation directory of the 
+contextual circtuit application on remote hosts.
+
+The tool expects a list of host names, separated by new line, on its standard input.
+Dead worker jails from all requested hosts are deleted in parallel.
 */
 package main
 
