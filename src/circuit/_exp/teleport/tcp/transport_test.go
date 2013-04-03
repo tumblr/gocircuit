@@ -15,11 +15,11 @@
 package tcp
 
 import (
-	"net/http"
-	"testing"
 	x "circuit/exp/teleport"
 	_ "circuit/kit/debug/http/trace"
+	"net/http"
 	"sync"
+	"testing"
 )
 
 func init() {

@@ -82,7 +82,7 @@ type Listener interface {
 
 	// Close closes the listening device.
 	Close()
-	
+
 	// Addr returns the address of this endpoint.
 	Addr() Addr
 }

@@ -61,12 +61,12 @@ func (x *SlidingMoment) Slot(t time.Time) *Moment {
 // Slots returns a slice of moment sketches, ordered from most recent to least recent.
 func (x *SlidingMoment) Slots() ([]*Moment, time.Time) {
 	result := make([]*Moment, len(x.slots))
-	j := int(x.head % int64(len(x.slots))) + len(x.slots)
+	j := int(x.head%int64(len(x.slots))) + len(x.slots)
 	for i := 0; i < len(result); i++ {
 		result[i] = &x.slots[j%len(x.slots)]
 		j--
 	}
-	return result, time.Unix(0, x.head * x.slotdur)
+	return result, time.Unix(0, x.head*x.slotdur)
 }
 
 // spin rotates the circular slot buffer forward to ensure that the requested

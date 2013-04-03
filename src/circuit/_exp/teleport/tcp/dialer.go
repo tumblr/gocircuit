@@ -15,8 +15,8 @@
 package tcp
 
 import (
-	"sync"
 	x "circuit/exp/teleport"
+	"sync"
 )
 
 type Dialer struct {

@@ -62,6 +62,7 @@ func readAsMain() {
 	// If CIR is set, it points to a single file that contains all three configuration structures in JSON format.
 	cir := os.Getenv("CIR")
 	if cir == "" {
+		println("* CIR environment is empty. Are you forgetting something?")
 		// Otherwise, each one is parsed independently
 		parseZookeeper()
 		parseInstall()

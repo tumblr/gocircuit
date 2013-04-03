@@ -23,7 +23,7 @@ type X interface {
 	// Call invokes the method named proc of the actual object (possibly
 	// living remotely) underlying the cross-interface. The invokation
 	// arguments are take from in, and the returned values are placed in
-	// the returned slice. 
+	// the returned slice.
 	//
 	// Errors can only occur as a result of physical/external circumstances
 	// that impede cross-worker communication. Such errors are returned in

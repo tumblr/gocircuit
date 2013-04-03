@@ -40,7 +40,7 @@ type FS interface {
 	// Stat returns file meta-information or error
 	Stat(name string) (os.FileInfo, error)
 
-	// Mkdir makes a new directory 
+	// Mkdir makes a new directory
 	Mkdir(name string) error
 
 	// Mkdir makes a new directory recursively, if necessary

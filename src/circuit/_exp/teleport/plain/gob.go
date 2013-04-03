@@ -15,9 +15,9 @@
 package plain
 
 import (
+	x "circuit/exp/teleport"
 	"encoding/gob"
 	"io"
-	x "circuit/exp/teleport"
 )
 
 type ReadWriter interface {

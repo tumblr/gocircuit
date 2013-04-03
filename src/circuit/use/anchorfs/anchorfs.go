@@ -45,7 +45,7 @@ type Dir interface {
 	Dirs() ([]string, error)
 
 	// Files returns a the workers who have created files in this directory and their respective files.
-	// Files also returns a revision number of the directory contents. 
+	// Files also returns a revision number of the directory contents.
 	Files() (rev int64, workers map[circuit.WorkerID]File, err error)
 
 	// Change blocks until the contents of this directory changes relative to its contents at revision sinceRev.
@@ -58,7 +58,7 @@ type Dir interface {
 	// OpenFile opens the file, registered by the given worker ID, if it exists
 	OpenFile(circuit.WorkerID) (File, error)
 
-	// OpenDir opens a subdirectory 
+	// OpenDir opens a subdirectory
 	OpenDir(string) (Dir, error)
 }
 

@@ -15,30 +15,30 @@
 package tcp
 
 import (
+	x "circuit/exp/teleport"
 	"encoding/gob"
 	"net"
 	"sync"
 	"time"
-	x "circuit/exp/teleport"
 )
 
 type autoDialMsg struct {
 	ID linkID
 }
 
-type autoAcceptMsg struct {}
+type autoAcceptMsg struct{}
 
 func init() {
 	gob.Register(&autoDialMsg{})
 	gob.Register(&autoAcceptMsg{})
 }
 
-// autoDialConn is a ReadWriteCloser on top of a TCP connection. 
+// autoDialConn is a ReadWriteCloser on top of a TCP connection.
 type autoDialConn struct {
-	id      linkID
-	addr    x.Addr
+	id   linkID
+	addr x.Addr
 	sync.Mutex
-	tcpaddr *net.TCPAddr	// Cache resolved TCP address for resilience against DNS down
+	tcpaddr *net.TCPAddr // Cache resolved TCP address for resilience against DNS down
 	under   *gobConn
 }
 
@@ -69,12 +69,13 @@ func (l *autoDialConn) link() *gobConn {
 }
 
 func (l *autoDialConn) redial() *gobConn {
-	for l.dial() != nil {}
+	for l.dial() != nil {
+	}
 	return l.under
 }
 
 func (l *autoDialConn) dial() error {
-	time.Sleep(time.Second)	// Prevents redials going out of control
+	time.Sleep(time.Second) // Prevents redials going out of control
 	var err error
 	if l.tcpaddr == nil {
 		if l.tcpaddr, err = net.ResolveTCPAddr("tcp", string(l.addr)); err != nil {
@@ -142,7 +143,7 @@ type autoAcceptConn struct {
 	dialerID linkID
 	accept   chan *gobConn
 	sync.Mutex
-	under    *gobConn
+	under *gobConn
 }
 
 func newAutoAcceptConn(dialerID linkID, under *gobConn) *autoAcceptConn {

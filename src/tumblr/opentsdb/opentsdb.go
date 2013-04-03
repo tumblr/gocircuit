@@ -107,7 +107,7 @@ func (c *Conn) Put(metric string, value interface{}, tags ...Tag) error {
 	w.WriteString(metric)
 	w.WriteByte(' ')
 
-	w.WriteString(strconv.FormatInt(time.Now().UnixNano() / 1e9, 10))
+	w.WriteString(strconv.FormatInt(time.Now().UnixNano()/1e9, 10))
 	w.WriteByte(' ')
 
 	w.WriteString(fmt.Sprintf("%v ", value))

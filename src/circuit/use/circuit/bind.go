@@ -70,11 +70,11 @@ func setBoot(v interface{}) {
 	get().SetBoot(v)
 }
 
-// Spawn starts a new worker process on host. 
+// Spawn starts a new worker process on host.
 // The worker is registered under all directories in the anchor file system named by anchor.
-// The worker function fn, whose type must have previously been registered with RegisterFunc, 
+// The worker function fn, whose type must have previously been registered with RegisterFunc,
 // is executed on the newly spawned worker with arguments given by in.
-// Spawn blocks until the execution of fn completes. 
+// Spawn blocks until the execution of fn completes.
 // Spawn returns the return values of fn's invokation in the slice retrn.
 // The types of the elements of retrn exactly match the declared return types of fn's singleton public method.
 // Spawn also returns the address of the spawned worker in addr.
@@ -98,7 +98,7 @@ func Kill(addr Addr) error {
 }
 
 // Dial contacts the worker specified by addr and requests a cross-worker
-// interface to the named service. 
+// interface to the named service.
 // If service is not being listened to at this worker, nil is returned.
 // Failures to contact the worker for external/physical reasons result in a
 // panic.

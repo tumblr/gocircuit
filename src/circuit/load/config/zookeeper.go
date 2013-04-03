@@ -74,13 +74,17 @@ func parseZookeeper() {
 
 	// Otherwise, parse Zookeeper config out of a file
 	ifile := os.Getenv("CIR_ZOOKEEPER")
+	if ifile == "" {
+		fmt.Fprintf(os.Stderr, "Cannot find circuit zookeeper configuration.\n")
+		os.Exit(1)
+	}
 	data, err := ioutil.ReadFile(ifile)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Problem reading install file (%s)", err)
+		fmt.Fprintf(os.Stderr, "problem reading app configuration file (%s)\n", err)
 		os.Exit(1)
 	}
 	if err := json.Unmarshal(data, Config.Deploy); err != nil {
-		fmt.Fprintf(os.Stderr, "Problem parsing install file (%s)", err)
+		fmt.Fprintf(os.Stderr, "problem parsing app configuration file (%s)\n", err)
 		os.Exit(1)
 	}
 }

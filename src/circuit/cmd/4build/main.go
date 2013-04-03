@@ -191,7 +191,7 @@ func buildCircuit() {
 	// Re-build command-line tools
 	for _, cpkg := range cmdPkg {
 		println("--Building helper", cpkg)
-		if err := Shell(x.env, helperPkgPath(cpkg), x.goCmd + " build -a -x"); err != nil {
+		if err := Shell(x.env, helperPkgPath(cpkg), x.goCmd+" build -a -x"); err != nil {
 			Fatalf("Problem compiling %s (%s)\n", cpkg, err)
 		}
 	}
@@ -207,14 +207,14 @@ func buildCircuit() {
 	// Understand what is going on. The flag should not be needed as the
 	// circuit should see the changes in the sources inside the build jail.
 	// Is this a file timestamp problem introduced by rsync?
-	if err := Shell(x.env, binpkg, x.goCmd + " build -a -x"); err != nil {
+	if err := Shell(x.env, binpkg, x.goCmd+" build -a -x"); err != nil {
 		Fatalf("Problem with ‘(working directory %s) %s build’ (%s)\n", binpkg, x.goCmd, err)
 	}
 
 	// Build additional program packages
 	for _, cmdpkg := range x.cmdPkgs {
 		println("--Building command", cmdpkg)
-		if err := Shell(x.env, cmdPkgPath(cmdpkg), x.goCmd + " build -a -x"); err != nil {
+		if err := Shell(x.env, cmdPkgPath(cmdpkg), x.goCmd+" build -a -x"); err != nil {
 			Fatalf("Problem compiling %s (%s)\n", cmdpkg, err)
 		}
 	}

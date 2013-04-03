@@ -16,9 +16,9 @@
 package plain
 
 import (
+	x "circuit/exp/teleport"
 	"net"
 	"time"
-	x "circuit/exp/teleport"
 )
 
 // Listener

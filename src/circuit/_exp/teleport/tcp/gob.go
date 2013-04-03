@@ -15,10 +15,10 @@
 package tcp
 
 import (
+	x "circuit/exp/teleport"
 	"encoding/gob"
 	"io"
 	"net"
-	x "circuit/exp/teleport"
 )
 
 type ReadWriter interface {

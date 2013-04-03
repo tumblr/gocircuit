@@ -23,19 +23,19 @@ import (
 type FileInfo struct {
 
 	// XName is the absolute name of the file.
-	XName    string
+	XName string
 
 	// XSize is the file size in bytes.
-	XSize    int64
+	XSize int64
 
 	// XMode is the file mode.
-	XMode    os.FileMode
+	XMode os.FileMode
 
 	// XModTime is the time when the file was modified last.
 	XModTime time.Time
 
 	// XIsDir indicates if this file is a directory.
-	XIsDir   bool
+	XIsDir bool
 }
 
 // Name returns the absolute name of this file

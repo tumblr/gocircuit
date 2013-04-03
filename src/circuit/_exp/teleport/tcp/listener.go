@@ -16,11 +16,11 @@
 package tcp
 
 import (
+	x "circuit/exp/teleport"
 	"circuit/kit/sched/limiter"
 	"net"
 	"strings"
 	"sync"
-	x "circuit/exp/teleport"
 )
 
 type Listener struct {
@@ -67,21 +67,21 @@ func (t *Listener) accept(c *net.TCPConn) {
 	g := newGobConn(c)
 
 	/*
-	XXX: Maybe this handshake should be in auto, where the other side of it is
-	dmsg_, err := g.Read()
-	if err != nil {
-		g.Close()
-		return
-	}
-	dmsg, ok := dmsg_.(*autoDialMsg)
-	if !ok {
-		g.Close()
-		return
-	}
-	if err := g.Write(&autoAcceptMsg{}); err != nil {
-		g.Close()
-		return
-	}
+		XXX: Maybe this handshake should be in auto, where the other side of it is
+		dmsg_, err := g.Read()
+		if err != nil {
+			g.Close()
+			return
+		}
+		dmsg, ok := dmsg_.(*autoDialMsg)
+		if !ok {
+			g.Close()
+			return
+		}
+		if err := g.Write(&autoAcceptMsg{}); err != nil {
+			g.Close()
+			return
+		}
 	*/
 
 	addr := x.Addr(c.RemoteAddr().String())
@@ -96,7 +96,7 @@ func (t *Listener) accept(c *net.TCPConn) {
 	}
 }
 
-type listenerBroker struct{
+type listenerBroker struct {
 	*Listener
 }
 

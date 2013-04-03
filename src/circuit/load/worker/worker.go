@@ -16,8 +16,8 @@
 package worker
 
 import (
-	_ "circuit/load"
 	_ "circuit/kit/debug/kill"
+	_ "circuit/load"
 )
 
 func init() {

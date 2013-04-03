@@ -31,7 +31,7 @@ func (x *TimeSampler) Init() {
 	x.t0 = nil
 }
 
-// Start initiates a new measurement. 
+// Start initiates a new measurement.
 func (x *TimeSampler) Start() {
 	if x.t0 != nil {
 		panic("previous sample not completed")

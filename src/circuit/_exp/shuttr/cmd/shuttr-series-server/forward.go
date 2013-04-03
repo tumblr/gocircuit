@@ -16,8 +16,8 @@ package main
 
 import (
 	"circuit/exp/shuttr/proto"
-	"circuit/exp/shuttr/shard"
 	"circuit/exp/shuttr/series"
+	"circuit/exp/shuttr/shard"
 	"circuit/exp/shuttr/x"
 	"errors"
 	"fmt"

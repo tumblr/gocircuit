@@ -15,9 +15,9 @@
 package tcp
 
 import (
+	x "circuit/exp/teleport"
 	"math/rand"
 	"sync"
-	x "circuit/exp/teleport"
 )
 
 // Within a physical connection, the connID distinguishes a unique logical session
@@ -36,14 +36,14 @@ type conn struct {
 	id     connID
 	scrb   func()
 	//
-	ulk    sync.Mutex
-	under  ReadWriteCloser
+	ulk   sync.Mutex
+	under ReadWriteCloser
 	//
-	chlk   sync.Mutex
-	ch     chan interface{} // link.readLoop send msgs for this conn to ch
+	chlk sync.Mutex
+	ch   chan interface{} // link.readLoop send msgs for this conn to ch
 	//
-	shlk   sync.Mutex
-	shook  bool
+	shlk  sync.Mutex
+	shook bool
 }
 
 const ConnReadBufferLen = 100

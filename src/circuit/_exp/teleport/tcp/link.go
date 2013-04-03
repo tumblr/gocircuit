@@ -15,10 +15,10 @@
 package tcp
 
 import (
+	x "circuit/exp/teleport"
 	"encoding/gob"
 	"math/rand"
 	"sync"
-	x "circuit/exp/teleport"
 )
 
 type linkID int64
@@ -46,7 +46,7 @@ type link struct {
 	id     linkID
 	addr   x.Addr
 	broker broker
-	under    ReadWriteCloser
+	under  ReadWriteCloser
 	//under  *permConn
 	//dial   *autoDialConn
 	//accept *autoAcceptConn
@@ -61,9 +61,9 @@ type broker interface {
 func newDialLink(addr x.Addr) *link {
 	//a, id := newAutoDialConn(addr)
 	l := &link{
-		id:    chooseLinkID(),
-		addr:  addr,
-		open:  make(map[connID]*conn),
+		id:   chooseLinkID(),
+		addr: addr,
+		open: make(map[connID]*conn),
 		// dial:  a,
 		// under: newPermConn(a),
 		under: newGobConn(mustDial(addr)),
@@ -82,7 +82,7 @@ func newAcceptLink(addr x.Addr, id linkID, g *gobConn, broker broker) *link {
 		open:   make(map[connID]*conn),
 		// accept: a,
 		// under:  newPermConn(a),
-		under:  g,
+		under: g,
 	}
 	go l.readLoop()
 	return l
@@ -138,11 +138,11 @@ func (l *link) readLoop() {
 		switch msg := m.(type) {
 		case *linkOpenMsg:
 			/*
-			if l.accept == nil {
-				// If this is dial-link, incoming connections are in error
-				println("dropping; this is not an accepting link")
-				continue
-			}
+				if l.accept == nil {
+					// If this is dial-link, incoming connections are in error
+					println("dropping; this is not an accepting link")
+					continue
+				}
 			*/
 			if err = l.reserveID(msg.ID); err != nil {
 				// Connection with colliding ID a protocol violation and
