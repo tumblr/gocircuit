@@ -1,4 +1,4 @@
-// Copyright 2012 Tumblr, Inc.
+// Copyright 2013 Tumblr, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 package zdurablefs
 
 import (
-	"circuit/kit/zookeeper"
+	zookeeper "launchpad.net/gozk"
 	"circuit/kit/zookeeper/zutil"
 	"circuit/use/durablefs"
 	"path"

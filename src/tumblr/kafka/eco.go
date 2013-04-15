@@ -1,4 +1,4 @@
-// Copyright 2012 Tumblr, Inc.
+// Copyright 2013 Tumblr, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"circuit/kit/zookeeper"
+	zookeeper "launchpad.net/gozk"
 	zutil "circuit/kit/zookeeper/util"
 )
 
