@@ -1,4 +1,4 @@
-// Copyright 2013 Tumblr, Inc.
+// Copyright 2012 Tumblr, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,12 +23,12 @@ import (
 
 func TestSpeed(t *testing.T) {
 	freq := &Request{
-		HostPort:      "",
-		Username:      "",
-		Password:      "",
-		ApplicationID: "",
-		ClientID:      "",
-		Offset:        "",
+		HostPort:      "", // Firehose host and port
+		Username:      "", // Your username
+		Password:      "", // Your password
+		ApplicationID: "", // Your application ID
+		ClientID:      "", // Your client ID
+		Offset:        "", // Your offset
 	}
 
 	conns := make([]*Conn, 2)

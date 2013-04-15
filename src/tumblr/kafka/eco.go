@@ -1,4 +1,4 @@
-// Copyright 2013 Tumblr, Inc.
+// Copyright 2012 Tumblr, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"tumblr/zookeeper"
-	zutil "tumblr/zookeeper/util"
+	"circuit/kit/zookeeper"
+	zutil "circuit/kit/zookeeper/util"
 )
 
 // Ecosystem maintains a real-time record of the current Kafka broker

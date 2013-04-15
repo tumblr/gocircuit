@@ -1,4 +1,4 @@
-// Copyright 2013 Tumblr, Inc.
+// Copyright 2012 Tumblr, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ func TestLowLevel(t *testing.T) {
 }
 
 func TestSetGet(t *testing.T) {
-	c, err := Dial("")
+	c, err := Dial("test.datacenter.net:7000")
 	if err != nil {
 		fmt.Printf("err (%s)\n", err)
 		return

@@ -1,4 +1,4 @@
-// Copyright 2013 Tumblr, Inc.
+// Copyright 2012 Tumblr, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,21 +20,12 @@ import (
 )
 
 var testFreq = &Request{
-	HostPort:      "",
-	Username:      "",
-	Password:      "",
-	ApplicationID: "",
-	ClientID:      "",
-	Offset:        "",
-}
-
-var testPrivFreq = &Request{
-	HostPort:      "",
-	Username:      "",
-	Password:      "",
-	ApplicationID: "",
-	ClientID:      "",
-	Offset:        "",
+	HostPort:      "", // Firehose host and port
+	Username:      "", // Your username
+	Password:      "", // Your password
+	ApplicationID: "", // Your application ID
+	ClientID:      "", // Your client ID
+	Offset:        "", // Your offset
 }
 
 func validateRaw(s string) {
@@ -95,15 +86,10 @@ func TestReadEvent(t *testing.T) {
 		if ev, err := conn.Read(); err != nil {
 			t.Errorf("read (%s)", err)
 		} else {
-			//fmt.Printf("PrivateData: %#v\n", ev.PrivateData)
-			//fmt.Printf("a=%s\n", ev.Activity.String())
 			if ev.Post != nil {
 				if ev.Post.BlogID == 0 {
 					fmt.Printf("WOA\n")
 				}
-				//fmt.Printf("BlogID: %#v\n", ev.Post.BlogID)
-				//fmt.Printf("BlogName=%s\n", ev.Post.BlogName)
-				//fmt.Printf("Tags=%#v\n", ev.Post.Tags)
 			}
 		}
 	}
