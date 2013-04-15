@@ -16,7 +16,7 @@ package util
 
 import (
 	"sync"
-	"github.com/jmhodges/levigo"
+	"github.com/petar/levigo"
 )
 
 type Server struct {
