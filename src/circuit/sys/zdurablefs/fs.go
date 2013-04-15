@@ -16,7 +16,7 @@
 package zdurablefs
 
 import (
-	zookeeper "launchpad.net/gozk"
+	zookeeper "github.com/petar/gozk"
 	"circuit/use/circuit"
 	"path"
 )

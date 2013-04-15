@@ -22,7 +22,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	zookeeper "launchpad.net/gozk"
+	zookeeper "github.com/petar/gozk"
 	zutil "circuit/kit/zookeeper/util"
 )
 

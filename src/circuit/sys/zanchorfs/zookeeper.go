@@ -15,7 +15,7 @@
 package zanchorfs
 
 import (
-	zookeeper "launchpad.net/gozk"
+	zookeeper "github.com/petar/gozk"
 	"circuit/kit/zookeeper/zutil"
 )
 

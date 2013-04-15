@@ -16,7 +16,7 @@
 package zutil
 
 import (
-	zookeeper "launchpad.net/gozk"
+	zookeeper "github.com/petar/gozk"
 	"errors"
 	"path"
 	"strings"

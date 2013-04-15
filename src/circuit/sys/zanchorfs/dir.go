@@ -16,7 +16,7 @@ package zanchorfs
 
 import (
 	"bytes"
-	zookeeper "launchpad.net/gozk"
+	zookeeper "github.com/petar/gozk"
 	"circuit/kit/zookeeper/zutil"
 	"circuit/use/anchorfs"
 	"circuit/use/circuit"
