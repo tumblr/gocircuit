@@ -31,7 +31,7 @@ syntactically identical to Go while also:
 * Treating local and remote goroutines in the same manner, both syntactically and semantically.
 
 As a result, distributed application code becomes orders of magnitude shorter,
-as compared to using traditional alternatives. For isntance, we have been able
+as compared to using traditional alternatives. For instance, we have been able
 to write large real-world cloud applications — e.g. streaming multi-stage
 MapReduce pipelines — in as many as 200 lines of code _from the ground up_.
 
